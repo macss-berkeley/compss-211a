@@ -1,0 +1,5 @@
+{
+  "project": "dlab-demo",
+  "version": "1.0",
+  "features": ["ingest", "clean", "analyze"]
+}

@@ -1,0 +1,4 @@
+2024-01-02 08:00:00 [INFO] job queued id=42
+2024-02-10 12:30:05 [WARN] retrying request attempt=1
+2024-05-14 17:11:55 [ERROR] database connection lost
+2024-05-14 17:12:02 [info] reconnection succeeded

@@ -1,0 +1,13 @@
+beautifulsoup4>=4.13.5,<5
+datasets>=4.0.0,<5
+nltk>=3.8,<4
+pandas>=2.2,<3
+requests>=2.32,<3
+scikit-learn>=1.5,<2
+seaborn>=0.13,<1
+spacy>=3.8,<4
+transformers>=4.43,<5
+trafilatura>=2.0.0,<3
+pymupdf>=1.26.4,<2
+gensim>=4.3,<5
+bertopic>=0.17.3,<1

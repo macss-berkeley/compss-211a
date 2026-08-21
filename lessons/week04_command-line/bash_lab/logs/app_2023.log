@@ -1,0 +1,4 @@
+2023-11-21 10:15:03 [INFO] startup complete
+2023-11-21 10:16:10 [warn] cache miss for key=abc123
+2023-11-22 09:01:44 [INFO] user login u001
+2023-12-01 18:44:10 [Error] failed to open file: missing.csv

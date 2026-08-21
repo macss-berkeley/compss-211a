@@ -1,0 +1,10 @@
+.ipynb_checkpoints
+.DS_Store
+.claude
+.virtual_documents/
+.github/
+.env
+.vscode/
+wandb/
+*.wandb
+/course-planning
