@@ -1,0 +1,4 @@
+# Additions not supplied by the Google Colab 2026.07 runtime.
+# Run this file only when a notebook uses web-text or PDF extraction.
+pymupdf==1.28.2
+trafilatura==2.2.0

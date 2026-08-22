@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service_requests dataset="Fictional Berkeley Methods Studio service requests" record_count="5">
+  <service_request>
+    <request_id>000101</request_id>
+    <opened_at>2026-09-28T09:15:00-07:00</opened_at>
+    <request_type>Crosswalk Signal</request_type>
+    <status>open</status>
+    <district_code>NA</district_code>
+    <latitude>37.8715</latitude>
+    <longitude>-122.2585</longitude>
+    <note>Button reports no response</note>
+  </service_request>
+  <service_request>
+    <request_id>000102</request_id>
+    <opened_at>2026-09-28T10:40:00-07:00</opened_at>
+    <request_type>Lighting</request_type>
+    <status>closed</status>
+    <district_code>SA</district_code>
+    <latitude>37.8671</latitude>
+    <longitude>-122.2550</longitude>
+    <note>Lamp near path is dark</note>
+  </service_request>
+  <service_request>
+    <request_id>000103</request_id>
+    <opened_at>2026-09-29T08:05:00-07:00</opened_at>
+    <request_type>Wayfinding</request_type>
+    <status>open</status>
+    <district_code>WA</district_code>
+    <latitude>37.8702</latitude>
+    <longitude />
+    <note>Directional sign is difficult to read</note>
+  </service_request>
+  <service_request>
+    <request_id>000104</request_id>
+    <opened_at>2026-09-29T14:20:00-07:00</opened_at>
+    <request_type>Bike Parking</request_type>
+    <status>pending</status>
+    <district_code>NA</district_code>
+    <latitude>37.8727</latitude>
+    <longitude>-122.2660</longitude>
+    <note>Rack is full after 10 a.m.</note>
+  </service_request>
+  <service_request>
+    <request_id>000105</request_id>
+    <opened_at>2026-09-30T11:55:00-07:00</opened_at>
+    <request_type>Sidewalk</request_type>
+    <status>closed</status>
+    <district_code>SA</district_code>
+    <latitude>37.8659</latitude>
+    <longitude>-122.2521</longitude>
+    <note>Uneven surface near entrance</note>
+  </service_request>
+</service_requests>

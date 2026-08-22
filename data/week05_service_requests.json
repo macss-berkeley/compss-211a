@@ -1,0 +1,63 @@
+{
+  "metadata": {
+    "dataset": "Fictional Berkeley Methods Studio service requests",
+    "record_count": 5,
+    "district_codes": {
+      "NA": "North Area",
+      "SA": "South Area",
+      "WA": "West Area"
+    }
+  },
+  "records": [
+    {
+      "request_id": "000101",
+      "opened_at": "2026-09-28T09:15:00-07:00",
+      "request_type": "Crosswalk Signal",
+      "status": "open",
+      "district_code": "NA",
+      "latitude": 37.8715,
+      "longitude": -122.2585,
+      "note": "Button reports no response"
+    },
+    {
+      "request_id": "000102",
+      "opened_at": "2026-09-28T10:40:00-07:00",
+      "request_type": "Lighting",
+      "status": "closed",
+      "district_code": "SA",
+      "latitude": 37.8671,
+      "longitude": -122.255,
+      "note": "Lamp near path is dark"
+    },
+    {
+      "request_id": "000103",
+      "opened_at": "2026-09-29T08:05:00-07:00",
+      "request_type": "Wayfinding",
+      "status": "open",
+      "district_code": "WA",
+      "latitude": 37.8702,
+      "longitude": null,
+      "note": "Directional sign is difficult to read"
+    },
+    {
+      "request_id": "000104",
+      "opened_at": "2026-09-29T14:20:00-07:00",
+      "request_type": "Bicycle Parking",
+      "status": "pending",
+      "district_code": "NA",
+      "latitude": 37.8727,
+      "longitude": -122.266,
+      "note": "Rack is full after 10 a.m."
+    },
+    {
+      "request_id": "000105",
+      "opened_at": "2026-09-30T11:55:00-07:00",
+      "request_type": "Sidewalk",
+      "status": "closed",
+      "district_code": "SA",
+      "latitude": 37.8659,
+      "longitude": -122.2521,
+      "note": "Uneven surface near entrance"
+    }
+  ]
+}
