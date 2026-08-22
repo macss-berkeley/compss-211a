@@ -1,53 +1,68 @@
-# COMPSS-211A
+# COMPSS 211A
 
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
-This repository contains the materials for COMPSS 211A: Computing I, a hands-on course in computational social science. The course develops practical skills for collecting, managing, analyzing, and communicating social and textual data, with an emphasis on reproducible workflows and responsible use of AI.
+This repository contains the materials for COMPSS 211A: Computing I. The course is for master's students in computational social science, and it is built around the work you will actually need to do: manage files, write and debug Python, collect data, analyze text, collaborate through Git, and explain what your results do and do not show.
 
-Key topics include:
+During the semester, you will:
 
-* Python and Pandas: Working with core Python objects, functions, tabular data, debugging, and reproducible data analysis.
-* Version Control and Local Computing: Using Git and GitHub for version control and collaboration, and the command line for navigating files, running scripts, and managing computing workflows.
-* Structured Data and Web APIs: Working with CSV, TSV, JSON, and XML; acquiring data through APIs; and handling authentication, pagination, rate limits, privacy, and data-quality limitations.
-* Natural Language Processing: Cleaning and tokenizing text, constructing bag-of-words and TF-IDF representations, creating lightweight document embeddings, and using clustering and classification methods while critically evaluating interpretation and bias.
-* LLMs and Agentic Workflows: Using large language models and AI coding tools for bounded research and programming tasks, while validating structured outputs, debugging generated code, protecting credentials, tracking costs, and documenting limitations.
-* Cloud Computing: Using hosted environments and APIs, including Google Colab and Gemini, to run models and build reproducible cloud-based workflows.
+- use Python and Pandas to work with tabular data;
+- use Git, GitHub, and the command line to keep projects organized and reviewable;
+- compare CSV, TSV, JSON, and XML data, then collect records through web APIs;
+- clean and represent text with counts, TF-IDF, and lightweight document embeddings;
+- test AI-generated code and evaluate LLM output against simpler methods;
+- move selected workflows between local Jupyter, Google Colab, and cloud APIs.
 
-Throughout the course, students apply these methods to computational social science problems using real and synthetic datasets. The course culminates in a team-based project in which students formulate a social science question, work with a textual dataset, conduct a reproducible analysis, interpret their findings, and communicate the results through code, a written report, and a presentation.
+Some exercises use public snapshots; others use synthetic data written for class. Either way, a result is only as good as its source, checks, and interpretation. You are expected to understand submitted code, document AI assistance, keep credentials out of notebooks, and remain accountable for every claim.
 
-A central theme of the course is responsible computing in the age of AI: students are expected to understand and verify their code and model outputs, document AI assistance, protect sensitive information and credentials, and remain accountable for every result they submit.
+The course ends with a team project based on a text dataset. Your team will pose a social-science question, build a reproducible analysis, inspect errors and limitations, and present the result through code, a report, and a short talk.
 
-# Local Setup
-Anaconda is a useful package management software that allows you to run Python and Jupyter notebooks easily. Installing Anaconda allows you to run the materials for this workshop on your local machine. If you would like to run Python on your own computer, complete the following steps prior to the workshop:
+## Local setup
 
-1. [Download and install Anaconda](https://www.anaconda.com/products/individual). Click the "Download" button.
+The supported local runtime is **Python 3.12.13** in the `compss211` Conda environment. Install [Miniconda](https://docs.conda.io/projects/miniconda/en/latest/) or Anaconda, then open a terminal and run:
 
-2. Download the workshop materials (this repo):
+```bash
+git clone https://github.com/macss-berkeley/compss-211a.git
+cd compss-211a
+conda env create -f environment.yml
+conda activate compss211
+python -m ipykernel install --user --name compss211 --display-name "COMPSS 211 (Python 3.12.13)"
+jupyter lab
+```
 
-   -   Click the green "Code" button in the top right of the repository information.
-   -   Click "Download Zip".
-   -   Extract this file to a folder on your computer where you can easily access it (we recommend Desktop).
+Select **COMPSS 211 (Python 3.12.13)** as the notebook kernel. To update an existing course environment after the repository changes, run:
 
-3. Optional: if you're familiar with `git`, you can instead clone this repository by opening a terminal and entering the command `git clone
-   git@github.com:macss-berkeley/compss-211a.git`.
+```bash
+conda env update -f environment.yml --prune
+```
 
-# Google Colab Setup
+The required environment is deliberately small. Install `requirements-optional-nlp.txt` only when an optional notebook asks for it.
 
-Google Colab lets you open and run course notebooks in a web browser without installing Python locally.
+## Google Colab
 
-## To launch a notebook:
+Colab runs notebooks in a browser, so it is the easiest route when you do not need a local terminal or Git repository.
+
+For Fall 2026, select the **2026.07 past runtime** under **Runtime -> Change runtime type**. It uses Python 3.12.13 and matches the supported local version.
+
+To open a course notebook:
 
 1. Go to [Google Colab](https://colab.research.google.com/).
-2. Select **File → Open notebook**, then choose the **GitHub** tab.
-3. Enter the URL of this repository and select the notebook you want to open.
-4. Select **File → Save a copy in Drive** before making changes. The repository copy is read-only and your Colab runtime is temporary.
+2. Select **File -> Open notebook**, then choose the **GitHub** tab.
+3. Enter this repository's URL and select the notebook.
+4. Select **File -> Save a copy in Drive** before making changes. The repository copy is read-only, and the Colab runtime is temporary.
 
-When an assignment is complete, restart the runtime, run every cell from top to bottom, save the notebook, and download the finished `.ipynb` file for submission through bCourses.
+Most required notebooks use packages already present in the 2026.07 runtime. If a notebook uses web-text or PDF extraction, install the small Colab supplement in its first cell:
 
-Some lessons teach Git, the command line, or local package management and therefore still require the local setup described above. Assignment instructions will state when local work is required.
+```python
+%pip install -q -r https://raw.githubusercontent.com/macss-berkeley/compss-211a/main/requirements-colab.txt
+```
 
-# Contributors
+Before submitting an assignment, restart the runtime, run every cell from top to bottom, save the notebook, and download the finished `.ipynb` file for bCourses.
 
--  [Tom van Nuenen](https://github.com/tomvannuenen)
--  [Pratik Sachdeva](https://github.com/pssachdeva)
--  [Arul Murugan Renganathan](arul@berkeley.edu)
+Weeks on Git, the command line, or local package management still require the local setup above. The assignment or lesson will say when local work is required.
+
+## Contributors
+
+- [Tom van Nuenen](https://github.com/tomvannuenen)
+- [Pratik Sachdeva](https://github.com/pssachdeva)
+- [Arul Murugan Renganathan](mailto:arul@berkeley.edu)

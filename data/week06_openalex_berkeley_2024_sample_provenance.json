@@ -1,0 +1,30 @@
+{
+  "fixture": "week06_openalex_berkeley_2024_sample.json",
+  "fixture_sha256": "4db2e4da3bf962f102a99b3cf9c651476f79a44cc5644ac473d5b65080044ad9",
+  "retrieved_at_utc": "2026-08-22T01:18:40Z",
+  "method": "GET",
+  "endpoint": "https://api.openalex.org/works",
+  "sanitized_parameters": {
+    "filter": "institutions.id:I95457486,publication_year:2024,has_abstract:true",
+    "per_page": 2,
+    "cursor": "*",
+    "select": "id,display_name,publication_year,authorships,abstract_inverted_index,primary_topic"
+  },
+  "response_status": 200,
+  "authentication_used": false,
+  "records_in_fixture": 2,
+  "source_result_count_at_retrieval": 9167,
+  "coverage_statement": "Works with at least one UC Berkeley-affiliated authorship, publication year 2024, and an OpenAlex abstract.",
+  "construction_notes": [
+    "The live response was requested without an API key.",
+    "The fixture preserves the OpenAlex list-response shape: meta, results, and group_by.",
+    "To keep the teaching fixture small, each result retains only the authorship entry containing institution I95457486; selected root fields and each full abstract_inverted_index are preserved.",
+    "No API key, email address, request header, or personal local path is stored.",
+    "OpenAlex metadata can change after retrieval; this tracked fixture is the deterministic classroom and grading fallback."
+  ],
+  "official_documentation": [
+    "https://developers.openalex.org/quickstart",
+    "https://developers.openalex.org/api-reference/works/list-works",
+    "https://developers.openalex.org/api-reference/authentication"
+  ]
+}

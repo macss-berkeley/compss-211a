@@ -1,0 +1,7 @@
+document_id,conversation_id,reply_to,channel,issue,text,synthetic
+D01,C01,,night_walk,safety,"It is not safe after 9.",true
+D02,C02,,transit,bus_service,"Love waiting 40 minutes for the bus 🙃",true
+D03,C03,,campus_forum,safety,"They called it ""SAFE."" Sure!!!",true
+D04,C04,,night_walk,safety,"Walking home again #NotSafeAfterDark...",true
+D05,C05,,accessibility,elevator,"The elevator broke again—soooo reliable.",true
+D06,C01,D01,night_walk,safety,"Exactly.",true

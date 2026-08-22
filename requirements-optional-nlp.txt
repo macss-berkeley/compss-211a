@@ -1,0 +1,13 @@
+# Optional legacy NLP and local-model demonstrations.
+# These packages are not required for homework or Friday labs.
+accelerate==1.14.0
+bertopic==0.17.4
+bertviz==1.4.1
+datasets==4.8.5
+gensim==4.4.0
+sentence-transformers==4.1.0
+spacy==3.8.15
+torch==2.11.0
+transformers==4.57.6
+vadersentiment==3.3.2
+wordcloud==1.9.6

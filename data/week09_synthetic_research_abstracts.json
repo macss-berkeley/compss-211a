@@ -1,0 +1,144 @@
+{
+  "fixture": {
+    "name": "Week 9 synthetic research abstracts",
+    "synthetic": true,
+    "purpose": "Deterministic teaching corpus for TF-IDF, LSA, cosine similarity, and exploratory clustering.",
+    "provenance_note": "Every title, abstract, identifier, and designed theme in this file is fictional and was written for COMPSS 211A instruction. These records are not OpenAlex works and must not be used to make claims about Berkeley research.",
+    "records_total": 22,
+    "records_with_abstracts": 20
+  },
+  "records": [
+    {
+      "document_id": "SYN-D001",
+      "title": "Night bus reliability and rider waiting",
+      "abstract": "This synthetic study examines public transit reliability on night bus routes. It compares scheduled and observed bus arrival times and summarizes rider waiting time across transit stops.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D005",
+      "title": "Bus arrival information and transit confidence",
+      "abstract": "This synthetic study evaluates whether real time bus arrival information changes rider confidence in public transit. The analysis focuses on delayed routes, waiting time, and service reliability.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D009",
+      "title": "Accessible transit stops and route design",
+      "abstract": "This synthetic study audits accessibility features at public transit stops. It connects bus route design, reliable service, and rider access for people using mobility devices.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D013",
+      "title": "Fare changes and public transit use",
+      "abstract": "This synthetic study explores how fare changes may shape public transit use. It compares rider reports about bus service, route frequency, and waiting time before and after a fare policy change.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D017",
+      "title": "Connecting bus routes across neighborhoods",
+      "abstract": "This synthetic study maps connections between bus routes and neighborhood transit access. It examines transfer waiting time, service reliability, and gaps in the public transit network.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D002",
+      "title": "Rent burden and household housing stability",
+      "abstract": "This synthetic study measures rent burden and housing stability among renter households. It examines monthly housing cost, household income, and the risk of displacement.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D006",
+      "title": "Eviction prevention and tenant support",
+      "abstract": "This synthetic study evaluates an eviction prevention program for renter households. It connects tenant support, overdue rent, displacement risk, and longer term housing stability.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D010",
+      "title": "Zoning reform and affordable housing supply",
+      "abstract": "This synthetic study considers zoning reform and affordable housing supply. It compares neighborhood housing construction, rent levels, and displacement concerns under alternative zoning rules.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D014",
+      "title": "Housing vouchers and rental access",
+      "abstract": "This synthetic study examines housing voucher use in the rental market. It documents tenant search time, rent limits, landlord participation, and barriers to stable housing.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D018",
+      "title": "Tenant organizing and displacement risk",
+      "abstract": "This synthetic study analyzes tenant organizing in neighborhoods facing displacement. It links renter participation, housing cost, rent increases, and perceived housing stability.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D003",
+      "title": "Community clinic access and preventive health",
+      "abstract": "This synthetic study examines access to community health clinics. It compares appointment waiting time, preventive care use, and barriers reported by patients seeking health services.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D007",
+      "title": "Vaccination outreach through health clinics",
+      "abstract": "This synthetic study evaluates vaccination outreach delivered through community health clinics. It analyzes patient access, preventive care communication, and uptake of health services.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D011",
+      "title": "Air quality and respiratory health visits",
+      "abstract": "This synthetic study links neighborhood air quality to respiratory health visits. It examines clinic records, patient symptoms, environmental exposure, and unequal access to preventive care.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D015",
+      "title": "Mental health counseling access",
+      "abstract": "This synthetic study investigates access to mental health counseling. It compares appointment waiting time, patient referrals, community clinic capacity, and continuity of health care.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D019",
+      "title": "Food support and community health",
+      "abstract": "This synthetic study evaluates a food support program as part of community health services. It examines patient participation, preventive care visits, and barriers to clinic access.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D004",
+      "title": "Course access and student learning",
+      "abstract": "This synthetic study examines course access and student learning. It compares enrollment barriers, classroom participation, academic support, and completion of education requirements.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D008",
+      "title": "Tutoring and academic support",
+      "abstract": "This synthetic study evaluates tutoring as academic support for student learning. It examines course performance, education access, classroom confidence, and student participation.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D012",
+      "title": "Library study space and course completion",
+      "abstract": "This synthetic study investigates library study space and course completion. It connects student access to quiet space, academic support, learning routines, and education outcomes.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D016",
+      "title": "Online learning and classroom participation",
+      "abstract": "This synthetic study compares online learning with classroom participation. It examines student access, course engagement, academic support, and barriers to education technology.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D020",
+      "title": "Academic advising and education pathways",
+      "abstract": "This synthetic study evaluates academic advising for student education pathways. It analyzes course planning, learning support, enrollment access, and student progress toward completion.",
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D021",
+      "title": "Record without an abstract",
+      "abstract": null,
+      "synthetic": true
+    },
+    {
+      "document_id": "SYN-D022",
+      "title": "Second record without an abstract",
+      "abstract": "",
+      "synthetic": true
+    }
+  ]
+}

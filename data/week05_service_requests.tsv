@@ -1,0 +1,6 @@
+request_id	opened_at	request_type	status	district_code	latitude	longitude	note
+000101	2026-09-28T09:15:00-07:00	Crosswalk Signal	open	NA	37.8715	-122.2585	Button reports no response
+000102	2026-09-28T10:40:00-07:00	Lighting	closed	SA	37.8671	-122.2550	Lamp near path is dark
+000103	2026-09-29T08:05:00-07:00	Wayfinding	open	WA	37.8702		Directional sign is difficult to read
+000104	2026-09-29T14:20:00-07:00	Bicycle Parking	pending	NA	37.8727	-122.2660	Rack is full after 10 a.m.
+000105	2026-09-30T11:55:00-07:00	Sidewalk	closed	SA	37.8659	-122.2521	Uneven surface near entrance

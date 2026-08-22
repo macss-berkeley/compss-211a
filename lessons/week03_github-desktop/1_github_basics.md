@@ -1,149 +1,115 @@
+# GitHub Desktop fundamentals
 
-# GitHub Desktop Fundamentals
----
-**_Learning Objectives_:**  
-1. Understand why we use version control, Git, and GitHub
-2. Learn basic terms used in GitHub, such as clone, commit, push, pull, and merge
-3. Learn how to clone repositories, make changes, and update changes on local and remote repositories
-4. Handle branches and resolve merge conflicts<br>
- ---
-### Icons Used in This Notebook 
-🔔 **Question**: A quick question to help you understand what's going on.<br>
-🥊 **Challenge**: Interactive excersise. We'll work through these in the workshop!<br>
-💡 **Tip**: How to do something a bit more efficiently or effectively.<br>
- ⚠️ **Warning:** Heads-up about tricky stuff or common mistakes.<br>
-📝 **Poll:** A Zoom poll to help you learn!<br>
-🎬 **Demo**: Showing off something more advanced <br>
- 
-## Version Control<br>
- 🔔**Question**: Have you ever made a mistake of overwriting a file or saving the wrong version?<br>
- 
-> Imagine that you’re collaborating with one of your labmates on a project. You’re both making changes to a document or a codebase. At one point, you both have changed the same lines in a particular document. How do you go about merging your changes?
+## What you will practice
 
-This is why we use version control. **Version control** is a system that manages and records changes to files over time. The most commonly used version control system is called **Git** (others include Mercurial and SVN). Git keeps track of the differences in the repository each time you make a change. The entire history of the repository is tracked by Git. If you realize you made a mistake in your code, you can always roll it back to a previous time point.
+By the end of this lesson, you should be able to:
 
-If you have used Google Docs, you likely have already used version control. Google Docs now tracks every change that every user makes, and allows you to go to any version of the document. Git allows us to do the same thing in complex code environments.
+1. explain the difference between Git and GitHub;
+2. distinguish a local repository from its remote copy;
+3. make, commit, push, and pull a change in GitHub Desktop;
+4. use a branch and pull request for collaborative work;
+5. recognize a merge conflict and inspect it before choosing a resolution.
 
-## Git Workflows: Personal Workflow
-There are a variety of workflows you may employ when using Git to track your changes. The most common, particularly for academic settings, is the **personal workflow**.
+## Why use version control?
 
-<br><img src="../../img/personal.png" alt="forking" width="50%">
+Suppose two people edit the same file, or you overwrite code that worked yesterday. A folder full of names such as `analysis_final_v2_really-final.ipynb` will not tell you what changed or why.
 
-In the personal workflow, you are largely going to be the only person adding to the repository. You have one **branch**, or version of your project. It is called the `main` branch. Every time you make changes to the code, you'll add them to the `main` branch. 
+Git records snapshots of a project's files. Each snapshot, or commit, has a message and a place in the project's history. You can inspect earlier versions, compare changes, and return to a known state without keeping a pile of duplicate folders.
 
-The main goal with version control settings is keeping track of the changes that you, the main user, are making to your repository. You don't have to worry about handling multiple people working on the repository at once, which simplifies the workflow. This is the first setting we will work in for this workshop.
+Google Docs has a version history for one document. Git applies the same basic idea to a project containing code, data instructions, documentation, and other text files.
 
-## GitHub
-Git is often used in tandem with a cloud-based hosting platform - the most common is **GitHub** (but others include Gitlab and Bitbucket). GitHub is a hosting service for Git repositories. It allows you to store your Git projects in the cloud and provides a platform for collaborating with others. The benefit to using GitHub is that it makes it easier to collaborate on code with others via its web platform.<br>
- 
-In this lesson, we're going to use the [**GitHub Desktop Application**](https://desktop.github.com/download/) to make updates to a repository. [The documentation for GitHub Desktop](https://docs.github.com/en/desktop) is available online. <br>
+## Git and GitHub are different
 
-A **repository** (or repo for short) is a central place where all the files related to a project are stored. It includes your project’s code, documentation, and a record of every change made to the files over time, managed through a version control system like Git. <br>
+Git is the version-control software. GitHub hosts remote Git repositories and adds a web interface for collaboration, review, and publishing.
 
-💡**Tip**: Git and GitHub can be used through command line. We are focusing on GUI version of GitHub. 
+A **repository** is the project folder Git tracks. It contains the current files plus the history stored in its hidden `.git` directory.
 
-## Managing Local and Remote Repositories
-We need to make a distinction between two kinds of repositories: there's the local repository and the remote repository. **The local repository** is the version of the code that is stored on your computer. **The remote repository**, meanwhile, is any version of the repository that lies on some other machine. In this context, remote repository is almost always going to refer to the version that is on on GitHub's servers. <br>
+- The **local repository** is on your computer.
+- The **remote repository** is hosted elsewhere, usually on GitHub in this course.
 
-So, when we're making changes to a repository, there's two versions that need to stay in sync with each other: the local and the remote. The steps we outline keep track of those changes between both cases, while also keeping track of the entire history. GitHub provides a nice platform on which we can peruse the history of a repository.<br>
-<br><img src="../../img/workflow.png" alt="forking" width="50%"><br>
+The two copies do not synchronize automatically:
 
-1. **Commit**: Save your selected changes with a description.
-2. **Push**: Upload your saved changes to GitHub for others to see.
-3. **Pull**: Download the latest updates from GitHub to your project.
- 
-Let's go through the process of making changes to a repository, step by step.<br>
- 
-### 1. Creating a Repository 
-To create a new repository on GitHub, click on this [link](https://docs.github.com/en/get-started/quickstart/create-a-repo) and follow the instructions. Make sure to tick the `Add a README file` box under "Initialize this repository with". Click on `Create repository`. You now have a remote    repository (on GitHub's servers), but **not** a local repository.<br>
+1. **Commit** records selected local changes with a message.
+2. **Push** sends local commits to GitHub.
+3. **Pull** brings remote commits to your local repository.
 
-To create a new repository on GitHub Desktop, click `Current Repository`, and `add`. Click `Create New Repository`. Make sure to tick the "Initialize this repository with a README file". You now have a local repository but **not** a remote repository. `Publish repository` in order to put this newly created repository onto GitHub. <br>
+<img src="../../img/workflow.png" alt="Local commits are pushed to GitHub, and remote commits are pulled back to the local repository." width="55%">
 
-🥊**Challenge**: Let's create a new repository under your account. <br>
+## Personal workflow
 
-### 2. **Making a Change** 
-GitHub Desktop automatically tracks changes. Whenever you make changes to the local repository, the changes will how up on the application. <br>
+When you are the only person working in a repository, you will often commit directly to the `main` branch. The basic loop is:
 
-Let's make a change by creating a new file. Create a file called `text.txt`, which has some text in it of your choosing.<br>
+1. inspect the changed files;
+2. write a short commit message that explains the change;
+3. commit locally;
+4. push the commit;
+5. check GitHub to confirm that it arrived.
 
-🔔**Question**: Do you see these changes on your GitHub Desktop?<br>
- 
-### 3. **Committing a Change** 
-Committing changes entails taking a snapshot of them: once we do this, the changes are frozen and placed in the `git` history. Each commit needs an accompanying message to say what the reason for the commit is. Make sure these messages are informative - your future self will thank you!<br>
+### Create a repository
 
-### 4. **Pushing to the Remote Repository** 
-Right now, the local repo knows about the changes we did, but the remote repo doesn't. So, we need to synchronize the two by "pushing" our changes to the remote repo. <br>
+You can start in either place:
 
-### 5. Check GitHub
-Let's check the GitHub page to see if the changes you made manifest on the website! <br>
+- **GitHub.com:** create a repository and select **Add a README file**. This creates the remote repository. Clone it in GitHub Desktop to create the local copy.
+- **GitHub Desktop:** select **Current Repository -> Add -> Create New Repository** and initialize it with a README. This creates the local repository. Select **Publish repository** to create the remote copy.
 
-### 6. Make Edits and Commits on GitHub Directly
-Let's make changes to the remote repository by making changes GitHub page directly. <br>
+### Practice the loop
 
-So, even in the personal workflow, there's a lot of individual steps needed just to make changes to the codebase. This becomes a little bit more complicated when multiple people are making changes at the same time, which requires a slightly different workflow.<br>
+1. Create a repository under your account.
+2. Add a file named `text.txt` with one or two lines of text.
+3. Open GitHub Desktop and inspect the change.
+4. Commit it with a message that says what you added.
+5. Push the commit.
+6. Open the repository on GitHub and find the file.
 
-🎬 **Demo**: We will make two different edits both on remote and local repositories. What happens when you try to merge these two repositories?
- 
-## GitHub Workflows: Collaborative Workflow <br>
-In the collaborative workflow, multiple people may be working on the same repository at the same time. So we need to have a system in place for how to decide whose changes to add, and how to handle scenarios when changes may clash with each other.<br>
- 
-Collaborative workflows heavily rely on **branching**. A branch in Git (and GitHub) is a separate line of development within a repository. It allows you to work on new features, bug fixes, or experiments without affecting the main codebase. We've already seen this terminology in the context of the `main` branch. <br> 
+Question: At which step did the change become part of local history? At which step did it reach GitHub?
 
-Think of branches like **alternate versions** of the same folder. When you switch to a new branch, the files on your computer instantly change to match that version. It’s like flipping between parallel universes of your project, where each one has different contents.
- 
-Now, we might be interested in adding a new feature to a code repository. When working collaboratively, we create a **branch** off the `main` repository. This branch can be updated in parallel, without modifying the `main` branch. When we've committed all the changes to the feature branch, how do we go about incorporating them into the`main` branch? <br>
+## Collaborative workflow
 
- **Forking** in GitHub is the process of creating a personal copy of someone else's repository in your GitHub account. It allows you to freely make changes without affecting the original repository. <br>
-* **Branches** are within the same repository. Branches make it easier collaboration among team members who have access to the repository. <br>
-* **Forks** create a completely separate copy of the repository, which is useful for outside contributors.
+When several people share a repository, use branches to keep unfinished work away from `main`.
 
-<br><img src="../../img/collaborative.png" alt="forking" width="50%">
- 
-### 1. **Forking the Repository** 
-An extra step you can take when working on a collaborative repository is to **fork** the repo. This creates a copy of the repository on your own GitHub account, which you're free to change at will. You can still, however, pull changes from the original repo, and make pull requests with your own changes. Go ahead and fork the repo [`Git-Playground`](https://github.com/dlab-berkeley/Git-Playground). See the image below for where to find the button:<br>
-<img src="../../img/fork.png" alt="forking" width="50%"><br>
+A **branch** is another line of development inside the same repository. A **fork** is a separate copy of someone else's repository under another GitHub account. Team members with access to the same repository usually use branches. Outside contributors often use forks.
 
- If you try to commit on a repository that you don't have access to, GitHub Desktop will ask you to create a fork.  <br>
+<img src="../../img/collaborative.png" alt="Contributors develop changes separately and merge reviewed work into the main branch." width="55%">
 
-<br><img src="../../img/fork2.png" alt="forking" width="50%"><br>
+### Fork and clone the practice repository
 
-### 2. **Cloning** 
-Cloning a repository means taking a remote repository, and copying it to our local machine to create a local repository. Under `Current Repository`, click `add` and select `Clone Repository`. You can clone your own repository or any publically avaialable repository.  
-For this section, clone the forked repo of `Git-Playground` to your local machine. Make sure you click `To contribute to the parent project` <br>
+1. Fork [D-Lab's Git Playground](https://github.com/dlab-berkeley/Git-Playground) to your account.
+2. In GitHub Desktop, select **Current Repository -> Add -> Clone Repository**.
+3. Select your fork and choose where to store it locally.
+4. If GitHub Desktop asks how you plan to use the fork, select **To contribute to the parent project**.
 
-### 3. **Branching** 
-Create a new branch on your local machine. On GitHub Desktop, you can do this by clicking on `Current Branch`. Under `Branches`, there is button with `New Branch`.  Choose a branch name that feels appropriate to you.<br>
- 
-### 4. **Commit a Change** 
-Create a new file with some text, stage it, and commit it.<br>
+### Make a branch and pull request
 
-### 5. **Push the Change** 
-Push the change on this branch to your remote repo. <br>
+1. Select **Current Branch -> New Branch** and choose a descriptive name.
+2. Create a small text file or edit the README.
+3. Inspect the diff and commit the change on your branch.
+4. Select **Publish branch**.
+5. On GitHub, select **Compare & pull request**. If the banner is absent, open **Pull requests -> New pull request**.
+6. Confirm that the base branch is `main` and the compare branch is yours.
+7. Write a title and a short description, then open the pull request.
+8. Ask a teammate to inspect the **Files changed** tab before merging.
 
-🎬 **Demo**: We will make two different edits both on `main` branch and your new branch. What happens when you try to merge these two branches with conflicts?
+A pull request is a review conversation around a proposed merge. It does not automatically make the code correct.
 
-### 6. **Make the Pull Request** 
-To merge our changes into the original repository, we do a **Pull Request** (PR). In a PR, we are requesting the `main` branch to pull the changes from the feature branch into the `main` branch. 
+## Merge conflicts
 
-GitHub provides a very nice platform to handle PRs - users can view the PRs, comment on them, and ask for changes. Once the maintainer of the repo is satisfied, they can merge the PR and the `main` branch is updated with the changes in the feature branch.<br>
- 
-The process of merging the changes in this way allows people to work in parallel on the `main` repo without modifying the `main` branch. Couple this with GitHub's platform for handling PRs, and you have a powerful tool for incorporating parallel changes into a repository.<br>
- 
-Let's give this a shot! You are going to make a change to an existing repository and submit a pull request for it. 
- 
-Go to your forked `Git-Playground` repository on GitHub. GitHub can already tell you made a change, and gives you the option to make a pull request! Click `Contribute` andn `Open pull request`. If you don't see this button, no worries - go to the "Pull Requests" button next to Issues, and you can manually make one there. Follow the instructions for making the pull request, and we'll merge a couple of them!<br>
+A conflict occurs when Git cannot combine changes automatically, often because two branches edited the same lines. Stop and read both versions before resolving it. Decide what the final file should say, remove the conflict markers, test or preview the result, and then commit the resolution.
 
-# Removing git repositories<br>
- 
-* **Local:** If you want to delete local git-related information (like branches and versions), all you have to do is delete the `.git` directory in the root-directory of your repository. Note that `.git` directories are hidden  by default, so you'll need to be able to view hidden files to delete it.  If you want to delete everything (data, code, etc.), just delete the whole directory.<br>
+Question: If Git reports a conflict, what information would you inspect before choosing either version?
 
-In GitHub Desktop, you can delete branches by right-clicking on a branch name in Branches and selecting "Delete.."<br>
- 
-* **Remote:** If you want to delete a remote repository, navigate to GitHub and go to Settings, then Danger Zone (at the bottom of the Settings page). Warning:Once you delete a repository, there is no going back.<br>
- 
-# Key Points
- There are several different workflows in which you might imagine using `git` and `GitHub`, particularly in an academic setting. These include:<br>
- 
-1. Working on a repository that is your own repo. You expect that you will generally be the only person developing code for this repository. <br>
-2. Working on a repository that several people - perhaps some collaborators - are working on concurrently. <br>
-3. Working on a repository that *many* people (e.g., at least dozens) are involved in. This may be, for example, an open-source project to which you contribute changes. We will not cover this approach in this workshop, as the details may be specific to the project you're working on. However, the principles from approach #2 hold here.<br>
+## Removing repositories and branches
+
+These actions discard information, so verify the target first.
+
+- Removing a repository from GitHub Desktop does not necessarily delete its local folder.
+- Deleting the hidden `.git` directory removes local Git history but leaves the visible project files.
+- Deleting the entire project folder removes both files and local history.
+- Deleting a remote repository happens under **Settings -> Danger Zone** on GitHub and cannot be undone through the normal interface.
+- A merged branch can usually be deleted after confirming that its commits are on `main`.
+
+## What to remember
+
+- A commit records local history; a push transfers commits to a remote.
+- Inspect changes before committing or resolving a conflict.
+- Pull before starting shared work, especially when teammates may have pushed changes.
+- Use a branch and pull request when the change needs review before it reaches `main`.

@@ -1,0 +1,1202 @@
+{
+  "meta": {
+    "count": 9167,
+    "db_response_time_ms": 15,
+    "page": null,
+    "per_page": 2,
+    "next_cursor": "IlsxMDAuMCwgMTk1MywgJ2h0dHBzOi8vb3BlbmFsZXgub3JnL1czMTk2ODM2NTAxJ10i",
+    "groups_count": null,
+    "cost_usd": 0.0001
+  },
+  "results": [
+    {
+      "id": "https://openalex.org/W4400089962",
+      "display_name": "Revised criteria for diagnosis and staging of Alzheimer's disease: Alzheimer's Association Workgroup",
+      "publication_year": 2024,
+      "authorships": [
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5061269385",
+            "display_name": "William J. Jagust",
+            "orcid": "https://orcid.org/0000-0002-4458-113X"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I95457486",
+              "display_name": "University of California, Berkeley",
+              "ror": "https://ror.org/01an7q238",
+              "country_code": "US",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I95457486"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false
+        }
+      ],
+      "abstract_inverted_index": {
+        "The": [
+          0,
+          36,
+          84
+        ],
+        "National": [
+          1
+        ],
+        "Institute": [
+          2
+        ],
+        "on": [
+          3,
+          56
+        ],
+        "Aging": [
+          4
+        ],
+        "and": [
+          5,
+          16,
+          22,
+          30,
+          70,
+          101,
+          116,
+          146,
+          189,
+          207,
+          238,
+          254,
+          269,
+          276,
+          291,
+          306,
+          313
+        ],
+        "the": [
+          6,
+          28,
+          40,
+          168,
+          181,
+          186,
+          218,
+          228,
+          261,
+          299
+        ],
+        "Alzheimer's": [
+          7,
+          33,
+          157
+        ],
+        "Association": [
+          8
+        ],
+        "convened": [
+          9
+        ],
+        "three": [
+          10
+        ],
+        "separate": [
+          11
+        ],
+        "work": [
+          12,
+          18
+        ],
+        "groups": [
+          13,
+          19
+        ],
+        "in": [
+          14,
+          20,
+          44,
+          63,
+          107
+        ],
+        "2011": [
+          15
+        ],
+        "single": [
+          17
+        ],
+        "2012": [
+          21
+        ],
+        "2018": [
+          23,
+          41
+        ],
+        "to": [
+          24,
+          46,
+          77,
+          95,
+          109,
+          124,
+          143,
+          160,
+          185,
+          248,
+          255,
+          286
+        ],
+        "create": [
+          25
+        ],
+        "recommendations": [
+          26
+        ],
+        "for": [
+          27,
+          99,
+          130
+        ],
+        "diagnosis": [
+          29,
+          100,
+          145,
+          251
+        ],
+        "characterization": [
+          31
+        ],
+        "of": [
+          32,
+          66,
+          148,
+          170,
+          180,
+          191,
+          230,
+          252
+        ],
+        "disease": [
+          34,
+          158,
+          262
+        ],
+        "(AD).": [
+          35
+        ],
+        "present": [
+          37,
+          85,
+          96
+        ],
+        "document": [
+          38,
+          86
+        ],
+        "updates": [
+          39
+        ],
+        "research": [
+          42,
+          115
+        ],
+        "framework": [
+          43
+        ],
+        "response": [
+          45
+        ],
+        "several": [
+          47
+        ],
+        "recent": [
+          48,
+          105
+        ],
+        "developments.": [
+          49
+        ],
+        "Defining": [
+          50
+        ],
+        "diseases": [
+          51
+        ],
+        "biologically,": [
+          52
+        ],
+        "rather": [
+          53,
+          138
+        ],
+        "than": [
+          54
+        ],
+        "based": [
+          55
+        ],
+        "syndromic": [
+          57
+        ],
+        "presentation,": [
+          58
+        ],
+        "has": [
+          59
+        ],
+        "long": [
+          60
+        ],
+        "been": [
+          61
+        ],
+        "standard": [
+          62
+        ],
+        "many": [
+          64
+        ],
+        "areas": [
+          65
+        ],
+        "medicine": [
+          67
+        ],
+        "(e.g.,": [
+          68
+        ],
+        "oncology),": [
+          69
+        ],
+        "is": [
+          71,
+          87,
+          94,
+          246,
+          284,
+          295
+        ],
+        "becoming": [
+          72
+        ],
+        "a": [
+          73,
+          112,
+          162,
+          250
+        ],
+        "unifying": [
+          74
+        ],
+        "concept": [
+          75
+        ],
+        "common": [
+          76,
+          302
+        ],
+        "all": [
+          78
+        ],
+        "neurodegenerative": [
+          79
+        ],
+        "diseases,": [
+          80
+        ],
+        "not": [
+          81,
+          122
+        ],
+        "just": [
+          82
+        ],
+        "AD.": [
+          83
+        ],
+        "consistent": [
+          88
+        ],
+        "with": [
+          89,
+          167
+        ],
+        "this": [
+          90
+        ],
+        "principle.": [
+          91
+        ],
+        "Our": [
+          92
+        ],
+        "intent": [
+          93
+        ],
+        "objective": [
+          97
+        ],
+        "criteria": [
+          98,
+          120
+        ],
+        "staging": [
+          102,
+          147,
+          293
+        ],
+        "AD,": [
+          103
+        ],
+        "incorporating": [
+          104
+        ],
+        "advances": [
+          106
+        ],
+        "biomarkers,": [
+          108,
+          206
+        ],
+        "serve": [
+          110,
+          139
+        ],
+        "as": [
+          111,
+          140
+        ],
+        "bridge": [
+          113
+        ],
+        "between": [
+          114,
+          311
+        ],
+        "clinical": [
+          117,
+          127,
+          131,
+          192,
+          257,
+          292,
+          312
+        ],
+        "care.": [
+          118
+        ],
+        "These": [
+          119
+        ],
+        "are": [
+          121,
+          177
+        ],
+        "intended": [
+          123
+        ],
+        "provide": [
+          125,
+          273
+        ],
+        "step-by-step": [
+          126
+        ],
+        "practice": [
+          128
+        ],
+        "guidelines": [
+          129
+        ],
+        "workflow": [
+          132
+        ],
+        "or": [
+          133,
+          221
+        ],
+        "specific": [
+          134
+        ],
+        "treatment": [
+          135
+        ],
+        "protocols,": [
+          136
+        ],
+        "but": [
+          137
+        ],
+        "general": [
+          141
+        ],
+        "principles": [
+          142
+        ],
+        "inform": [
+          144,
+          256
+        ],
+        "AD": [
+          149,
+          171,
+          222,
+          253,
+          283,
+          315
+        ],
+        "that": [
+          150,
+          165,
+          282,
+          297,
+          301
+        ],
+        "reflect": [
+          151,
+          227
+        ],
+        "current": [
+          152
+        ],
+        "science.": [
+          153
+        ],
+        "HIGHLIGHTS:": [
+          154
+        ],
+        "We": [
+          155
+        ],
+        "define": [
+          156
+        ],
+        "(AD)": [
+          159
+        ],
+        "be": [
+          161
+        ],
+        "biological": [
+          163,
+          290,
+          314
+        ],
+        "process": [
+          164
+        ],
+        "begins": [
+          166
+        ],
+        "appearance": [
+          169,
+          188
+        ],
+        "neuropathologic": [
+          172,
+          182
+        ],
+        "change": [
+          173
+        ],
+        "(ADNPC)": [
+          174
+        ],
+        "while": [
+          175
+        ],
+        "people": [
+          176
+        ],
+        "asymptomatic.": [
+          178
+        ],
+        "Progression": [
+          179
+        ],
+        "burden": [
+          183
+        ],
+        "leads": [
+          184
+        ],
+        "later": [
+          187
+        ],
+        "progression": [
+          190
+        ],
+        "symptoms.": [
+          193,
+          287
+        ],
+        "Early-changing": [
+          194
+        ],
+        "Core": [
+          195,
+          242,
+          265
+        ],
+        "1": [
+          196,
+          243
+        ],
+        "biomarkers": [
+          197,
+          210,
+          267
+        ],
+        "(amyloid": [
+          198
+        ],
+        "positron": [
+          199
+        ],
+        "emission": [
+          200
+        ],
+        "tomography": [
+          201
+        ],
+        "[PET],": [
+          202
+        ],
+        "approved": [
+          203
+        ],
+        "cerebrospinal": [
+          204
+        ],
+        "fluid": [
+          205
+        ],
+        "accurate": [
+          208
+        ],
+        "plasma": [
+          209
+        ],
+        "[especially": [
+          211
+        ],
+        "phosphorylated": [
+          212
+        ],
+        "tau": [
+          213,
+          270
+        ],
+        "217])": [
+          214
+        ],
+        "map": [
+          215
+        ],
+        "onto": [
+          216
+        ],
+        "either": [
+          217
+        ],
+        "amyloid": [
+          219
+        ],
+        "beta": [
+          220
+        ],
+        "tauopathy": [
+          223
+        ],
+        "pathway;": [
+          224
+        ],
+        "however,": [
+          225
+        ],
+        "these": [
+          226
+        ],
+        "presence": [
+          229
+        ],
+        "ADNPC": [
+          231
+        ],
+        "more": [
+          232
+        ],
+        "generally": [
+          233
+        ],
+        "(i.e.,": [
+          234
+        ],
+        "both": [
+          235
+        ],
+        "neuritic": [
+          236
+        ],
+        "plaques": [
+          237
+        ],
+        "tangles).": [
+          239
+        ],
+        "An": [
+          240,
+          288
+        ],
+        "abnormal": [
+          241
+        ],
+        "biomarker": [
+          244
+        ],
+        "result": [
+          245
+        ],
+        "sufficient": [
+          247
+        ],
+        "establish": [
+          249
+        ],
+        "decision": [
+          258
+        ],
+        "making": [
+          259
+        ],
+        "throughout": [
+          260
+        ],
+        "continuum.": [
+          263
+        ],
+        "Later-changing": [
+          264
+        ],
+        "2": [
+          266
+        ],
+        "(biofluid": [
+          268
+        ],
+        "PET)": [
+          271
+        ],
+        "can": [
+          272
+        ],
+        "prognostic": [
+          274
+        ],
+        "information,": [
+          275
+        ],
+        "when": [
+          277
+        ],
+        "abnormal,": [
+          278
+        ],
+        "will": [
+          279
+        ],
+        "increase": [
+          280
+        ],
+        "confidence": [
+          281
+        ],
+        "contributing": [
+          285
+        ],
+        "integrated": [
+          289
+        ],
+        "scheme": [
+          294
+        ],
+        "described": [
+          296
+        ],
+        "accommodates": [
+          298
+        ],
+        "fact": [
+          300
+        ],
+        "copathologies,": [
+          303
+        ],
+        "cognitive": [
+          304
+        ],
+        "reserve,": [
+          305
+        ],
+        "resistance": [
+          307
+        ],
+        "may": [
+          308
+        ],
+        "modify": [
+          309
+        ],
+        "relationships": [
+          310
+        ],
+        "stages.": [
+          316
+        ]
+      },
+      "primary_topic": {
+        "id": "https://openalex.org/T10009",
+        "display_name": "Dementia and Cognitive Impairment Research",
+        "score": 0.9998999834060669,
+        "subfield": {
+          "id": "https://openalex.org/subfields/2738",
+          "display_name": "Psychiatry and Mental health"
+        },
+        "field": {
+          "id": "https://openalex.org/fields/27",
+          "display_name": "Medicine"
+        },
+        "domain": {
+          "id": "https://openalex.org/domains/4",
+          "display_name": "Health Sciences"
+        }
+      }
+    },
+    {
+      "id": "https://openalex.org/W3196836501",
+      "display_name": "Revisiting Event-Study Designs: Robust and Efficient Estimation",
+      "publication_year": 2024,
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5043376121",
+            "display_name": "Kirill Borusyak",
+            "orcid": null
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I95457486",
+              "display_name": "University of California, Berkeley",
+              "ror": "https://ror.org/01an7q238",
+              "country_code": "US",
+              "type": "education",
+              "lineage": [
+                "https://openalex.org/I95457486"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false
+        }
+      ],
+      "abstract_inverted_index": {
+        "Abstract": [
+          0
+        ],
+        "We": [
+          1,
+          16,
+          36,
+          56,
+          88
+        ],
+        "develop": [
+          2,
+          69
+        ],
+        "a": [
+          3,
+          97
+        ],
+        "framework": [
+          4
+        ],
+        "for": [
+          5,
+          66,
+          71
+        ],
+        "difference-in-differences": [
+          6
+        ],
+        "designs": [
+          7
+        ],
+        "with": [
+          8,
+          77,
+          84
+        ],
+        "staggered": [
+          9
+        ],
+        "treatment": [
+          10
+        ],
+        "adoption": [
+          11
+        ],
+        "and": [
+          12,
+          68,
+          83,
+          100,
+          125
+        ],
+        "heterogeneous": [
+          13
+        ],
+        "causal": [
+          14
+        ],
+        "effects.": [
+          15
+        ],
+        "show": [
+          17,
+          89
+        ],
+        "that": [
+          18,
+          115
+        ],
+        "conventional": [
+          19
+        ],
+        "regression-based": [
+          20
+        ],
+        "estimators": [
+          21
+        ],
+        "fail": [
+          22
+        ],
+        "to": [
+          23,
+          107,
+          120,
+          138
+        ],
+        "provide": [
+          24
+        ],
+        "unbiased": [
+          25
+        ],
+        "estimates": [
+          26,
+          136
+        ],
+        "of": [
+          27,
+          61,
+          93
+        ],
+        "relevant": [
+          28
+        ],
+        "estimands": [
+          29
+        ],
+        "absent": [
+          30
+        ],
+        "strong": [
+          31
+        ],
+        "restrictions": [
+          32
+        ],
+        "on": [
+          33
+        ],
+        "treatment-effect": [
+          34,
+          52
+        ],
+        "homogeneity.": [
+          35
+        ],
+        "then": [
+          37
+        ],
+        "derive": [
+          38
+        ],
+        "the": [
+          39,
+          58,
+          62,
+          90,
+          104,
+          111,
+          116,
+          128,
+          145,
+          149
+        ],
+        "efficient": [
+          40
+        ],
+        "estimator": [
+          41
+        ],
+        "addressing": [
+          42
+        ],
+        "this": [
+          43
+        ],
+        "challenge,": [
+          44
+        ],
+        "which": [
+          45
+        ],
+        "takes": [
+          46
+        ],
+        "an": [
+          47,
+          101
+        ],
+        "intuitive": [
+          48
+        ],
+        "“imputation”": [
+          49
+        ],
+        "form": [
+          50
+        ],
+        "when": [
+          51
+        ],
+        "heterogeneity": [
+          53
+        ],
+        "is": [
+          54,
+          122
+        ],
+        "unrestricted.": [
+          55
+        ],
+        "characterize": [
+          57
+        ],
+        "asymptotic": [
+          59
+        ],
+        "behaviour": [
+          60
+        ],
+        "estimator,": [
+          63
+        ],
+        "propose": [
+          64
+        ],
+        "tools": [
+          65
+        ],
+        "inference,": [
+          67
+        ],
+        "tests": [
+          70
+        ],
+        "identifying": [
+          72
+        ],
+        "assumptions.": [
+          73
+        ],
+        "Our": [
+          74
+        ],
+        "method": [
+          75
+        ],
+        "applies": [
+          76
+        ],
+        "time-varying": [
+          78
+        ],
+        "controls,": [
+          79
+        ],
+        "in": [
+          80,
+          96,
+          110,
+          127,
+          144
+        ],
+        "triple-difference": [
+          81
+        ],
+        "designs,": [
+          82
+        ],
+        "certain": [
+          85
+        ],
+        "non-binary": [
+          86
+        ],
+        "treatments.": [
+          87
+        ],
+        "practical": [
+          91
+        ],
+        "relevance": [
+          92
+        ],
+        "our": [
+          94
+        ],
+        "results": [
+          95
+        ],
+        "simulation": [
+          98
+        ],
+        "study": [
+          99
+        ],
+        "application.": [
+          102
+        ],
+        "Studying": [
+          103
+        ],
+        "consumption": [
+          105
+        ],
+        "response": [
+          106
+        ],
+        "tax": [
+          108
+        ],
+        "rebates": [
+          109
+        ],
+        "U.S.,": [
+          112
+        ],
+        "we": [
+          113
+        ],
+        "find": [
+          114
+        ],
+        "notional": [
+          117
+        ],
+        "marginal": [
+          118
+        ],
+        "propensity": [
+          119
+        ],
+        "consume": [
+          121
+        ],
+        "between": [
+          123
+        ],
+        "8": [
+          124
+        ],
+        "11%": [
+          126
+        ],
+        "first": [
+          129,
+          146
+        ],
+        "quarter—about": [
+          130
+        ],
+        "half": [
+          131
+        ],
+        "as": [
+          132,
+          134
+        ],
+        "large": [
+          133
+        ],
+        "benchmark": [
+          135
+        ],
+        "used": [
+          137
+        ],
+        "calibrate": [
+          139
+        ],
+        "macroeconomic": [
+          140
+        ],
+        "models—and": [
+          141
+        ],
+        "predominantly": [
+          142
+        ],
+        "occurs": [
+          143
+        ],
+        "month": [
+          147
+        ],
+        "after": [
+          148
+        ],
+        "rebate.": [
+          150
+        ]
+      },
+      "primary_topic": {
+        "id": "https://openalex.org/T11544",
+        "display_name": "Gender, Labor, and Family Dynamics",
+        "score": 0.9973000288009644,
+        "subfield": {
+          "id": "https://openalex.org/subfields/3318",
+          "display_name": "Gender Studies"
+        },
+        "field": {
+          "id": "https://openalex.org/fields/33",
+          "display_name": "Social Sciences"
+        },
+        "domain": {
+          "id": "https://openalex.org/domains/2",
+          "display_name": "Social Sciences"
+        }
+      }
+    }
+  ],
+  "group_by": []
+}
