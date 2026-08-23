@@ -43,17 +43,56 @@ uv sync --frozen
 
 This creates a private `.venv` folder inside the repository. It also installs Python 3.13 if your computer does not already have a compatible version. The command uses `uv.lock`, so everyone receives the same tested package versions.
 
-### 4. Start Jupyter
+### 4. Install VS Code and its Python tools
+
+Install [Visual Studio Code](https://code.visualstudio.com/) and these two
+Microsoft extensions from the Extensions view:
+
+- [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+- [Jupyter](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter)
+
+You need both extensions to edit Python comfortably and run `.ipynb` notebook
+cells inside VS Code.
+
+### 5. Open the repository in VS Code
 
 From the repository folder, run:
+
+```bash
+code .
+```
+
+If the `code` command is unavailable, open VS Code, choose **File -> Open
+Folder**, and select the complete `compss-211a` repository. Do not open only an
+individual notebook file; opening the repository lets VS Code discover the
+course environment and data files.
+
+### 6. Select the course environment
+
+1. Open the VS Code Command Palette with <kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>
+   on macOS or <kbd>Control</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> on Windows/Linux.
+2. Run **Python: Select Interpreter**.
+3. Choose the interpreter inside this repository's `.venv` folder. Its path
+   ends in `.venv/bin/python` on macOS/Linux or `.venv\Scripts\python.exe` on
+   Windows.
+4. Open an `.ipynb` file, click **Select Kernel** in the upper-right corner,
+   choose **Python Environments**, and select the same `.venv` environment
+   running Python 3.13.
+
+VS Code now starts the notebook backend when you run a cell. You do not need to
+run `uv run jupyter lab` or create a separately registered kernel named
+`compss211`.
+
+### Optional: use JupyterLab in a browser
+
+VS Code is the default local workflow. If you prefer the browser interface for
+a particular session, you can still run:
 
 ```bash
 uv run jupyter lab
 ```
 
-Open notebooks from the Jupyter file browser. The ordinary **Python 3 (ipykernel)** option is correct because Jupyter itself is running inside the course environment. You do not need to create or select a kernel named `compss211`.
-
-To stop Jupyter, return to the terminal and press <kbd>Control</kbd>+<kbd>C</kbd>.
+To stop JupyterLab, return to the terminal and press <kbd>Control</kbd>+<kbd>C</kbd>.
 
 ## Google Colab
 
@@ -75,7 +114,8 @@ git pull
 uv sync --frozen
 ```
 
-Then continue to start Jupyter with `uv run jupyter lab`.
+Then reopen the repository in VS Code. If it was already open, verify that the
+notebook kernel still points to the repository's `.venv` environment.
 
 ## What the setup files do
 
@@ -99,5 +139,10 @@ uv --version
 uv run python --version
 uv run python -c "import pandas; print(pandas.__version__)"
 ```
+
+In VS Code, also confirm that the Microsoft Python and Jupyter extensions are
+enabled and that both the selected interpreter and notebook kernel point to
+`.venv`. If `.venv` is not listed, run **Python: Select Interpreter -> Enter
+interpreter path** and select it directly.
 
 Copy the complete output when asking for help. Do not delete `.venv/` or reinstall several Python distributions unless the instructional team asks you to; the error message usually points to a smaller fix.
