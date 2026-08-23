@@ -1,0 +1,97 @@
+document_id,channel,issue,text,synthetic
+CAMPUS-001,web form,transit,"The bus stop information is useful, but service gaps make trip planning difficult.",True
+CAMPUS-002,listening session,study_space,"The study space is welcoming, though outlet access is uneven across the room.",True
+CAMPUS-003,web form,accessibility,The accessible entrance is difficult to locate from the main pedestrian route.,True
+CAMPUS-004,workshop card,food,A microwave and water refill point would make evening study more manageable.,True
+CAMPUS-005,workshop card,safety,Construction detours create isolated walking segments after dark. I would like the next update to include a concrete timeline.,True
+CAMPUS-006,workshop card,services,"Staff were helpful once I reached them, although the handoff between offices was confusing.",True
+CAMPUS-007,workshop card,transit,"The bus stop information is useful, but service gaps make trip planning difficult.",True
+CAMPUS-008,listening session,study_space,"The study space is welcoming, though outlet access is uneven across the room.",True
+CAMPUS-009,workshop card,accessibility,"An elevator outage notice should include a usable alternate route, not only an apology.",True
+CAMPUS-010,workshop card,food,The dining information should make dietary ingredients easier to compare. I would like the next update to include a concrete timeline.,True
+CAMPUS-011,workshop card,safety,Construction detours create isolated walking segments after dark.,True
+CAMPUS-012,listening session,services,"A single page showing eligibility, location, and response time would reduce uncertainty.",True
+CAMPUS-013,listening session,transit,A clearer late-night shuttle map would make it easier to choose between walking and waiting.,True
+CAMPUS-014,workshop card,study_space,"The study space is welcoming, though outlet access is uneven across the room.",True
+CAMPUS-015,workshop card,accessibility,Wayfinding needs to describe step-free paths before visitors reach the stairs. I would like the next update to include a concrete timeline.,True
+CAMPUS-016,workshop card,food,Late classes end after many affordable food options have closed.,True
+CAMPUS-017,workshop card,safety,"Emergency information is visible, but the route to the nearest staffed space is unclear.",True
+CAMPUS-018,web form,services,"The service exists, but finding the correct appointment page takes too many clicks.",True
+CAMPUS-019,workshop card,transit,The evening bus connection is unreliable after seminar and the wait feels much longer in the rain.,True
+CAMPUS-020,listening session,study_space,It is hard to find a quiet study seat after dinner when several libraries close early. I would like the next update to include a concrete timeline.,True
+CAMPUS-021,web form,accessibility,Wayfinding needs to describe step-free paths before visitors reach the stairs.,True
+CAMPUS-022,workshop card,food,A microwave and water refill point would make evening study more manageable.,True
+CAMPUS-023,listening session,safety,Construction detours create isolated walking segments after dark.,True
+CAMPUS-024,web form,services,"A single page showing eligibility, location, and response time would reduce uncertainty.",True
+CAMPUS-025,listening session,transit,A clearer late-night shuttle map would make it easier to choose between walking and waiting. I would like the next update to include a concrete timeline.,True
+CAMPUS-026,listening session,study_space,It is hard to find a quiet study seat after dinner when several libraries close early.,True
+CAMPUS-027,web form,accessibility,"An elevator outage notice should include a usable alternate route, not only an apology.",True
+CAMPUS-028,listening session,food,The dining information should make dietary ingredients easier to compare.,True
+CAMPUS-029,web form,safety,Construction detours create isolated walking segments after dark.,True
+CAMPUS-030,listening session,services,"The service exists, but finding the correct appointment page takes too many clicks. I would like the next update to include a concrete timeline.",True
+CAMPUS-031,workshop card,transit,A clearer late-night shuttle map would make it easier to choose between walking and waiting.,True
+CAMPUS-032,web form,study_space,It is hard to find a quiet study seat after dinner when several libraries close early.,True
+CAMPUS-033,workshop card,accessibility,The accessible entrance is difficult to locate from the main pedestrian route.,True
+CAMPUS-034,web form,food,A microwave and water refill point would make evening study more manageable.,True
+CAMPUS-035,web form,safety,Construction detours create isolated walking segments after dark. I would like the next update to include a concrete timeline.,True
+CAMPUS-036,listening session,services,"A single page showing eligibility, location, and response time would reduce uncertainty.",True
+CAMPUS-037,workshop card,transit,A clearer late-night shuttle map would make it easier to choose between walking and waiting.,True
+CAMPUS-038,web form,study_space,More reservable group rooms would help teams meet without disturbing quiet floors.,True
+CAMPUS-039,listening session,accessibility,"An elevator outage notice should include a usable alternate route, not only an apology.",True
+CAMPUS-040,web form,food,The dining information should make dietary ingredients easier to compare. I would like the next update to include a concrete timeline.,True
+CAMPUS-041,web form,safety,The path is not well lit between the building exit and the transit stop.,True
+CAMPUS-042,web form,services,"A single page showing eligibility, location, and response time would reduce uncertainty.",True
+CAMPUS-043,workshop card,transit,A clearer late-night shuttle map would make it easier to choose between walking and waiting.,True
+CAMPUS-044,workshop card,study_space,"The study space is welcoming, though outlet access is uneven across the room.",True
+CAMPUS-045,listening session,accessibility,Wayfinding needs to describe step-free paths before visitors reach the stairs. I would like the next update to include a concrete timeline.,True
+CAMPUS-046,listening session,food,The dining information should make dietary ingredients easier to compare.,True
+CAMPUS-047,workshop card,safety,Construction detours create isolated walking segments after dark.,True
+CAMPUS-048,workshop card,services,"A single page showing eligibility, location, and response time would reduce uncertainty.",True
+CAMPUS-049,web form,transit,The evening bus connection is unreliable after seminar and the wait feels much longer in the rain.,True
+CAMPUS-050,web form,study_space,It is hard to find a quiet study seat after dinner when several libraries close early. I would like the next update to include a concrete timeline.,True
+CAMPUS-051,web form,accessibility,The accessible entrance is difficult to locate from the main pedestrian route.,True
+CAMPUS-052,workshop card,food,The dining information should make dietary ingredients easier to compare.,True
+CAMPUS-053,workshop card,safety,Construction detours create isolated walking segments after dark.,True
+CAMPUS-054,workshop card,services,"Staff were helpful once I reached them, although the handoff between offices was confusing.",True
+CAMPUS-055,web form,transit,"The bus stop information is useful, but service gaps make trip planning difficult. I would like the next update to include a concrete timeline.",True
+CAMPUS-056,workshop card,study_space,It is hard to find a quiet study seat after dinner when several libraries close early.,True
+CAMPUS-057,workshop card,accessibility,Wayfinding needs to describe step-free paths before visitors reach the stairs.,True
+CAMPUS-058,workshop card,food,The dining information should make dietary ingredients easier to compare.,True
+CAMPUS-059,listening session,safety,"Emergency information is visible, but the route to the nearest staffed space is unclear.",True
+CAMPUS-060,listening session,services,"Staff were helpful once I reached them, although the handoff between offices was confusing. I would like the next update to include a concrete timeline.",True
+CAMPUS-061,workshop card,transit,The evening bus connection is unreliable after seminar and the wait feels much longer in the rain.,True
+CAMPUS-062,workshop card,study_space,"The study space is welcoming, though outlet access is uneven across the room.",True
+CAMPUS-063,workshop card,accessibility,Wayfinding needs to describe step-free paths before visitors reach the stairs.,True
+CAMPUS-064,web form,food,Late classes end after many affordable food options have closed.,True
+CAMPUS-065,web form,safety,Construction detours create isolated walking segments after dark. I would like the next update to include a concrete timeline.,True
+CAMPUS-066,listening session,services,"Staff were helpful once I reached them, although the handoff between offices was confusing.",True
+CAMPUS-067,web form,transit,A clearer late-night shuttle map would make it easier to choose between walking and waiting.,True
+CAMPUS-068,listening session,study_space,It is hard to find a quiet study seat after dinner when several libraries close early.,True
+CAMPUS-069,listening session,accessibility,The accessible entrance is difficult to locate from the main pedestrian route.,True
+CAMPUS-070,listening session,food,Late classes end after many affordable food options have closed. I would like the next update to include a concrete timeline.,True
+CAMPUS-071,workshop card,safety,Construction detours create isolated walking segments after dark.,True
+CAMPUS-072,listening session,services,"Staff were helpful once I reached them, although the handoff between offices was confusing.",True
+CAMPUS-073,workshop card,transit,A clearer late-night shuttle map would make it easier to choose between walking and waiting.,True
+CAMPUS-074,workshop card,study_space,More reservable group rooms would help teams meet without disturbing quiet floors.,True
+CAMPUS-075,web form,accessibility,"An elevator outage notice should include a usable alternate route, not only an apology. I would like the next update to include a concrete timeline.",True
+CAMPUS-076,workshop card,food,The dining information should make dietary ingredients easier to compare.,True
+CAMPUS-077,workshop card,safety,"Emergency information is visible, but the route to the nearest staffed space is unclear.",True
+CAMPUS-078,workshop card,services,"Staff were helpful once I reached them, although the handoff between offices was confusing.",True
+CAMPUS-079,workshop card,transit,The evening bus connection is unreliable after seminar and the wait feels much longer in the rain.,True
+CAMPUS-080,listening session,study_space,"The study space is welcoming, though outlet access is uneven across the room. I would like the next update to include a concrete timeline.",True
+CAMPUS-081,web form,accessibility,The accessible entrance is difficult to locate from the main pedestrian route.,True
+CAMPUS-082,workshop card,food,A microwave and water refill point would make evening study more manageable.,True
+CAMPUS-083,web form,safety,"Emergency information is visible, but the route to the nearest staffed space is unclear.",True
+CAMPUS-084,listening session,services,"Staff were helpful once I reached them, although the handoff between offices was confusing.",True
+CAMPUS-085,web form,transit,A clearer late-night shuttle map would make it easier to choose between walking and waiting. I would like the next update to include a concrete timeline.,True
+CAMPUS-086,listening session,study_space,"The study space is welcoming, though outlet access is uneven across the room.",True
+CAMPUS-087,workshop card,accessibility,"An elevator outage notice should include a usable alternate route, not only an apology.",True
+CAMPUS-088,listening session,food,The dining information should make dietary ingredients easier to compare.,True
+CAMPUS-089,workshop card,safety,The path is not well lit between the building exit and the transit stop.,True
+CAMPUS-090,web form,services,"Staff were helpful once I reached them, although the handoff between offices was confusing. I would like the next update to include a concrete timeline.",True
+CAMPUS-091,web form,transit,"The bus stop information is useful, but service gaps make trip planning difficult.",True
+CAMPUS-092,listening session,study_space,"The study space is welcoming, though outlet access is uneven across the room.",True
+CAMPUS-093,listening session,accessibility,The accessible entrance is difficult to locate from the main pedestrian route.,True
+CAMPUS-094,web form,food,A microwave and water refill point would make evening study more manageable.,True
+CAMPUS-095,web form,safety,"Emergency information is visible, but the route to the nearest staffed space is unclear. I would like the next update to include a concrete timeline.",True
+CAMPUS-096,listening session,services,"The service exists, but finding the correct appointment page takes too many clicks.",True
