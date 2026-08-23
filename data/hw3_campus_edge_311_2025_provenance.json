@@ -1,0 +1,24 @@
+{
+  "source": "City of Berkeley 311 Cases",
+  "endpoint": "https://data.cityofberkeley.info/resource/p88g-6gs2.json",
+  "retrieved_on": "2026-08-23",
+  "selection": "First 60 records ordered by date_opened within the HW3 2025 date and campus-edge coordinate filters.",
+  "fields": [
+    "case_id",
+    "date_opened",
+    "case_status",
+    "last_action_date",
+    "date_closed",
+    "case_request",
+    "city",
+    "state",
+    "latitude",
+    "longitude"
+  ],
+  "formats": [
+    "csv",
+    "tsv",
+    "json",
+    "xml"
+  ]
+}

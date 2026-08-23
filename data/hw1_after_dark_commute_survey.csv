@@ -1,0 +1,25 @@
+respondent_id,program_year,home_area,commute_mode,one_way_minutes,days_on_campus,leaves_after_8pm_days,feels_safe_after_dark,wellbeing
+R001,1,Campus,Walk,14,2,0,yes,2
+R002,2,North Berkeley,Bike,22,3,1,sometimes,3
+R003,1,South Berkeley,Bus,42,4,2,no,4
+R004,2,Oakland,BART,46,5,3,yes,5
+R005,1,Albany,Drive,33,2,0,sometimes,2
+R006,2,Remote,Remote,8,0,0,no,
+R007,1,Campus,Walk,14,4,2,yes,4
+R008,2,North Berkeley,Bike,,5,3,sometimes,5
+R009,1,South Berkeley,Bus,42,2,0,no,2
+R010,2,Oakland,BART,46,3,1,yes,3
+R011,1,Albany,Drive,33,4,2,sometimes,4
+R012,2,Remote,Remote,8,0,0,no,5
+R013,1,Campus,Walk,14,2,0,yes,2
+R014,2,North Berkeley,Bike,22,3,1,sometimes,3
+R015,1,South Berkeley,Bus,42,4,2,no,4
+R016,2,Oakland,BART,46,5,3,yes,5
+R017,1,Albany,Drive,33,2,0,sometimes,2
+R018,2,Remote,Remote,8,0,0,no,3
+R019,1,Campus,Walk,14,4,2,yes,
+R020,2,North Berkeley,Bike,22,5,3,sometimes,5
+R021,1,South Berkeley,Bus,,2,0,no,2
+R022,2,Oakland,BART,46,3,1,yes,3
+R023,1,Albany,Drive,33,4,2,sometimes,4
+R024,2,Remote,Remote,8,0,0,no,5

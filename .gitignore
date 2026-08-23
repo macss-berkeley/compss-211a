@@ -2,9 +2,11 @@
 .DS_Store
 .claude
 .virtual_documents/
+.venv/
 .github/
 .env
 .vscode/
 wandb/
 *.wandb
 /course-planning
+/generated/
