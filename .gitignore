@@ -8,3 +8,4 @@
 wandb/
 *.wandb
 /course-planning
+/generated/
