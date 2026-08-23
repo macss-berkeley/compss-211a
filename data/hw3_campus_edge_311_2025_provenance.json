@@ -2,7 +2,7 @@
   "source": "City of Berkeley 311 Cases",
   "endpoint": "https://data.cityofberkeley.info/resource/p88g-6gs2.json",
   "retrieved_on": "2026-08-23",
-  "selection": "First 60 records ordered by date_opened within the HW3 2025 date and campus-edge coordinate filters.",
+  "selection": "1,896 records opened during 2025 within latitude 37.862 to 37.884 and longitude -122.274 to -122.244, ordered by case_id.",
   "fields": [
     "case_id",
     "date_opened",

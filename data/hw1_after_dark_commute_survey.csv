@@ -1,25 +1,97 @@
-respondent_id,program_year,home_area,commute_mode,one_way_minutes,days_on_campus,leaves_after_8pm_days,feels_safe_after_dark,wellbeing
-R001,1,Campus,Walk,14,2,0,yes,2
-R002,2,North Berkeley,Bike,22,3,1,sometimes,3
-R003,1,South Berkeley,Bus,42,4,2,no,4
-R004,2,Oakland,BART,46,5,3,yes,5
-R005,1,Albany,Drive,33,2,0,sometimes,2
-R006,2,Remote,Remote,8,0,0,no,
-R007,1,Campus,Walk,14,4,2,yes,4
-R008,2,North Berkeley,Bike,,5,3,sometimes,5
-R009,1,South Berkeley,Bus,42,2,0,no,2
-R010,2,Oakland,BART,46,3,1,yes,3
-R011,1,Albany,Drive,33,4,2,sometimes,4
-R012,2,Remote,Remote,8,0,0,no,5
-R013,1,Campus,Walk,14,2,0,yes,2
-R014,2,North Berkeley,Bike,22,3,1,sometimes,3
-R015,1,South Berkeley,Bus,42,4,2,no,4
-R016,2,Oakland,BART,46,5,3,yes,5
-R017,1,Albany,Drive,33,2,0,sometimes,2
-R018,2,Remote,Remote,8,0,0,no,3
-R019,1,Campus,Walk,14,4,2,yes,
-R020,2,North Berkeley,Bike,22,5,3,sometimes,5
-R021,1,South Berkeley,Bus,,2,0,no,2
-R022,2,Oakland,BART,46,3,1,yes,3
-R023,1,Albany,Drive,33,4,2,sometimes,4
-R024,2,Remote,Remote,8,0,0,no,5
+respondent_id,program,commute_mode,commute_minutes_one_way,days_on_campus,leaves_after_8pm_days,monthly_transport_cost_usd,wellbeing_score,reliable_internet
+BMS-001,Information,Walk,18,5,2,0,6.8,Yes
+BMS-002,Public Policy,Walk,13,4,2,0,6.2,Yes
+BMS-003,Public Policy,Bike,16,5,1,92.27,7.5,Yes
+BMS-004,Social Welfare,Remote,0,0,0,0,7.1,Yes
+BMS-005,Public Policy,Walk,25,3,0,0,7.3,Yes
+BMS-006,Public Policy,BART + walk,49,2,1,65.44,6.2,Yes
+BMS-007,Information,Bike,28,4,0,125.16,5.9,Yes
+BMS-008,MaCSS,BART + walk,60,4,3,153.1,4.4,Yes
+BMS-009,MaCSS,Bike,,3,1,0,7.1,Yes
+BMS-010,Information,BART + walk,46,5,2,0,6.8,Yes
+BMS-011,MaCSS,Walk,30,2,2,0,7.8,Yes
+BMS-012,Public Policy,Walk,7,5,3,0,6.2,Yes
+BMS-013,Public Policy,Drive,40,2,0,116.22,6.0,Yes
+BMS-014,Social Welfare,Walk,21,4,1,,6.4,Yes
+BMS-015,MaCSS,BART + walk,52,5,0,148.08,6.7,Yes
+BMS-016,MaCSS,BART + walk,60,3,3,85.12,7.5,No
+BMS-017,Social Welfare,Walk,14,4,4,0,7.3,Yes
+BMS-018,Social Welfare,BART + walk,54,3,1,104.47,6.6,Yes
+BMS-019,Public Policy,BART + walk,57,4,0,177.48,6.7,Yes
+BMS-020,Social Welfare,Walk,24,4,3,0,5.5,No
+BMS-021,Social Welfare,Walk,20,3,2,0,7.8,No
+BMS-022,Information,BART + walk,65,4,2,113.72,8.3,Yes
+BMS-023,Public Policy,AC Transit,47,2,2,121.07,8.4,No
+BMS-024,Information,AC Transit,40,4,2,0,6.0,Yes
+BMS-025,Information,Walk,23,5,1,0,6.6,Yes
+BMS-026,Information,BART + walk,55,3,1,54.57,6.9,Yes
+BMS-027,Information,Walk,12,5,2,0,8.6,No
+BMS-028,MaCSS,BART + walk,57,3,3,120.12,6.9,Yes
+BMS-029,MaCSS,Walk,28,5,0,0,6.7,Yes
+BMS-030,Information,AC Transit,56,2,2,118.61,6.9,No
+BMS-031,Social Welfare,Drive,,4,2,79.46,5.5,Yes
+BMS-032,Public Policy,BART + walk,54,3,3,96.73,9.0,Yes
+BMS-033,MaCSS,Walk,7,5,4,0,6.3,Yes
+BMS-034,Public Policy,Bike,14,5,1,133.74,7.6,Yes
+BMS-035,Information,Bike,14,2,2,144.88,7.9,Yes
+BMS-036,Information,AC Transit,41,2,0,89.94,4.6,Yes
+BMS-037,Public Policy,Drive,46,3,0,114.79,7.9,Yes
+BMS-038,Social Welfare,Drive,31,4,1,52.46,7.1,Yes
+BMS-039,Social Welfare,BART + walk,58,4,2,118.19,6.6,Yes
+BMS-040,Information,AC Transit,47,3,2,148.15,6.4,Yes
+BMS-041,Public Policy,AC Transit,59,3,2,36.05,3.8,Yes
+BMS-042,Information,AC Transit,33,3,2,154.15,7.1,Yes
+BMS-043,Information,Bike,27,2,2,152.57,5.7,Yes
+BMS-044,Public Policy,AC Transit,39,5,1,90.05,5.8,Yes
+BMS-045,Information,AC Transit,62,3,3,34.72,6.1,Yes
+BMS-046,Public Policy,Remote,0,0,0,0,8.1,No
+BMS-047,Public Policy,Drive,28,4,0,,6.9,Yes
+BMS-048,Public Policy,Drive,26,3,1,122.46,6.9,Yes
+BMS-049,Public Policy,Walk,9,4,3,0,7.3,Yes
+BMS-050,MaCSS,AC Transit,36,3,0,72.85,7.2,Yes
+BMS-051,Social Welfare,BART + walk,59,3,2,92.39,6.6,No
+BMS-052,Social Welfare,Walk,24,2,2,0,7.5,Yes
+BMS-053,Public Policy,BART + walk,42,4,1,33.16,6.0,Yes
+BMS-054,MaCSS,BART + walk,44,3,3,105.27,5.7,Yes
+BMS-055,Public Policy,BART + walk,52,4,0,58.63,6.4,Yes
+BMS-056,Public Policy,Bike,22,4,2,50.7,5.9,Yes
+BMS-057,Public Policy,Walk,18,3,2,0,6.7,Yes
+BMS-058,Social Welfare,Walk,,4,1,0,7.1,No
+BMS-059,Social Welfare,BART + walk,45,2,1,76.54,6.7,Yes
+BMS-060,Public Policy,Walk,34,2,2,0,5.8,Yes
+BMS-061,Information,AC Transit,39,3,3,197.01,6.5,Yes
+BMS-062,MaCSS,Drive,24,2,2,131.29,7.1,Yes
+BMS-063,Public Policy,BART + walk,65,3,3,63.1,7.2,Yes
+BMS-064,Information,AC Transit,38,5,4,173.04,7.8,Yes
+BMS-065,Social Welfare,Bike,21,4,2,116.56,6.8,Yes
+BMS-066,MaCSS,Walk,10,3,1,0,6.4,Yes
+BMS-067,Social Welfare,BART + walk,53,4,0,36.31,5.1,Yes
+BMS-068,MaCSS,AC Transit,39,2,2,134.17,3.8,Yes
+BMS-069,Public Policy,Drive,50,3,1,100.86,6.1,Yes
+BMS-070,Social Welfare,BART + walk,54,2,2,75.16,6.0,Yes
+BMS-071,Information,AC Transit,45,5,3,151.67,4.9,Yes
+BMS-072,Social Welfare,Drive,39,3,1,64.82,7.5,Yes
+BMS-073,Information,Bike,36,4,1,45.23,7.8,Yes
+BMS-074,Information,Bike,15,5,3,133.43,7.7,Yes
+BMS-075,Information,Remote,0,0,0,0,7.5,Yes
+BMS-076,Social Welfare,Bike,27,3,2,20.25,8.6,Yes
+BMS-077,Public Policy,BART + walk,44,4,4,57.76,6.4,Yes
+BMS-078,Social Welfare,Drive,30,3,1,38.4,5.7,Yes
+BMS-079,Public Policy,Walk,11,4,3,0,5.8,Yes
+BMS-080,Public Policy,Drive,33,4,4,178.64,6.6,Yes
+BMS-081,Information,Remote,0,0,0,0,6.3,Yes
+BMS-082,Social Welfare,Bike,30,5,0,108.66,6.8,Yes
+BMS-083,Public Policy,AC Transit,42,3,0,28.82,7.3,Yes
+BMS-084,Information,AC Transit,47,2,2,94.1,5.3,Yes
+BMS-085,MaCSS,BART + walk,68,4,2,63.74,5.2,Yes
+BMS-086,Social Welfare,Remote,0,0,0,0,7.6,Yes
+BMS-087,Social Welfare,Remote,0,0,0,0,5.3,Yes
+BMS-088,MaCSS,Bike,29,2,1,67.5,6.4,Yes
+BMS-089,Information,Remote,0,0,0,0,5.8,No
+BMS-090,Information,AC Transit,41,3,1,46.46,6.1,Yes
+BMS-091,MaCSS,Remote,0,0,0,0,6.7,Yes
+BMS-092,Social Welfare,AC Transit,44,4,1,172.62,6.5,Yes
+BMS-093,MaCSS,Walk,12,2,1,0,7.4,Yes
+BMS-094,Public Policy,Remote,0,0,0,0,7.7,Yes
+BMS-095,MaCSS,AC Transit,51,3,2,82.66,7.8,Yes
+BMS-096,Social Welfare,BART + walk,46,4,2,64.98,8.8,No

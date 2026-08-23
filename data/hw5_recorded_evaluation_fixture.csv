@@ -1,97 +1,97 @@
-document_id,recorded_llm_label,traditional_prediction,recorded_rationale
-CAMPUS-001,accessibility,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-002,transit,transit,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-003,transit,transit,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-004,transit,transit,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-005,transit,transit,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-006,transit,transit,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-007,transit,transit,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-008,transit,transit,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-009,transit,transit,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-010,transit,transit,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-011,transit,transit,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-012,transit,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-013,transit,transit,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-014,transit,transit,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-015,transit,transit,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-016,transit,transit,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-017,study_space,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-018,food,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-019,study_space,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-020,study_space,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-021,study_space,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-022,study_space,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-023,study_space,accessibility,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-024,study_space,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-025,study_space,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-026,study_space,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-027,study_space,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-028,study_space,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-029,study_space,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-030,study_space,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-031,study_space,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-032,study_space,study_space,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-033,accessibility,accessibility,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-034,accessibility,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-035,safety,accessibility,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-036,accessibility,accessibility,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-037,accessibility,accessibility,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-038,accessibility,accessibility,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-039,accessibility,accessibility,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-040,accessibility,accessibility,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-041,accessibility,accessibility,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-042,accessibility,accessibility,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-043,accessibility,accessibility,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-044,accessibility,accessibility,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-045,accessibility,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-046,accessibility,accessibility,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-047,accessibility,accessibility,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-048,accessibility,accessibility,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-049,food,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-050,food,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-051,food,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-052,services,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-053,food,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-054,food,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-055,food,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-056,food,safety,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-057,food,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-058,food,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-059,food,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-060,food,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-061,food,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-062,food,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-063,food,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-064,food,food,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-065,safety,safety,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-066,safety,safety,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-067,safety,services,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-068,safety,safety,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-069,transit,safety,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-070,safety,safety,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-071,safety,safety,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-072,safety,safety,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-073,safety,safety,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-074,safety,safety,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-075,safety,safety,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-076,safety,safety,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-077,safety,safety,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-078,safety,services,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-079,safety,safety,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-080,safety,safety,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-081,services,services,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-082,services,services,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-083,services,services,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-084,services,services,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-085,services,services,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-086,study_space,services,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-087,services,services,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-088,services,services,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-089,services,transit,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-090,services,services,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-091,services,services,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-092,services,services,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-093,services,services,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-094,services,services,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-095,services,services,Recorded classroom fixture; inspect the source text before accepting this label.
-CAMPUS-096,other,services,Recorded classroom fixture; inspect the source text before accepting this label.
+document_id,human_label,recorded_llm_label,traditional_prediction,recorded_fixture,fixture_note
+CAMPUS-001,transit,study_space,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-002,study_space,study_space,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-003,accessibility,accessibility,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-004,food,food,food,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-005,safety,safety,safety,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-006,services,services,services,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-007,transit,transit,transit,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-008,study_space,study_space,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-009,accessibility,accessibility,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-010,food,safety,food,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-011,safety,safety,safety,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-012,services,services,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-013,transit,transit,transit,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-014,study_space,study_space,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-015,accessibility,accessibility,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-016,food,food,food,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-017,safety,safety,safety,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-018,services,services,services,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-019,transit,study_space,transit,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-020,study_space,study_space,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-021,accessibility,accessibility,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-022,food,food,food,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-023,safety,safety,transit,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-024,services,services,services,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-025,transit,transit,transit,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-026,study_space,study_space,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-027,accessibility,accessibility,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-028,food,safety,food,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-029,safety,safety,safety,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-030,services,services,services,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-031,transit,transit,transit,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-032,study_space,study_space,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-033,accessibility,accessibility,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-034,food,food,services,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-035,safety,safety,safety,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-036,services,services,services,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-037,transit,study_space,transit,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-038,study_space,study_space,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-039,accessibility,accessibility,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-040,food,food,food,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-041,safety,safety,safety,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-042,services,services,services,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-043,transit,transit,transit,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-044,study_space,study_space,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-045,accessibility,accessibility,safety,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-046,food,safety,food,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-047,safety,safety,safety,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-048,services,services,services,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-049,transit,transit,transit,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-050,study_space,study_space,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-051,accessibility,accessibility,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-052,food,food,food,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-053,safety,safety,safety,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-054,services,services,services,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-055,transit,study_space,transit,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-056,study_space,study_space,food,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-057,accessibility,accessibility,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-058,food,food,food,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-059,safety,safety,safety,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-060,services,services,services,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-061,transit,transit,transit,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-062,study_space,study_space,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-063,accessibility,accessibility,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-064,food,safety,food,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-065,safety,safety,safety,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-066,services,services,services,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-067,transit,transit,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-068,study_space,study_space,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-069,accessibility,accessibility,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-070,food,food,food,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-071,safety,safety,safety,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-072,services,services,services,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-073,transit,study_space,transit,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-074,study_space,study_space,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-075,accessibility,accessibility,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-076,food,food,food,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-077,safety,safety,safety,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-078,services,services,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-079,transit,transit,transit,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-080,study_space,study_space,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-081,accessibility,accessibility,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-082,food,safety,food,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-083,safety,safety,safety,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-084,services,services,services,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-085,transit,transit,transit,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-086,study_space,study_space,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-087,accessibility,accessibility,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-088,food,food,food,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-089,safety,safety,transit,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-090,services,services,services,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-091,transit,study_space,transit,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-092,study_space,study_space,study_space,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-093,accessibility,accessibility,accessibility,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-094,food,food,food,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-095,safety,safety,safety,True,Synthetic deterministic teaching fixture; not a live Gemini result.
+CAMPUS-096,services,services,services,True,Synthetic deterministic teaching fixture; not a live Gemini result.

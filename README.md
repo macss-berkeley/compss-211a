@@ -30,13 +30,24 @@ uv run jupyter lab
 
 Install `uv` first and follow the operating-system instructions in [SETUP.md](SETUP.md). You do not need Conda or a separately registered `compss211` kernel. Start Jupyter through `uv run` whenever you work locally.
 
+## Course data
+
+The local fixtures required by homework and lab notebooks are committed under
+[`data/`](data/). Their sources, synthetic-data labels, and interpretation
+limits are documented in [`data/README.md`](data/README.md).
+
 ## Google Colab
 
-Colab runs notebooks in a browser, so it is the easiest route when you do not need a local terminal or Git repository.
+Colab runs notebooks in a browser. Homework and lab notebooks that use tracked
+fixtures must be run with the complete course repository or student package,
+not as a standalone notebook: upload and extract the package under `/content`,
+open the notebook from that copy, and then run its setup cell. The setup cell
+locates the repository-level `data/` directory automatically.
 
 Use Colab's default **latest runtime**. If a notebook needs a package that Colab does not supply, its instructions will provide the install command.
 
-To open a course notebook:
+Lesson notebooks with an explicit raw-GitHub data fallback can instead be
+opened directly from GitHub:
 
 1. Go to [Google Colab](https://colab.research.google.com/).
 2. Select **File -> Open notebook**, then choose the **GitHub** tab.

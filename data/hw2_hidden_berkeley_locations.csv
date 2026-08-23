@@ -1,9 +1,9 @@
-name,category,area,access_note,source_url
-Student Learning Center,Academic support,Lower Sproul,"Check the official page for current programs, eligibility, and hours.",https://slc.berkeley.edu/
-Basic Needs Center,Basic needs,UC Berkeley campus,Use the official page to confirm services and how to access them.,https://basicneeds.berkeley.edu/
-Disabled Students' Program,Accessibility,UC Berkeley campus,Consult the official page for accommodation procedures and appointments.,https://dsp.berkeley.edu/
-LEAD Center,Student organizations,UC Berkeley campus,Check the official page for advising options and current hours.,https://lead.berkeley.edu/
-PATH to Care Center,Confidential support,UC Berkeley campus,Use the official page for current confidential support options.,https://care.berkeley.edu/
-University Health Services,Health and wellbeing,Tang Center,"Check the official page for appointments, urgent care, and current hours.",https://uhs.berkeley.edu/
-Graduate Division,Graduate support,Sproul Hall,Use the official page to find the appropriate graduate-student service.,https://grad.berkeley.edu/
-Berkeley International Office,International student support,UC Berkeley campus,"Check the official page for advising topics, appointments, and deadlines.",https://internationaloffice.berkeley.edu/
+location_id,name,category,area,access_note,source_url
+HB01,D-Lab,methods support,Social Sciences Building,Check the official site for current access details,https://dlab.berkeley.edu/
+HB02,BAMPFA Film Library and Study Center,media research,Downtown Berkeley,Confirm appointments and access on the official site,https://bampfa.org/
+HB03,Morrison Library,quiet reading,Doe Library,Library access policies can change,https://www.lib.berkeley.edu/
+HB04,Jacobs Institute Makerspace,prototyping,North campus,Training may be required before equipment use,https://jacobsinstitute.berkeley.edu/
+HB05,Basic Needs Center,student support,UC Berkeley,Use official pages for eligibility and hours,https://basicneeds.berkeley.edu/
+HB06,Disabled Students' Program,access support,UC Berkeley,Do not publish private accommodation information,https://dsp.berkeley.edu/
+HB07,Berkeley Art Museum and Pacific Film Archive,arts and archives,Downtown Berkeley,Admission and hours vary,https://bampfa.org/
+HB08,UC Botanical Garden,field observation,Strawberry Canyon,Check current reservations and transit,https://botanicalgarden.berkeley.edu/
