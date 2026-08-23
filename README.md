@@ -11,7 +11,7 @@ During the semester, you will:
 - compare CSV, TSV, JSON, and XML data, then collect records through web APIs;
 - clean and represent text with counts, TF-IDF, and lightweight document embeddings;
 - test AI-generated code and evaluate LLM output against simpler methods;
-- move selected workflows between local Jupyter, Google Colab, and cloud APIs.
+- move selected workflows between local VS Code, Google Colab, and cloud APIs.
 
 Some exercises use public snapshots; others use synthetic data written for class. Either way, a result is only as good as its source, checks, and interpretation. You are expected to understand submitted code, document AI assistance, keep credentials out of notebooks, and remain accountable for every claim.
 
@@ -25,10 +25,14 @@ The course uses `uv` to install the tested Python version and packages in a proj
 git clone https://github.com/macss-berkeley/compss-211a.git
 cd compss-211a
 uv sync --frozen
-uv run jupyter lab
+code .
 ```
 
-Install `uv` first and follow the operating-system instructions in [SETUP.md](SETUP.md). You do not need Conda or a separately registered `compss211` kernel. Start Jupyter through `uv run` whenever you work locally.
+Install `uv`, Visual Studio Code, and the Microsoft Python and Jupyter extensions
+first, then follow the operating-system instructions in [SETUP.md](SETUP.md).
+In VS Code, select the repository's `.venv` environment as both the Python
+interpreter and notebook kernel. You do not need Conda, a separately registered
+`compss211` kernel, or a separate JupyterLab server.
 
 ## Course data
 
