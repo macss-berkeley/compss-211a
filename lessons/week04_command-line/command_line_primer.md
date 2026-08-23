@@ -200,6 +200,8 @@ Always inspect `status` and `diff` before `restore`. `git restore` discards the 
 
 Colab can run shell commands, but its hosted runtime has a different file system, temporary state, and no necessary connection to your local Git repository. This week uses the local terminal so the paths, Python process, and Git state all refer to the project on your computer.
 
+The course environment is part of that project state. From the repository folder, `uv sync --frozen` makes the local environment match `uv.lock`; `uv run python ...` or `uv run jupyter lab` runs a program inside it. There is no separate environment to activate and no global course kernel to maintain.
+
 ## A useful first workflow
 
 The following sequence captures most of the week's mental model:
@@ -210,7 +212,7 @@ ls -lah
 head -n 5 data/sample.csv
 grep -Hin "error" logs/*.log
 grep -Hin "error" logs/*.log | wc -l
-python scripts/summarize_csv.py data/sample.csv
+uv run python scripts/summarize_csv.py data/sample.csv
 echo $?
 git status --short
 ```

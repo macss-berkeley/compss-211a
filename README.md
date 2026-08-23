@@ -19,24 +19,16 @@ The course ends with a team project based on a text dataset. Your team will pose
 
 ## Local setup
 
-The supported local runtime is **Python 3.12.13** in the `compss211` Conda environment. Install [Miniconda](https://docs.conda.io/projects/miniconda/en/latest/) or Anaconda, then open a terminal and run:
+The course uses `uv` to install the tested Python version and packages in a project-specific environment:
 
 ```bash
 git clone https://github.com/macss-berkeley/compss-211a.git
 cd compss-211a
-conda env create -f environment.yml
-conda activate compss211
-python -m ipykernel install --user --name compss211 --display-name "COMPSS 211 (Python 3.12.13)"
-jupyter lab
+uv sync --frozen
+uv run jupyter lab
 ```
 
-Select **COMPSS 211 (Python 3.12.13)** as the notebook kernel. To update an existing course environment after the repository changes, run:
-
-```bash
-conda env update -f environment.yml --prune
-```
-
-The required environment is deliberately small. Install `requirements-optional-nlp.txt` only when an optional notebook asks for it.
+Install `uv` first and follow the operating-system instructions in [SETUP.md](SETUP.md). You do not need Conda or a separately registered `compss211` kernel. Start Jupyter through `uv run` whenever you work locally.
 
 ## Course data
 
@@ -52,7 +44,7 @@ not as a standalone notebook: upload and extract the package under `/content`,
 open the notebook from that copy, and then run its setup cell. The setup cell
 locates the repository-level `data/` directory automatically.
 
-For Fall 2026, select the **2026.07 past runtime** under **Runtime -> Change runtime type**. It uses Python 3.12.13 and matches the supported local version.
+Use Colab's default **latest runtime**. If a notebook needs a package that Colab does not supply, its instructions will provide the install command.
 
 Lesson notebooks with an explicit raw-GitHub data fallback can instead be
 opened directly from GitHub:
@@ -62,7 +54,7 @@ opened directly from GitHub:
 3. Enter this repository's URL and select the notebook.
 4. Select **File -> Save a copy in Drive** before making changes. The repository copy is read-only, and the Colab runtime is temporary.
 
-Most required notebooks use packages already present in the 2026.07 runtime. If a notebook uses web-text or PDF extraction, install the small Colab supplement in its first cell:
+Most required notebooks use packages already present in Colab. If a notebook uses web-text or PDF extraction, install the small Colab supplement in its first cell:
 
 ```python
 %pip install -q -r https://raw.githubusercontent.com/macss-berkeley/compss-211a/main/requirements-colab.txt
@@ -70,7 +62,7 @@ Most required notebooks use packages already present in the 2026.07 runtime. If 
 
 Before submitting an assignment, restart the runtime, run every cell from top to bottom, save the notebook, and download the finished `.ipynb` file for bCourses.
 
-Weeks on Git, the command line, or local package management still require the local setup above. The assignment or lesson will say when local work is required.
+Weeks on Git, the command line, or local package management still require the local setup above. The assignment or lesson will say when local work is required. See [SETUP.md](SETUP.md) for the full local and Colab instructions.
 
 ## Contributors
 

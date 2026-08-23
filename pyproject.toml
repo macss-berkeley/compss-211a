@@ -1,0 +1,38 @@
+[project]
+name = "compss-211a"
+version = "0.1.0"
+description = "Reproducible local environment for COMPSS 211A: Computing I"
+requires-python = "==3.13.*"
+dependencies = [
+    "beautifulsoup4==4.13.5",
+    "google-genai==2.11.0",
+    "ipykernel==7.3.0",
+    "jupyterlab==4.6.3",
+    "matplotlib==3.10.0",
+    "nltk==3.9.1",
+    "numpy==2.1.3",
+    "pandas==2.2.3",
+    "pymupdf==1.28.2",
+    "requests==2.32.4",
+    "scikit-learn==1.6.1",
+    "seaborn==0.13.2",
+    "trafilatura==2.2.0",
+]
+
+[dependency-groups]
+optional-nlp = [
+    "accelerate==1.14.0",
+    "bertopic==0.17.4",
+    "bertviz==1.4.1",
+    "datasets==4.8.5",
+    "gensim==4.4.0",
+    "sentence-transformers==4.1.0",
+    "spacy==3.8.15",
+    "torch==2.11.0",
+    "transformers==4.57.6",
+    "vadersentiment==3.3.2",
+    "wordcloud==1.9.6",
+]
+
+[tool.uv]
+package = false

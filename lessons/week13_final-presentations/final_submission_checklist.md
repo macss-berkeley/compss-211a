@@ -52,7 +52,7 @@ Pretend the reviewer has only the repository URL and no access to your team's me
 ### Environment and execution
 
 - [ ] Python and important package/runtime versions are recorded.
-- [ ] Dependencies are declared using the course-approved environment files or clearly documented additions.
+- [ ] Local dependencies are declared in `pyproject.toml` and locked in `uv.lock`; any Colab-only bootstrap is documented.
 - [ ] Random seeds and important model, API, and prompt versions are recorded where relevant.
 - [ ] Personal absolute paths have been replaced with portable relative paths or documented configuration.
 - [ ] A fresh session can execute the intended workflow in the documented order.

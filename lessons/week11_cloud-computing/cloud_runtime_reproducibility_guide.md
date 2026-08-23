@@ -54,6 +54,8 @@ A reproducible handoff records at least:
 
 Do **not** place an API key, token, personal path, or private text in the manifest.
 
+For this course's local route, `pyproject.toml` states the direct requirements and `uv.lock` records the full resolved environment. `.python-version` selects Python 3.13, while `.venv/` is only the local installation and is not committed. A clean local reproduction therefore starts with `uv sync --frozen` and runs commands through `uv run`. In Colab, the notebook bootstrap must install any missing package and retrieve any temporary data again.
+
 ## Credentials and data boundaries
 
 - Locally, read the key from `GEMINI_API_KEY` in the process environment.
