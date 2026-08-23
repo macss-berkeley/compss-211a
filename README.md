@@ -19,20 +19,21 @@ The course ends with a team project based on a text dataset. Your team will pose
 
 ## Local setup
 
-The course uses `uv` to install the tested Python version and packages in a project-specific environment:
+**First time?** Complete [SETUP.md](SETUP.md). It is the authoritative guide for
+installing `uv`, Visual Studio Code, and the required extensions; cloning the
+repository; creating the course environment; and selecting the notebook kernel.
+
+After completing that setup, open a terminal in your cloned repository and use
+this returning-user workflow:
 
 ```bash
-git clone https://github.com/macss-berkeley/compss-211a.git
-cd compss-211a
+git pull
 uv sync --frozen
 code .
 ```
 
-Install `uv`, Visual Studio Code, and the Microsoft Python and Jupyter extensions
-first, then follow the operating-system instructions in [SETUP.md](SETUP.md).
-In VS Code, select the repository's `.venv` environment as both the Python
-interpreter and notebook kernel. You do not need Conda, a separately registered
-`compss211` kernel, or a separate JupyterLab server.
+This updates the course files, refreshes the locked `.venv` environment, and
+opens the complete repository in VS Code.
 
 ## Course data
 
