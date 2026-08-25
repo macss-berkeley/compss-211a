@@ -73,29 +73,47 @@ A **branch** is another line of development inside the same repository. A **fork
 
 ### Fork and clone the practice repository
 
-1. Fork [D-Lab's Git Playground](https://github.com/dlab-berkeley/Git-Playground) to your account.
-2. In GitHub Desktop, select **Current Repository -> Add -> Clone Repository**.
-3. Select your fork and choose where to store it locally.
+1. Fork this [Git Playground](https://github.com/macss-berkeley/git-playground) to your account.
+2. In GitHub Desktop, select **File -> Clone Repository**.
+3. Select your fork and choose a local folder you can find again.
 4. If GitHub Desktop asks how you plan to use the fork, select **To contribute to the parent project**.
+5. Read the playground README. Do not edit `conflicts/team_plan.md` until the merge-conflict exercise.
 
 ### Make a branch and pull request
 
-1. Select **Current Branch -> New Branch** and choose a descriptive name.
-2. Create a small text file or edit the README.
-3. Inspect the diff and commit the change on your branch.
-4. Select **Publish branch**.
-5. On GitHub, select **Compare & pull request**. If the banner is absent, open **Pull requests -> New pull request**.
-6. Confirm that the base branch is `main` and the compare branch is yours.
-7. Write a title and a short description, then open the pull request.
-8. Ask a teammate to inspect the **Files changed** tab before merging.
+This first branch exercise is intentionally conflict-free.
+
+1. Select **Current Branch -> New Branch** and use a descriptive name such as `add-river-contributor-note`.
+2. In `contributors/`, copy `example.md` to a new file named with your GitHub username, such as `river.md`.
+3. Replace the placeholders in your file. Do not edit another student's file, the repository README, or the conflict fixture.
+4. Inspect the diff and commit the change on your branch.
+5. Select **Publish branch**, then **Preview Pull Request**.
+6. Confirm that the base branch is `main`, the compare branch is yours, and only your contributor file changed.
+7. Select **Create Pull Request**, then write a title and short description in the browser.
+8. Ask a teammate to inspect the **Files changed** tab and explain what they would approve or request before merging.
 
 A pull request is a review conversation around a proposed merge. It does not automatically make the code correct.
 
-## Merge conflicts
+## Practice a controlled merge conflict
 
-A conflict occurs when Git cannot combine changes automatically, often because two branches edited the same lines. Stop and read both versions before resolving it. Decide what the final file should say, remove the conflict markers, test or preview the result, and then commit the resolution.
+A conflict occurs when Git cannot combine changes automatically, often because two branches edited the same lines. In this exercise, you will create a small conflict deliberately so you can recognize and resolve it without risking project work.
 
-Question: If Git reports a conflict, what information would you inspect before choosing either version?
+Complete the branch exercise first, then work in your own fork:
+
+1. Commit any current work. Switch to `main`, select **Fetch origin**, and pull if GitHub Desktop reports remote changes.
+2. Create a branch named `conflict-option-a` from `main`.
+3. Open `conflicts/team_plan.md` and replace only the line beginning `Review rule:` with one concrete rule. Save, inspect, and commit the change.
+4. Switch back to `main` without merging option A. Create a second branch named `conflict-option-b` from the same `main` commit.
+5. Replace the same `Review rule:` line with a different rule, then commit it.
+6. Switch to `main`. Select **Current Branch -> Choose a branch to merge into main**, choose `conflict-option-a`, complete the merge, and push your fork's `main`.
+7. Switch to `conflict-option-b`. Select **Current Branch -> Choose a branch to merge into conflict-option-b**, then choose `main`. GitHub Desktop should report a conflict in `conflicts/team_plan.md`.
+8. Open the repository in VS Code. Read both versions between `<<<<<<<`, `=======`, and `>>>>>>>`. Edit the file into the single final rule you actually want and remove every conflict marker.
+9. Save the file. When GitHub Desktop reports that all conflicts are resolved, continue the merge and inspect the resulting commit.
+10. Push `conflict-option-b`, open a pull request into your fork's `main`, and ask a teammate to verify that the final rule is coherent and contains no conflict markers.
+
+Do not resolve a conflict by choosing a side blindly. The correct result may keep one version, combine both, or replace both. After resolving a code conflict, rerun the relevant check. If a notebook conflicts, stop and coordinate with the other editor: `.ipynb` files are structured JSON and are much harder to merge safely than Markdown or Python files.
+
+Question: What evidence shows that your resolution preserved the intended work from both branches?
 
 ## Removing repositories and branches
 
