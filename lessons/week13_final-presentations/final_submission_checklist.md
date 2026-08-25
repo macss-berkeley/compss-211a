@@ -2,17 +2,23 @@
 
 Use this checklist to make the project understandable, runnable, and reviewable. It does not replace the syllabus, assignment rubric, or final bCourses instructions.
 
-The current syllabus lists a final report PDF and code-repository URL due through bCourses on December 12, and it separately describes presentation slides, an individual appendix, an LLM usage log, and a peer evaluation. The instructor will confirm the exact deadline time, permitted file formats, group-versus-individual submission routes, filename rules, and whether a commit or release tag is required. Follow those posted logistics when they are more specific.
+The final team submission is a substantive project website, a reproducible
+code repository, and a PDF snapshot of the website. The website replaces the
+separate written report and slide deck. The individual appendix, LLM usage
+documentation, and any peer evaluation remain private bCourses submissions.
+Follow the posted bCourses instructions for exact filenames, grouping, and
+deadlines.
 
 ## Confirm the submission contract
 
 Before submitting, identify which items are submitted once per team and which are submitted by every student.
 
-### Team items described in the syllabus
+### Team items
 
-- [ ] Final report in the required format
+- [ ] Published project-website URL
 - [ ] Code-repository URL
-- [ ] Presentation slides in the requested format and location
+- [ ] PDF snapshot of the website for grading and archival purposes
+- [ ] PDF presentation backup
 - [ ] Team-member and contribution statement
 
 ### Individual items described in the syllabus
@@ -25,16 +31,16 @@ Before submitting, identify which items are submitted once per team and which ar
 - [ ] We know whether the instructor wants a branch, commit hash, release, or tag as the final code reference.
 - [ ] We know whether revisions after presentation day are allowed and how they should be documented.
 
-## Report and presentation agreement
+## Website, presentation, and repository agreement
 
-- [ ] The research question is stated consistently across the report, deck, and repository.
+- [ ] The research question is stated consistently across the website and repository.
 - [ ] The strongest claim matches the data's actual coverage.
 - [ ] Counts, dates, labels, units, and reported metrics agree across artifacts.
 - [ ] Consequential preprocessing choices are documented rather than described only as "cleaning."
 - [ ] Method and parameter descriptions match the code that produced the submitted results.
 - [ ] Figures and tables can be traced to a documented script or notebook step.
 - [ ] Error analysis, uncertainty, limitations, and social implications are substantive and consistent.
-- [ ] Any changes made after the presentation are reflected in the final report and repository.
+- [ ] Any changes made after the presentation are reflected in the final website, PDF snapshot, and repository.
 
 ## Repository handoff
 
@@ -73,9 +79,20 @@ Pretend the reviewer has only the repository URL and no access to your team's me
 - [ ] The workflow contains checks appropriate to the project: schemas, required columns, uniqueness, allowed values, counts, known answers, or non-mutation tests.
 - [ ] Evaluation uses the intended records and labels, with exclusions documented.
 - [ ] At least one error, disagreement, ambiguous case, or sensitivity result is preserved in the analysis record.
-- [ ] Generated figures and tables have stable names and match the report.
+- [ ] Generated figures and tables have stable names and match the website.
 - [ ] Expected outputs can be distinguished from caches, temporary files, and local-only artifacts.
-- [ ] Known failures and limitations are documented in the README or report.
+- [ ] Known failures and limitations are documented in the README or website.
+
+## Website publication
+
+- [ ] `docs/index.md` contains the required question, data, methods, findings,
+      interpretation, limitations, reproducibility, and references sections.
+- [ ] The GitHub Pages URL opens in a signed-out browser.
+- [ ] Every image, internal link, and repository link works.
+- [ ] The website is readable on a laptop screen and does not require custom
+      software or a login.
+- [ ] Public text, data, figures, and metadata are safe to share.
+- [ ] The PDF snapshot contains the same substantive content as the published site.
 
 ## Privacy, credentials, and public exposure
 
@@ -87,7 +104,7 @@ Pretend the reviewer has only the repository URL and no access to your team's me
 
 ## AI-assistance disclosure
 
-- [ ] Every use required by course policy is disclosed in the designated report, appendix, code, or journal location.
+- [ ] Every use required by course policy is disclosed in the designated website, appendix, code, or journal location.
 - [ ] The disclosure identifies the tool and how it was used.
 - [ ] Prompts or interaction links are included only when required and safe to share.
 - [ ] The team explains how generated code, classifications, summaries, or interpretations were verified.
@@ -106,8 +123,8 @@ Pretend the reviewer has only the repository URL and no access to your team's me
 - [ ] Open every submitted file.
 - [ ] Open the repository URL in a browser and verify staff access.
 - [ ] Copy the final code reference exactly as requested.
-- [ ] Compare the final figure/table values against the report one last time.
+- [ ] Compare the final figure/table values against the website one last time.
 - [ ] Confirm that bCourses shows the expected team or individual submission status.
-- [ ] Save a local copy of the submitted report, slides, and submission confirmation.
+- [ ] Save a local copy of the website PDF, presentation backup, and submission confirmation.
 
 Use the [presentation and Q&A guide](presentation_and_qa_guide.md) for the oral handoff and [Course Synthesis and Next Steps](course_synthesis_and_next_steps.md) for the final reflection.

@@ -1,20 +1,20 @@
-# Week 4: Command line, Bash, and Git recovery
+# Week 4: Command line and Python scripts
 
 This week uses a **local terminal and text editor** as the live workspace. There is no lecture notebook. Google Colab remains available for notebook-based work in other weeks, but it does not replace the local file-system and repository practice in this lesson.
 
 ## Before Monday
 
-Open Terminal on macOS/Linux or Git Bash on Windows and run:
+Update or download the course repository, then open it in VS Code. Open the VS Code terminal, choose Git Bash if you use Windows, and run:
 
 ```bash
 git --version
-python --version
-python -c "import sys; print(sys.executable)"
+uv run python --version
+uv run python -c "import sys; print(sys.executable)"
 ```
 
-If `python` does not point to your course environment, activate that environment using the course setup instructions. Do not change or recreate the environment during class.
+Run these commands from the repository folder. `uv run` uses the course environment, so you do not need to activate it yourself.
 
-Then update or download the course repository and confirm that this folder contains `bash_lab/`.
+Confirm that the Week 4 folder contains `bash_lab/`.
 
 ## Learning goals
 
@@ -25,15 +25,17 @@ By the end of the week, you should be able to:
 - inspect and search files before changing them;
 - create, copy, and rename files inside a disposable directory;
 - explain quoting, globbing, pipes, and redirection;
-- run a Python script and interpret its exit status;
-- write and rerun a small Bash audit script;
+- move a few familiar lines of Python from a notebook into a `.py` file;
+- run, edit, and rerun a Python script from the repository folder;
+- explain why the working directory affects relative paths in a script;
+- recognize an exit status and, optionally, record commands in a small Bash script;
 - use `git status`, `git diff`, `git log`, and `git restore` for reversible diagnosis.
 
 ## Materials
 
 - [Command-line primer](command_line_primer.md): concepts and safety habits
 - [Command-line cheat sheet](command_line_cheatsheet.md): compact command reference
-- [`bash_lab/`](bash_lab): a small synthetic file tree copied to a disposable location during lecture
+- [`bash_lab/`](bash_lab): a small synthetic file tree copied to a disposable location during lecture; students will add a simple Python script to their copy
 - [Optional practice](optional_practice.md): additional no-AI rehearsal after class
 
 ## Reading

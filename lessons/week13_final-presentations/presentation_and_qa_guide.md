@@ -2,11 +2,14 @@
 
 Your presentation should make one argument the audience can follow: what you asked, what data you used, what you did, what you found, and where the result stops. A complicated method cannot rescue a weak question or an unsupported claim.
 
-The syllabus currently allows about 10 minutes for each presentation and 3-5 minutes for questions. Follow the final order, timing, slide-upload instructions, and accommodations posted in bCourses.
+The syllabus allows about 10 minutes for each website walkthrough and 3-5
+minutes for questions. Follow the final order, website-URL and PDF-backup
+instructions, and accommodations posted in bCourses. Do not create a separate
+slide deck.
 
 ## The argument to build
 
-Use this chain as a check, not as a required slide order:
+Use this chain as a check, not as a required website-section order:
 
 > question -> data and coverage -> preprocessing -> method -> checks -> result -> interpretation -> limitations -> handoff
 
@@ -56,7 +59,7 @@ Do not display credentials, private data, private AI conversations, or identifyi
 
 ## A possible ten-minute shape
 
-This is a pacing aid, not a slide template or grading formula.
+This is a pacing aid, not a website template or grading formula.
 
 - **1 minute:** question, motivation, and answer
 - **1.5 minutes:** data, unit of analysis, and coverage
@@ -66,9 +69,10 @@ This is a pacing aid, not a slide template or grading formula.
 - **1 minute:** limitations, ethics, and implications
 - **1 minute:** reproducibility, contributions, and handoff
 
-Practice aloud. Decide who advances the slides, who watches the time, and how you will handle transitions.
+Practice aloud. Decide who navigates the website, who watches the time, and
+how you will handle transitions.
 
-## Make the slides readable
+## Make the website walkthrough readable
 
 - Use type that remains legible from the back of the room or on a small screen.
 - Label axes, legends, units, denominators, and sample sizes.
@@ -77,6 +81,8 @@ Practice aloud. Decide who advances the slides, who watches the time, and how yo
 - Caption recorded media.
 - Define abbreviations and method names when they first appear.
 - Prefer one readable figure to a screen full of notebook output.
+- Open the pages and sections you need before presenting.
+- Avoid long scrolling, reading the page aloud, or showing every technical detail.
 
 ## If you use a live demonstration
 
@@ -101,8 +107,9 @@ Keep questions concise and answerable. For presenters, it is fine to say, "We di
 ## Before presentation day
 
 - Review the [final submission checklist](final_submission_checklist.md).
-- Download an offline copy of the deck in the requested format.
-- Test links and media, but plan to present without them.
+- Open the published website in a signed-out browser.
+- Export the website to PDF and practice using it as the offline backup.
+- Test links and media, but make sure the evidence remains understandable if they fail.
 - Remove credentials, personal paths, private data, and unapproved identifying information.
 - Make sure everyone knows the opening answer, the main limitation, and the repository handoff.
 - Check bCourses for the final order, timing, upload procedure, and accommodations.

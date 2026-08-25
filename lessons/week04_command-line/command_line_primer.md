@@ -160,18 +160,67 @@ grep -Hin "error" logs/*.log > error_report.txt
 
 Preview the command without redirection first. Then inspect the written file.
 
-## Running a Python script
+## From a notebook cell to a Python script
+
+A notebook cell and a Python script both contain ordinary Python code. A notebook runs selected cells in a kernel that remembers earlier work. A script starts fresh each time and runs the file from top to bottom.
+
+In VS Code, open your disposable copy of `bash_lab/`. Create a file named `scripts/inspect_data.py` and type these four lines:
+
+```python
+import pandas as pd
+
+data = pd.read_csv("data/sample.csv")
+print(data.head())
+```
+
+Save the file. From the `bash_lab/` folder, run:
 
 ```bash
-python scripts/summarize_csv.py data/sample.csv
+pwd
+uv run python scripts/inspect_data.py
+```
+
+The `.py` file saves the code, not a running kernel or the printed result. Each time you run it, Python starts at the first line. Change `head()` to `tail()`, save the file, and run the same command again. Editing and saving a script does not run it.
+
+This is a useful first rule:
+
+> Use a notebook to explore and explain. Use a script for a task that you understand and want to repeat.
+
+### Why the working directory matters
+
+The path `data/sample.csv` is read from the current working directory, not from the folder that contains the script. Try:
+
+```bash
+cd scripts
+pwd
+uv run python inspect_data.py
+```
+
+The script should report that it cannot find `data/sample.csv`. From `scripts/`, that relative path would mean `scripts/data/sample.csv`. Return to the project folder and rerun it:
+
+```bash
+cd ..
+uv run python scripts/inspect_data.py
+```
+
+This failure is useful evidence. Check `pwd`, then read the missing path in the error before changing the code.
+
+### A supplied script with an input
+
+The practice folder also contains `scripts/summarize_csv.py`. It accepts a file path after the script name:
+
+```bash
+uv run python scripts/summarize_csv.py data/sample.csv
 echo $?
 ```
 
+For now, you only need to run this supplied script and notice how the input path is written in the command. You do not need to reproduce or understand every line inside it yet.
+
 The final command prints the previous process's exit status. Zero normally means success; nonzero means the process reported another outcome or failure. Check it immediately because running another command replaces the saved status.
 
-## Small Bash scripts
+## Optional: a small Bash script
 
-A Bash script records commands that should be rerun in the same order:
+A Bash script records terminal commands that should be rerun in the same order. Python scripts are the focus this week; writing a Bash script is optional.
 
 ```bash
 #!/usr/bin/env bash
@@ -181,7 +230,7 @@ grep -Hin "error" logs/*.log > generated/error_report.txt
 wc -l generated/error_report.txt
 ```
 
-Run it with `bash audit_errors.sh`. A useful script is **idempotent** when rerunning it produces the same correct end state instead of duplicating work.
+Run it with `bash audit_errors.sh`. Rerunning it should replace the old report instead of adding the same results again.
 
 ## Git as diagnostic evidence
 
@@ -198,7 +247,7 @@ Always inspect `status` and `diff` before `restore`. `git restore` discards the 
 
 ## Local terminal versus Colab
 
-Colab can run shell commands, but its hosted runtime has a different file system, temporary state, and no necessary connection to your local Git repository. This week uses the local terminal so the paths, Python process, and Git state all refer to the project on your computer.
+Colab can run shell commands, but its hosted runtime has a different file system, temporary state, and no necessary connection to your local Git repository. This week uses the local terminal so the paths, Python script, and Git state all refer to the project on your computer.
 
 The course environment is part of that project state. From the repository folder, `uv sync --frozen` makes the local environment match `uv.lock`, and `uv run python ...` runs a command inside it. In VS Code, select the repository's `.venv` for both the Python interpreter and notebook kernel. There is no global course kernel to maintain.
 

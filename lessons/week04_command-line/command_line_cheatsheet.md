@@ -51,13 +51,14 @@ Deletion commands are intentionally omitted. Use the Finder/Explorer trash for c
 
 Preview output before adding `>` or `>>`.
 
-## Python processes
+## Python scripts
 
 | Goal | Command |
 |---|---|
-| Display the active Python version | `python --version` |
-| Display the active Python executable | `python -c "import sys; print(sys.executable)"` |
-| Run a script with one path argument | `python script.py data/file.csv` |
+| Display the course Python version | `uv run python --version` |
+| Display the course Python executable | `uv run python -c "import sys; print(sys.executable)"` |
+| Run a script | `uv run python scripts/inspect_data.py` |
+| Run a script with one path argument | `uv run python script.py data/file.csv` |
 
 ## Reversible Git diagnosis
 

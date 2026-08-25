@@ -24,14 +24,24 @@ Try the core tasks without AI first. Record the commands you used in a plain-tex
 3. Predict the count before running the complete pipeline.
 4. Write the matching lines to `generated/error_report.txt`, then inspect the file.
 
-## 4. Run a Python process
+## 4. Create and rerun a Python script
 
-1. Run `scripts/summarize_csv.py` on `data/sample.csv`.
+Create `scripts/inspect_data.py` with the four lines from the primer. Then:
+
+1. run it from the main `bash_lab/` folder with `uv run python scripts/inspect_data.py`;
+2. change `head()` to `tail()`, save the file, and rerun it;
+3. move into `scripts/` and try to run it there;
+4. use the error and `pwd` to explain why `data/sample.csv` was not found;
+5. return to the main `bash_lab/` folder and run it successfully again.
+
+## 5. Run a supplied Python script with an input
+
+1. Run `uv run python scripts/summarize_csv.py data/sample.csv`.
 2. Check the exit status immediately.
 3. Run the script on a path that does not exist.
 4. Check the new exit status and explain the difference.
 
-## 5. Write a rerunnable Bash script
+## Optional challenge: write a rerunnable Bash script
 
 Create `audit_errors.sh` that:
 
@@ -66,5 +76,6 @@ Without running a command, answer:
 1. How does a pipe differ from redirection?
 2. Why must a path containing spaces be quoted?
 3. What does a nonzero exit status tell you?
-4. Why should `git diff` come before `git restore`?
-5. Why does a Colab shell not represent the same state as your local project repository?
+4. What is one reason to use a notebook and one reason to use a script?
+5. Why should `git diff` come before `git restore`?
+6. Why does a Colab shell not represent the same state as your local project repository?

@@ -2,8 +2,8 @@
 
 Use this repository for your COMPSS 211A team project. Replace the bracketed
 prompts as your project develops. A reader should eventually be able to use
-this page to understand your question, find your analysis, and reproduce your
-main result.
+this README to reproduce your work and use the project website to understand
+your question, evidence, interpretation, and limitations.
 
 ## Project overview
 
@@ -42,6 +42,7 @@ before adding a package or changing the environment files.
 ```text
 .
 ├── README.md        project question, run order, and main findings
+├── docs/            final project website published with GitHub Pages
 ├── notebooks/       exploration, analysis, figures, and explanations
 ├── scripts/         repeated tasks that should run the same way each time
 ├── data/            permitted small data files or data-access instructions
@@ -107,7 +108,8 @@ A simple notebook-first workflow is:
 3. test cleaning and analysis steps in small notebook cells;
 4. move only stable, repeated tasks into `scripts/`;
 5. restart each important notebook and run it from top to bottom;
-6. record the final run order in this README.
+6. record the final run order in this README;
+7. build the web report in `docs/index.md` from results you have verified.
 
 ### Current run order
 
@@ -183,12 +185,44 @@ Complete this section as the analysis develops.
 - **Strongest claim supported:** [A bounded conclusion]
 - **Claim not supported:** [A tempting conclusion the project cannot make]
 
-## Project page later in the course
+## Final project website
 
-The instructional team may ask you to add a small project page in a `docs/`
-folder. Treat that page as a clear summary of the evidence already in the
-repository, not as a separate web-development project. Publish only material
-that is safe to make public.
+The website is your final written product and the surface your team will
+present from. You do not need to write a separate report or create a separate
+slide deck.
+
+Start with `docs/index.md`. The template asks for:
+
+- the research question and why it matters;
+- the data source, unit of analysis, coverage, and ethical considerations;
+- methods explained in clear language;
+- findings supported by readable figures or tables;
+- interpretation, limitations, and claims the evidence does not support;
+- reproducibility information and a link to the repository;
+- references.
+
+This is a web report, not a web-design assignment. Use the provided Markdown
+template and simple theme. You are graded on the quality of the research,
+evidence, interpretation, reproducibility, and communication—not on custom
+HTML, CSS, or JavaScript.
+
+### Publish with GitHub Pages
+
+1. Edit `docs/index.md` and save public-safe figures in `docs/assets/`.
+2. Push the finished work to `main` through the normal branch and pull-request
+   workflow.
+3. On GitHub, open **Settings → Pages**.
+4. Choose **Deploy from a branch**, select `main`, and select the `/docs`
+   folder.
+5. Open the published URL and check every section, image, and link.
+
+GitHub Pages sites are public. Do not publish restricted data, identifying
+information, credentials, or material you do not have permission to share.
+If the topic or data cannot be discussed safely on a public page, contact the
+instructional team early for a sanitized or offline alternative.
+
+Before presenting, print or export the website to PDF. This is only an
+archival copy and offline backup; it is not a separate report.
 
 ## Before submitting
 
@@ -198,7 +232,11 @@ that is safe to make public.
 - [ ] Important notebooks run from top to bottom in a fresh kernel.
 - [ ] Scripts can be run from the repository folder with their documented
       command.
-- [ ] Figures and reported values match the final report.
+- [ ] The website includes the required research, evidence, interpretation,
+      limitation, reproducibility, and reference sections.
+- [ ] Figures and reported values match the notebooks and scripts.
+- [ ] The GitHub Pages URL works in a signed-out browser.
+- [ ] A PDF snapshot of the website is ready as a presentation backup.
 - [ ] The data source, exclusions, and sharing limits are documented.
 - [ ] No credentials, restricted data, or accidental large files are present.
 - [ ] The final contribution of each team member is recorded.
