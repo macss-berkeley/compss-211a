@@ -3,10 +3,10 @@
 .claude
 .virtual_documents/
 .venv/
-.github/
 .env
 .vscode/
 wandb/
 *.wandb
 /course-planning
 /generated/
+.agents/skills/bcourses-admin/

@@ -1,75 +1,84 @@
-# Week 9: document embeddings, similarity, and clustering
+# Week 9: word and document embeddings
 
-This week asks how we can organize a collection of documents without treating a model's geometry as social truth.
+An embedding is a row of numbers that places an item in a vector space. We use the space to compare items, but the space does not tell us what a result means. That part still requires reading, judgment, and knowledge of the data.
 
-## Representation ladder
+## Two kinds of rows
 
-| Representation | One row represents | One column represents | Main use |
-|---|---|---|---|
-| Count matrix | A document | A word or phrase | Record which features occur |
-| TF-IDF matrix | A document | A weighted word or phrase | Emphasize features that distinguish documents |
-| LSA matrix | A document | A compressed direction of term-use variation | Compare and organize documents in fewer dimensions |
+| Model | One row represents | What nearness can suggest |
+|---|---|---|
+| Word embedding | A word | The words appear in similar documents or contexts |
+| Document embedding | A whole document | The documents use similar language or occupy similar model dimensions |
 
-`TruncatedSVD` creates the LSA matrix from TF-IDF. Its dimensions summarize correlated patterns in feature use. They are not automatically topics, causes, attitudes, or natural social categories.
+Near words are not always synonyms. Near documents do not necessarily agree or belong to one clear topic.
 
-## Word and document embeddings
+## Word vectors from the AITA comments
 
-- A **word embedding** gives one vector to a word or token. Word2Vec and GloVe are examples.
-- A **document embedding** gives one vector to an entire document. This week uses TF-IDF followed by TruncatedSVD.
+The lecture starts with a TF-IDF table whose rows are Reddit comments and whose columns are words. `TruncatedSVD` compresses that table. We then turn the result around so that each row represents a word.
 
-Both are geometric representations learned from data. Neither is a dictionary definition or guaranteed measure of meaning.
+With the current course file, the shapes are:
 
-## Shape glossary
+- comment-by-word TF-IDF table: `(5000, 1727)`
+- word-vector table: `(1727, 50)`
 
-Suppose 80 documents produce 1,200 TF-IDF features and we retain 8 LSA dimensions.
+The model places words near each other when they are used in similar comments. For example, `wedding` is close to words about brides, clothing, and events. `family` is close to words about relatives and traditions. These results describe this corpus. A news archive or a medical corpus would produce another space.
 
-- TF-IDF shape: `(80, 1200)`
-- LSA shape: `(80, 8)`
-- The number of rows stays 80 because the unit is still a document.
-- The number of columns changes because 1,200 text features were compressed into 8 dimensions.
+This is a small LSA word embedding built for class. Pretrained models such as Word2Vec, GloVe, and newer neural embedding models are trained differently and on much more text. The basic workflow is still recognizable: get a vector for each item, compare the vectors, and read the source material before interpreting the comparison.
 
-Always inspect shapes, missing text, duplicate IDs, zero vectors, and nonfinite values before interpretation.
+## Document vectors from OpenAlex
+
+For documents, the TF-IDF table already has the orientation we want: one abstract per row. LSA compresses its many term columns into a smaller number of dimensions.
+
+The current OpenAlex sample produces:
+
+- TF-IDF table: `(80, 1264)`
+- LSA table: `(80, 8)`
+
+The number of rows stays at 80 because the unit is still an abstract. The number of columns falls from 1,264 terms to eight model dimensions.
+
+In the current run, those eight dimensions retain about 14 percent of the variation in the TF-IDF table. That is substantial compression. It makes a small example easy to inspect, but some information is lost.
+
+## TF-IDF and LSA can give different neighbors
+
+TF-IDF similarity is driven by shared weighted terms. LSA similarity is based on compressed patterns across terms. An abstract can therefore have one set of neighbors under TF-IDF and another under LSA.
+
+Neither list should be accepted from titles alone. Read the anchor abstract and its nearest matches. Look for the language or subject matter that explains the score, and note anything that makes the match doubtful.
 
 ## Cosine similarity
 
-Cosine similarity compares the direction of two vectors. Values closer to 1 indicate more similar directions in the chosen representation.
+Cosine similarity compares the direction of two vectors. A value closer to 1 means that the two vectors point in more similar directions in the chosen representation.
 
-High cosine similarity does **not** prove that two documents:
+A high score does not prove that two documents make the same argument, agree with each other, or belong to a natural category. The score can also change when you change preprocessing, the corpus, or the number of LSA dimensions.
 
-- make the same argument;
-- belong to a true topic;
-- come from the same social group;
-- agree with each other;
-- are similar under a different preprocessing or representation choice.
+## Clustering choices
 
-Inspect the original documents before explaining a similarity score.
-
-## Clustering parameters
-
-| Choice | What it controls | Question to ask |
+| Choice | What it changes | What to check |
 |---|---|---|
-| `n_components` | LSA dimension count | Which variation may compression preserve or hide? |
-| `n_clusters` / `k` | Number of KMeans groups | Is this a useful partition for the research purpose? |
-| `random_state` | Reproduces a particular randomized procedure | Can another person obtain the same result? |
-| `n_init` | Number of initial KMeans solutions compared | Is the chosen solution sensitive to a weak initialization? |
+| `n_components` | Number of LSA dimensions | How much information did compression retain? |
+| `n_clusters` | Number of KMeans groups | Do the groups remain useful at another reasonable value? |
+| `random_state` | Random steps in the procedure | Can someone reproduce this particular result? |
+| `n_init` | Number of starting solutions tried | Is the result based on a weak starting point? |
 
-A fixed seed supports reproducibility. It does not establish validity.
+A fixed random seed helps someone rerun the analysis. It does not make a cluster valid.
 
-## Cluster-inspection checklist
+Before naming a cluster:
 
-Before assigning a provisional label:
+1. Check its size.
+2. Read several titles and abstracts.
+3. Look for documents that do not fit the tempting label.
+4. Compare the result with another value of `k`.
+5. Describe it as a group made by this model, not a category discovered in the world.
 
-1. Check how many documents are in the cluster.
-2. Inspect several high-weight features.
-3. Read at least three original documents.
-4. Look for documents that contradict the tempting label.
-5. Compare another defensible value of `k` or another representation choice.
-6. State what the corpus and acquisition filter exclude.
-7. Write "documents grouped by this model," not "natural kinds discovered in the data."
+It is acceptable to leave a cluster unlabeled when its documents do not support a clear description.
 
-## Data note
+## About the course data
 
-The frozen Week 6 OpenAlex fixture contains two genuine public OpenAlex records and demonstrates data lineage. Two documents are not enough for a useful clustering exercise. The Week 9 modeling corpus is therefore a separate, clearly labeled synthetic teaching fixture. It supports learning the workflow but cannot support claims about Berkeley scholarship, students, or public opinion.
+The AITA file is a fixed historical sample of Reddit comments included for teaching. It is not a sample of Reddit as a whole.
+
+The OpenAlex file contains 80 works with abstracts and at least one UC Berkeley-affiliated authorship. That filter does not mean every work was led by Berkeley or written by Berkeley faculty. The small sample is useful for practicing the workflow, not for making broad claims about Berkeley research.
+
+## Newer embedding models
+
+Current embedding models can handle context and word order better than this small LSA model. A library or API can create those vectors with very little code. It cannot decide what counts as a document, whether the corpus fits the research question, or whether a nearest neighbor makes sense after close reading.
 
 ## Documentation
 
@@ -78,4 +87,4 @@ The frozen Week 6 OpenAlex fixture contains two genuine public OpenAlex records 
 - [Cosine similarity](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise.cosine_similarity.html)
 - [KMeans](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html)
 
-Optional ethical extension: the Caliskan, Bryson, and Narayanan study on historical stereotypes in word embeddings is relevant to the broader claim that representations inherit associations from their training corpora. Word2Vec and GloVe are not required methods this week.
+For a later discussion of bias, the Caliskan, Bryson, and Narayanan study shows how word embeddings can reproduce historical associations found in their training data.

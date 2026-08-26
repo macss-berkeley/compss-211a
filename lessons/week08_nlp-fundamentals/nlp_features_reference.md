@@ -38,6 +38,18 @@ Modern contextual language models can use word order and more surrounding contex
 
 Keep an untouched `text` column. Put any transformed version in a new column so that you can compare it with the source.
 
+## Real corpus used in lecture
+
+After the six synthetic opening examples, the live notebook uses `data/aita_top_comments.csv`: 5,000 historical comments from r/AmItheAsshole. The lesson keeps only the comment body and score and does not display usernames.
+
+The corpus supports three concrete preprocessing questions:
+
+1. What evidence disappears when lowercasing removes capitalization?
+2. What happens when a standard English stop-word list removes negation such as `not`?
+3. Should AITA verdict labels such as `NTA` and `YTA` remain features when the research question concerns commenters' reasons rather than their verdicts?
+
+The answer depends on the research question. Removing a platform-specific label may reduce noise for one task and destroy the outcome of interest for another. This historical, highly scored snapshot is not representative of Reddit users or public opinion.
+
 ## Vectorizer choices
 
 - `lowercase=True` merges case variants but removes case as a feature.

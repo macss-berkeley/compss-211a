@@ -15,7 +15,7 @@ During the semester, you will:
 
 Some exercises use public snapshots; others use synthetic data written for class. Either way, a result is only as good as its source, checks, and interpretation. You are expected to understand submitted code, document AI assistance, keep credentials out of notebooks, and remain accountable for every claim.
 
-The course ends with a team project based on a text dataset. Your team will pose a social-science question, build a reproducible analysis, inspect errors and limitations, and present the result through code, a report, and a short talk.
+The course ends with a team project based on a text dataset. Your team will pose a social-science question, build a reproducible analysis, inspect errors and limitations, and present the result through a reproducible repository, a public-facing website, and a short website walkthrough.
 
 ## Local setup
 

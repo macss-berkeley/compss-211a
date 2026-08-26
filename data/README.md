@@ -15,12 +15,30 @@ final-project datasets.
   campus-related issue categories.
 - `hw5_recorded_evaluation_fixture.csv`: deterministic synthetic labels for
   offline mechanics. These are not live Gemini outputs.
+- `week08_preprocessing_signals.csv`: six short examples used to make
+  negation, punctuation, capitalization, emoji, and missing context visible.
+- `week10_campus_routing_fixture.csv`: 30 synthetic training records, 12
+  synthetic evaluation records, and recorded predictions for the Week 10
+  live evaluation. No API call is needed.
 - `optional_sql_berkeley_services.sqlite`: a synthetic relational
   program/session database.
 
 All synthetic generators use seed 211 where randomness is needed. These files
 must not be described as observations about Berkeley students or campus
 operations.
+
+## Historical Reddit snapshots
+
+- `aita_top_comments.csv` contains 5,000 highly scored historical comments from
+  r/AmItheAsshole. Week 8 uses only `body` and `score`; usernames should not be
+  displayed in class materials.
+- `aita_top_subs.csv` contains 5,000 historical submissions from the same
+  subreddit and includes titles, post text, scores, and platform metadata.
+
+These convenience samples are not representative of Reddit users or public
+opinion and may contain sensitive language. The original collection provenance
+is not recorded in this repository, so confirm it before redistributing these
+files outside the course.
 
 ## City of Berkeley 311 snapshot
 
