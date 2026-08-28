@@ -72,5 +72,5 @@ Weeks on Git, the command line, or local package management still require the lo
 ## Contributors
 
 - [Tom van Nuenen](https://github.com/tomvannuenen)
-- [Pratik Sachdeva](https://github.com/pssachdeva)
 - [Arul Murugan Renganathan](mailto:arul@berkeley.edu)
+- [Pratik Sachdeva](https://github.com/pssachdeva)
