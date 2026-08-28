@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="description" content="Interactive pre-quiz warmup for COMPSS 211A Week 8: watch four campus comments move through the full pipeline (raw text, tokens, counts, TF-IDF, top terms) and see how preprocessing choices change interpretation.">
+<title>Understanding TF-IDF · COMPSS 211A</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Inter+Tight:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   COMPSS 211A shared design system · Week 8 · Understanding TF-IDF
+   ============================================================ */
+:root {
+  --berkeley:#002676;
+  --ink:#1A1A1A;
+  --paper:#FFFFFF;
+  --card:#FFFFFF;
+  --gold:#FDBA12;
+  --gold-soft:#FFF1CC;
+  --blue-mid:#2A4D9B;
+  --line:#DDDDDD;
+  --ok:#1E7D4E;
+  --err:#B3403A;
+  --code-bg:#0E1B45;
+  --code-ink:#E8EDF6;
+  --font-display:"Inter Tight","Inter",-apple-system,"Segoe UI",sans-serif;
+  --font-body:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+* { box-sizing:border-box; margin:0; padding:0; }
+
+html { scroll-behavior:auto; }
+
+body {
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.55;
+  color:var(--ink);
+  background-color:var(--paper);
+  /* subtle pure-CSS grain */
+  background-size:7px 7px, 11px 11px;
+  background-position:0 0, 3px 5px;
+}
+
+.wrap { max-width:940px; margin:0 auto; padding:24px 20px 48px; }
+
+a { color:var(--blue-mid); }
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+input[type="radio"]:focus-visible,
+textarea:focus-visible {
+  outline:3px solid var(--gold);
+  outline-offset:2px;
+  border-radius:4px;
+}
+
+.sr-only {
+  position:absolute; width:1px; height:1px;
+  padding:0; margin:-1px; overflow:hidden;
+  clip:rect(0 0 0 0); white-space:nowrap; border:0;
+}
+
+/* ---------- Header ---------- */
+.back-link {
+  display:inline-block;
+  font-size:0.85rem;
+  font-weight:600;
+  text-decoration:none;
+  color:var(--blue-mid);
+  margin-bottom:18px;
+}
+.back-link:hover { text-decoration:underline; }
+
+.eyebrow {
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  font-weight:500;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--blue-mid);
+  margin-bottom:8px;
+}
+
+h1 {
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:clamp(1.9rem, 4.5vw, 2.6rem);
+  line-height:1.12;
+  color:var(--berkeley);
+  margin-bottom:12px;
+}
+
+.chip-row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+
+.meta-chip {
+  display:inline-block;
+  font-size:0.78rem;
+  font-weight:600;
+  padding:4px 12px;
+  border-radius:3px;
+}
+.meta-chip.gold { background:var(--gold); color:var(--ink); }
+.meta-chip.outline { background:transparent; color:var(--ink); border:1.5px solid var(--line); }
+
+.promise { max-width:62ch; margin-bottom:16px; }
+
+.gold-rule { height:3px; background:var(--gold); border:0; margin-bottom:26px; }
+
+/* ---------- Cards ---------- */
+.card {
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:4px;
+  box-shadow:0 1px 2px rgba(18,35,61,0.04), 0 6px 18px rgba(18,35,61,0.05);
+  padding:22px 24px;
+  margin-bottom:22px;
+}
+
+.stage-eyebrow {
+  font-family:var(--font-mono);
+  font-size:0.7rem;
+  font-weight:500;
+  letter-spacing:0.13em;
+  text-transform:uppercase;
+  color:var(--blue-mid);
+  margin-bottom:4px;
+}
+
+.card h2 {
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:1.35rem;
+  color:var(--berkeley);
+  margin-bottom:6px;
+}
+
+.card .sub { font-size:0.93rem; margin-bottom:14px; max-width:70ch; }
+
+.tag {
+  display:inline-block;
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  padding:2px 10px;
+  border-radius:3px;
+  background:var(--gold-soft);
+  border:1px solid var(--line);
+  margin-left:6px;
+  vertical-align:middle;
+  white-space:nowrap;
+}
+
+.smallnote { font-size:0.82rem; color:rgba(18,35,61,0.72); margin-top:10px; max-width:72ch; }
+.smallnote code, .sub code, .why code, li code {
+  font-family:var(--font-mono);
+  font-size:0.86em;
+  background:var(--gold-soft);
+  border-radius:4px;
+  padding:1px 5px;
+}
+
+/* ---------- Corpus editor ---------- */
+.doc-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+
+.doc-badge {
+  flex:none;
+  font-family:var(--font-mono);
+  font-size:0.78rem;
+  font-weight:500;
+  color:var(--berkeley);
+  background:var(--gold-soft);
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:3px 8px;
+}
+
+.doc-row textarea {
+  flex:1;
+  font-family:var(--font-mono);
+  font-size:0.9rem;
+  line-height:1.4;
+  color:var(--ink);
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:8px 11px;
+  resize:none;
+  overflow-x:hidden;
+  overflow-y:auto;
+  min-height:38px;
+  max-height:76px;
+}
+
+.corpus-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+
+button.plain {
+  font-family:var(--font-body);
+  font-weight:600;
+  font-size:0.83rem;
+  color:var(--berkeley);
+  background:#fff;
+  border:1.5px solid var(--line);
+  border-radius:3px;
+  padding:6px 14px;
+  cursor:pointer;
+}
+button.plain:hover { border-color:var(--blue-mid); }
+
+/* ---------- Toggle controls ---------- */
+#controls { z-index:30; }
+@media (min-width:760px) {
+  #controls { position:sticky; top:10px; }
+}
+
+.switch-grid {
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px 26px;
+  align-items:flex-start;
+}
+
+.switch {
+  display:inline-flex;
+  align-items:flex-start;
+  gap:10px;
+  cursor:pointer;
+  -webkit-user-select:none;
+  user-select:none;
+}
+.switch input {
+  position:absolute;
+  opacity:0;
+  width:1px;
+  height:1px;
+}
+.track {
+  flex:none;
+  width:42px;
+  height:24px;
+  border-radius:3px;
+  background:#E9E2D4;
+  border:1px solid var(--line);
+  position:relative;
+  margin-top:2px;
+}
+.track::after {
+  content:"";
+  position:absolute;
+  top:2px;
+  left:2px;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:#fff;
+  border:1px solid var(--line);
+}
+.switch input:checked + .track { background:var(--berkeley); border-color:var(--berkeley); }
+.switch input:checked + .track::after { left:20px; border-color:#fff; }
+.switch input:focus-visible + .track { outline:3px solid var(--gold); outline-offset:2px; }
+.switch input:disabled + .track { opacity:0.4; }
+.switch input:disabled ~ .switch-text { opacity:0.5; }
+.switch input:disabled { cursor:not-allowed; }
+
+.switch-text { display:block; max-width:220px; }
+.switch-text strong { display:block; font-size:0.92rem; font-weight:600; }
+.switch-text small { display:block; font-size:0.76rem; color:rgba(18,35,61,0.68); line-height:1.35; }
+
+.subswitch {
+  margin:10px 0 0 24px;
+  padding-left:14px;
+  border-left:2px solid var(--gold-soft);
+}
+
+#controls details { margin-top:14px; font-size:0.84rem; }
+#controls summary {
+  cursor:pointer;
+  font-weight:600;
+  color:var(--blue-mid);
+  font-size:0.84rem;
+}
+.stoplist { margin-top:8px; line-height:2; }
+.stoplist .sw {
+  font-family:var(--font-mono);
+  font-size:0.78rem;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:1px 7px;
+  margin-right:4px;
+  white-space:nowrap;
+}
+.stoplist .sw.neg { background:var(--gold-soft); border-color:var(--gold); font-weight:500; }
+.stoplist .sw.off { text-decoration:line-through; opacity:0.45; }
+
+.pipe-note {
+  margin-top:12px;
+  font-family:var(--font-mono);
+  font-size:0.76rem;
+  color:rgba(18,35,61,0.75);
+  line-height:1.6;
+}
+
+/* ---------- Stage A: token strips ---------- */
+.strip { display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-bottom:1px dashed var(--line); }
+.strip:last-child { border-bottom:0; }
+.strip .doc-badge { margin-top:3px; }
+.strip-body { flex:1; min-width:0; }
+
+.chips-row { display:flex; flex-wrap:wrap; align-items:center; gap:5px; min-height:30px; }
+
+.chip {
+  display:inline-block;
+  font-family:var(--font-mono);
+  font-size:0.84rem;
+  color:var(--ink);
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:2px 9px;
+  max-width:44ch;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.chip.bigram { background:var(--gold-soft); }
+.chip.ghost { opacity:0.35; border-style:dashed; }
+.chip.negkept { border-color:var(--gold); box-shadow:0 0 0 1px var(--gold) inset; }
+
+.bigram-label {
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:rgba(18,35,61,0.6);
+  margin-right:2px;
+}
+.bi-row { margin-top:6px; }
+
+.empty-doc { font-size:0.84rem; color:rgba(18,35,61,0.55); font-style:italic; }
+
+.strip-legend { margin-top:12px; font-size:0.8rem; color:rgba(18,35,61,0.72); }
+.strip-legend .chip { font-size:0.74rem; padding:0 7px; }
+
+/* ---------- Tables (Stages B & C) ---------- */
+.table-wrap {
+  overflow-x:auto;
+  border:1px solid var(--line);
+  border-radius:4px;
+  background:#fff;
+}
+
+table {
+  border-collapse:separate;
+  border-spacing:0;
+  width:100%;
+  font-size:0.85rem;
+}
+caption { text-align:left; }
+
+th, td {
+  padding:7px 11px;
+  border-bottom:1px solid var(--line);
+  text-align:center;
+  white-space:nowrap;
+  font-family:var(--font-mono);
+  font-weight:400;
+}
+thead th {
+  font-size:0.78rem;
+  font-weight:500;
+  color:var(--berkeley);
+  background:#fff;
+  border-bottom:2px solid var(--line);
+}
+tbody tr:last-child th,
+tbody tr:last-child td { border-bottom:0; }
+
+th.rowhead, td.corner {
+  position:sticky;
+  left:0;
+  z-index:2;
+  background:var(--card);
+  text-align:left;
+  border-right:1px solid var(--line);
+  font-weight:500;
+  color:var(--berkeley);
+}
+
+td.zero { color:rgba(18,35,61,0.62); }
+td.topcell { box-shadow:inset 0 0 0 2px var(--berkeley); }
+
+.matrix-note { font-size:0.82rem; color:rgba(18,35,61,0.72); margin-top:10px; }
+
+/* ---------- Stage C extras ---------- */
+.idea-callout {
+  font-family:var(--font-display);
+  font-weight:500;
+  font-size:1.12rem;
+  line-height:1.4;
+  color:var(--berkeley);
+  background:var(--gold-soft);
+  border:1px solid var(--line);
+  border-left:4px solid var(--gold);
+  border-radius:4px;
+  padding:12px 16px;
+  margin-bottom:14px;
+  max-width:64ch;
+}
+
+.legend-row {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 18px;
+  font-size:0.8rem;
+  margin-bottom:14px;
+}
+.legend-row span { white-space:nowrap; }
+.legend-row b { font-family:var(--font-mono); font-weight:500; color:var(--berkeley); }
+
+.footnote { font-size:0.78rem; color:rgba(18,35,61,0.66); margin-top:10px; }
+
+/* ---------- Stage D: top terms ---------- */
+.tops-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(190px, 1fr));
+  gap:12px;
+}
+.top-card {
+  border:1px solid var(--line);
+  border-radius:4px;
+  background:#fff;
+  padding:12px 14px;
+}
+.top-card .doc-badge { margin-bottom:6px; display:inline-block; }
+.top-card .snippet {
+  font-size:0.74rem;
+  color:rgba(18,35,61,0.62);
+  margin-bottom:8px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.top-card ol { list-style:none; counter-reset:tt; }
+.top-card li {
+  counter-increment:tt;
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  font-family:var(--font-mono);
+  font-size:0.84rem;
+  padding:3px 0;
+}
+.top-card li::before {
+  content:counter(tt);
+  flex:none;
+  font-size:0.7rem;
+  color:#fff;
+  background:var(--berkeley);
+  border-radius:50%;
+  width:16px;
+  height:16px;
+  line-height:16px;
+  text-align:center;
+}
+.top-card li .term { flex:1; overflow:hidden; text-overflow:ellipsis; }
+.top-card li .wt { color:var(--blue-mid); font-size:0.78rem; }
+.top-card .none { font-size:0.8rem; font-style:italic; color:rgba(18,35,61,0.55); }
+
+/* ---------- Predict-then-reveal cards ---------- */
+.predict { border-left:4px solid var(--gold); }
+.predict h2 { font-size:1.15rem; }
+.predict fieldset { border:0; margin:10px 0 12px; }
+.predict legend { font-weight:600; font-size:0.95rem; margin-bottom:8px; max-width:68ch; }
+
+.predict .opt {
+  display:flex;
+  gap:9px;
+  align-items:flex-start;
+  padding:7px 10px;
+  border:1px solid var(--line);
+  border-radius:4px;
+  margin-bottom:7px;
+  cursor:pointer;
+  background:#fff;
+  font-size:0.92rem;
+}
+.predict .opt:hover { border-color:var(--blue-mid); }
+.predict .opt input { margin-top:3px; accent-color:var(--berkeley); }
+
+button.check {
+  font-family:var(--font-body);
+  font-weight:600;
+  font-size:0.9rem;
+  color:var(--ink);
+  background:var(--gold);
+  border:1.5px solid var(--gold);
+  border-radius:3px;
+  padding:8px 20px;
+  cursor:pointer;
+}
+button.check:hover { filter:brightness(1.05); }
+
+.verdict { margin-top:12px; font-size:0.92rem; max-width:72ch; display:none; }
+.verdict.show { display:block; }
+.verdict .headline { font-weight:600; display:block; margin-bottom:4px; }
+.verdict.good .headline { color:var(--ok); }
+.verdict.bad .headline { color:var(--err); }
+.verdict .why { color:var(--ink); }
+.verdict .nudge { display:block; margin-top:6px; font-size:0.85rem; color:var(--blue-mid); font-weight:600; }
+
+/* ---------- Recap ---------- */
+#recap { background:var(--berkeley); border-color:var(--berkeley); color:#F5F8FC; }
+#recap .stage-eyebrow { color:var(--gold); }
+#recap h2 { color:#fff; }
+#recap ul { list-style:none; margin-top:10px; }
+#recap li {
+  padding:8px 0 8px 26px;
+  position:relative;
+  font-size:0.93rem;
+  max-width:74ch;
+  border-bottom:1px solid rgba(255,255,255,0.14);
+}
+#recap li:last-child { border-bottom:0; }
+#recap li::before {
+  content:"";
+  position:absolute;
+  left:2px;
+  top:15px;
+  width:10px;
+  height:10px;
+  border-radius:3px;
+  background:var(--gold);
+}
+#recap li strong { color:var(--gold-soft); }
+#recap li code {
+  font-family:var(--font-mono);
+  font-size:0.85em;
+  background:rgba(255,255,255,0.12);
+  border-radius:4px;
+  padding:1px 5px;
+  color:var(--code-ink);
+}
+
+/* ---------- Footer ---------- */
+footer {
+  border-top:1px solid var(--line);
+  margin-top:34px;
+  padding-top:16px;
+  font-size:0.8rem;
+  color:rgba(18,35,61,0.66);
+}
+
+/* ---------- Motion (only when allowed) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .fade { animation:rise 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both; animation-delay:var(--d, 0s); }
+  @keyframes rise {
+    from { opacity:0; transform:translateY(14px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .chip { animation:chipIn 0.28s ease-out both; }
+  @keyframes chipIn {
+    from { opacity:0; transform:scale(0.85); }
+    to   { opacity:1; transform:scale(1); }
+  }
+  .chip { transition:opacity 0.4s ease, max-width 0.4s ease, padding 0.4s ease, margin 0.4s ease, border-width 0.4s ease, transform 0.4s ease; }
+  .chip.vanish {
+    opacity:0 !important;
+    max-width:0;
+    padding-left:0;
+    padding-right:0;
+    margin:0;
+    border-width:0;
+    transform:scale(0.8);
+  }
+  .track { transition:background 0.18s ease; }
+  .track::after { transition:left 0.18s ease; }
+  td { transition:background-color 0.3s ease; }
+}
+
+@media (max-width:640px) {
+  .card { padding:18px 16px; }
+  .switch-text { max-width:160px; }
+}
+
+/* ═══ MaCSS skin, aligned with macss.berkeley.edu ═══ */
+html,body{overflow-x:clip}
+.mast{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:12px calc(50vw - 50%);display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.14)}
+.mast .brand{color:#fff;font-family:var(--sans);font-size:.9rem;font-weight:600;letter-spacing:.01em}
+.mast .brand .uc{font-family:Georgia,"Times New Roman",serif;color:var(--gold);font-size:1.04rem;font-weight:700;margin-right:7px}
+.mast a{color:#fff;font-family:var(--sans);font-weight:600;font-size:.83rem;text-decoration:none;border-bottom:1.5px solid rgba(255,255,255,.35);border-radius:0}
+.mast a:hover{border-bottom-color:var(--gold);color:#fff;text-decoration:none}
+.mast a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap>header,.page>header{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:30px calc(50vw - 50%) 28px;border-bottom:5px solid var(--gold);margin-bottom:40px}
+.wrap>header .eyebrow,.page>header .eyebrow{display:none}
+.wrap>header h1,.page>header h1{color:#fff;font-weight:800;letter-spacing:-.015em}
+.wrap>header .lede,.wrap>header .promise,.page>header .promise,.page>header .lede{color:rgba(255,255,255,.9)}
+.wrap>header .chip-line,.wrap>header .chip-outline,.page>header .chip-outline,.wrap>header .meta-chip.outline{border-color:rgba(255,255,255,.55);color:#fff;background:transparent}
+.rule,.goldrule,.gold-rule{display:none}
+.rise,.reveal,.fade{opacity:1!important;transform:none!important;animation:none!important}
+h2 .step{color:var(--berkeley)}
+footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(50% - 50vw) 0;padding:20px calc(50vw - 50%) 26px;border-top:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="mast"><span class="brand"><span class="uc">UC Berkeley</span>COMPSS 211A · Computing I</span><a href="../index.html">← All interactives</a></div>
+
+  <header>
+    <p class="eyebrow">COMPSS 211A &middot; COMPUTING I</p>
+    <h1>Understanding TF-IDF</h1>
+    <div class="chip-row">
+      <span class="meta-chip gold">Week 8 &middot; NLP Fundamentals</span>
+      <span class="meta-chip outline">&approx; 8 minutes</span>
+    </div>
+    <p class="promise">Four campus comments move through the whole pipeline (raw text, tokens, counts, TF-IDF, top terms) as you type and toggle. Each preprocessing choice changes what you would conclude.</p>
+    <hr class="gold-rule">
+  </header>
+
+  <main>
+
+    <!-- ================= Corpus ================= -->
+    <section class="card fade" style="--d:0.03s" aria-labelledby="corpus-h">
+      <div class="corpus-head">
+        <div>
+          <p class="stage-eyebrow">The corpus</p>
+          <h2 id="corpus-h">Four campus comments</h2>
+        </div>
+        <button type="button" class="plain" id="reset-btn">Reset corpus</button>
+      </div>
+      <p class="sub">A small synthetic corpus, similar to your homework&rsquo;s campus comments. Each line is one <strong>document</strong>. Edit any line and every stage below recomputes.</p>
+
+      <div class="doc-row">
+        <label class="doc-badge" for="doc0">D1<span class="sr-only">, document 1 text</span></label>
+        <textarea id="doc0" rows="1" spellcheck="false">The library wifi is not working again this week.</textarea>
+      </div>
+      <div class="doc-row">
+        <label class="doc-badge" for="doc1">D2<span class="sr-only">, document 2 text</span></label>
+        <textarea id="doc1" rows="1" spellcheck="false">Late night library wifi keeps dropping during finals.</textarea>
+      </div>
+      <div class="doc-row">
+        <label class="doc-badge" for="doc2">D3<span class="sr-only">, document 3 text</span></label>
+        <textarea id="doc2" rows="1" spellcheck="false">The campus shuttle schedule is great this semester.</textarea>
+      </div>
+      <div class="doc-row">
+        <label class="doc-badge" for="doc3">D4<span class="sr-only">, document 4 text</span></label>
+        <textarea id="doc3" rows="1" spellcheck="false">Great coffee near the shuttle stop makes mornings easier.</textarea>
+      </div>
+    </section>
+
+    <!-- ================= Toggles ================= -->
+    <section class="card fade" id="controls" style="--d:0.06s" aria-labelledby="controls-h">
+      <p class="stage-eyebrow">Preprocessing choices</p>
+      <h2 id="controls-h">The pipeline, four switches</h2>
+      <p class="sub">Every switch is a decision someone makes before any model runs. Flip them and watch the stages below.</p>
+
+      <div class="switch-grid">
+        <label class="switch">
+          <input type="checkbox" id="tg-lower">
+          <span class="track" aria-hidden="true"></span>
+          <span class="switch-text">
+            <strong>lowercase</strong>
+            <small>merge case variants: <code>The</code> &rarr; <code>the</code> (sklearn: <code>lowercase=True</code>)</small>
+          </span>
+        </label>
+
+        <label class="switch">
+          <input type="checkbox" id="tg-punct">
+          <span class="track" aria-hidden="true"></span>
+          <span class="switch-text">
+            <strong>strip punctuation</strong>
+            <small>drop anything that isn&rsquo;t a letter or number: <code>week.</code> &rarr; <code>week</code></small>
+          </span>
+        </label>
+
+        <label class="switch">
+          <input type="checkbox" id="tg-stop">
+          <span class="track" aria-hidden="true"></span>
+          <span class="switch-text">
+            <strong>remove stopwords</strong>
+            <small>drop very common words from a fixed list (matched case-insensitively); see the list below</small>
+          </span>
+        </label>
+
+        <label class="switch">
+          <input type="checkbox" id="tg-bigrams">
+          <span class="track" aria-hidden="true"></span>
+          <span class="switch-text">
+            <strong>include bigrams</strong>
+            <small>n-grams: also count adjacent token pairs, e.g. <code>library wifi</code> (sklearn: <code>ngram_range=(1,&nbsp;2)</code>)</small>
+          </span>
+        </label>
+      </div>
+
+      <div class="subswitch">
+        <label class="switch">
+          <input type="checkbox" id="tg-keepneg" disabled>
+          <span class="track" aria-hidden="true"></span>
+          <span class="switch-text">
+            <strong>keep negations</strong>
+            <small>curated stopword list: keep <code>not</code>, <code>no</code>, <code>never</code>, <code>nor</code> (only applies while stopword removal is on)</small>
+          </span>
+        </label>
+      </div>
+
+      <details>
+        <summary>See this page&rsquo;s stopword list</summary>
+        <p class="stoplist" id="stoplist"></p>
+        <p class="smallnote">Gold entries are negations; they are struck through while <em>keep negations</em> is on. This curated list is a <strong>choice</strong>. scikit-learn&rsquo;s <code>stop_words="english"</code> list is much longer, and it also contains <code>not</code>.</p>
+      </details>
+
+      <p class="pipe-note">Order of operations: lowercase &rarr; strip punctuation &rarr; split into tokens (tokenization) &rarr; remove stopwords &rarr; build bigrams. Bigrams are built <em>after</em> stopword removal, exactly as a standard vectorizer does it.</p>
+    </section>
+
+    <!-- ================= Stage A ================= -->
+    <section class="card fade" style="--d:0.09s" aria-labelledby="stagea-h">
+      <p class="stage-eyebrow">Stage A &middot; Tokenization</p>
+      <h2 id="stagea-h">Token strips</h2>
+      <p class="sub">Tokenization decides what counts as a word. These chips are exactly the tokens the matrices below will count. When you switch stopword removal on, the removed chips ghost out first so you can see what vanished.</p>
+
+      <div id="strips"></div>
+
+      <p class="strip-legend"><span class="chip">token</span> unigram &nbsp;&middot;&nbsp; <span class="chip bigram">two words</span> bigram &nbsp;&middot;&nbsp; <span class="chip negkept">not</span> negation kept by the curated list &nbsp;&middot;&nbsp; <span class="chip ghost">ghosted</span> about to be removed</p>
+    </section>
+
+    <!-- ================= Stage B ================= -->
+    <section class="card fade" style="--d:0.12s" aria-labelledby="stageb-h">
+      <p class="stage-eyebrow">Stage B &middot; Counts</p>
+      <h2 id="stageb-h">Document-term matrix <span class="tag">bag of words: order is gone</span></h2>
+      <p class="sub">Rows are documents, columns are vocabulary terms, cells are counts. At this point word order no longer exists: <code>wifi not working</code> and <code>not wifi working</code> would produce the same row.</p>
+
+      <div class="table-wrap">
+        <table id="count-table">
+          <caption class="sr-only">Document-term matrix of raw counts</caption>
+        </table>
+      </div>
+      <p class="matrix-note" id="vocab-note"></p>
+    </section>
+
+    <!-- ================= Predict 1 ================= -->
+    <section class="card predict fade" style="--d:0.15s" aria-labelledby="p1-h">
+      <p class="stage-eyebrow">Predict, then check &middot; 1 of 3</p>
+      <h2 id="p1-h">Raw frequency</h2>
+      <fieldset>
+        <legend>With all four switches <strong>off</strong>, which word has the highest raw count across the whole corpus?</legend>
+        <label class="opt"><input type="radio" name="p1" value="the"><span><code>the</code></span></label>
+        <label class="opt"><input type="radio" name="p1" value="wifi"><span><code>wifi</code></span></label>
+        <label class="opt"><input type="radio" name="p1" value="library"><span><code>library</code></span></label>
+        <label class="opt"><input type="radio" name="p1" value="shuttle"><span><code>shuttle</code></span></label>
+      </fieldset>
+      <button type="button" class="check" data-predict="p1">Check</button>
+      <p class="verdict" id="p1-verdict" role="status"></p>
+    </section>
+
+    <!-- ================= Predict 2 ================= -->
+    <section class="card predict fade" style="--d:0.18s" aria-labelledby="p2-h">
+      <p class="stage-eyebrow">Predict, then check &middot; 2 of 3</p>
+      <h2 id="p2-h">The negation trap</h2>
+      <fieldset>
+        <legend>Turn <strong>remove stopwords</strong> on (leave <em>keep negations</em> off). What happens to <code>not working</code> in D1?</legend>
+        <label class="opt"><input type="radio" name="p2" value="both-stay"><span>Both words stay, since stopword lists only remove small grammar words like <code>the</code> and <code>is</code>.</span></label>
+        <label class="opt"><input type="radio" name="p2" value="not-removed"><span><code>not</code> is removed but <code>working</code> stays, so the negation disappears.</span></label>
+        <label class="opt"><input type="radio" name="p2" value="both-removed"><span>The whole phrase is removed as noise.</span></label>
+      </fieldset>
+      <button type="button" class="check" data-predict="p2">Check</button>
+      <p class="verdict" id="p2-verdict" role="status"></p>
+    </section>
+
+    <!-- ================= Stage C ================= -->
+    <section class="card fade" style="--d:0.21s" aria-labelledby="stagec-h">
+      <p class="stage-eyebrow">Stage C &middot; Weighting</p>
+      <h2 id="stagec-h">TF-IDF matrix</h2>
+
+      <p class="idea-callout">A term scores high when it is frequent <em>in</em> this document but rare <em>across</em> documents.</p>
+
+      <p class="legend-row">
+        <span><b>TF</b> = count of the term in the document</span>
+        <span><b>DF</b> = number of documents containing the term</span>
+        <span><b>IDF</b> = ln(N &divide; DF), which grows as DF shrinks</span>
+        <span><b>N</b> = 4 documents</span>
+        <span><b>weight</b> = TF &times; IDF</span>
+      </p>
+      <p class="sub">A term in all 4 documents gets IDF = ln(4/4) = 0: weight zero, no matter how frequent. Darker gold = higher weight; the outlined cell is the strongest term shown for that document.</p>
+
+      <div class="table-wrap">
+        <table id="tfidf-table">
+          <caption class="sr-only">TF-IDF weight matrix</caption>
+        </table>
+      </div>
+      <p class="matrix-note" id="tfidf-note"></p>
+      <p class="footnote">scikit-learn&rsquo;s default <code>TfidfVectorizer</code> differs in details (smoothing, normalization); the ranking logic is the same.</p>
+    </section>
+
+    <!-- ================= Predict 3 ================= -->
+    <section class="card predict fade" style="--d:0.24s" aria-labelledby="p3-h">
+      <p class="stage-eyebrow">Predict, then check &middot; 3 of 3</p>
+      <h2 id="p3-h">Shared vs. distinctive</h2>
+      <fieldset>
+        <legend>Set <strong>lowercase</strong> and <strong>remove stopwords</strong> on. Under TF-IDF, which document does <code>shuttle</code> point to most strongly?</legend>
+        <label class="opt"><input type="radio" name="p3" value="d3"><span>D3, the shuttle-schedule comment.</span></label>
+        <label class="opt"><input type="radio" name="p3" value="d4"><span>D4, the coffee comment.</span></label>
+        <label class="opt"><input type="radio" name="p3" value="tie"><span>Neither: it ties between D3 and D4, so it cannot separate them.</span></label>
+        <label class="opt"><input type="radio" name="p3" value="d1"><span>D1, the wifi complaint.</span></label>
+      </fieldset>
+      <button type="button" class="check" data-predict="p3">Check</button>
+      <p class="verdict" id="p3-verdict" role="status"></p>
+    </section>
+
+    <!-- ================= Stage D ================= -->
+    <section class="card fade" style="--d:0.27s" aria-labelledby="staged-h">
+      <p class="stage-eyebrow">Stage D &middot; Inspection</p>
+      <h2 id="staged-h">Top 3 distinctive terms per document</h2>
+      <p class="sub">Ranked by TF-IDF over the full current vocabulary (not just the columns shown above); ties break alphabetically. This is the view you will read in the homework, and it changes every time you flip a switch.</p>
+      <div class="tops-grid" id="tops"></div>
+    </section>
+
+    <!-- ================= Recap ================= -->
+    <section class="card fade" id="recap" style="--d:0.30s" aria-labelledby="recap-h">
+      <p class="stage-eyebrow">Before Friday&rsquo;s quiz</p>
+      <h2 id="recap-h">Six lines to keep</h2>
+      <ul>
+        <li><strong>Tokenization</strong> decides what counts as a word: <code>The</code> &ne; <code>the</code> until you lowercase, and <code>week.</code> &ne; <code>week</code> until you strip punctuation.</li>
+        <li><strong>Stopword lists are a choice.</strong> A default list can delete meaning: <code>not working</code> becomes <code>working</code>.</li>
+        <li><strong>Bag-of-words discards order.</strong> Bigrams (n-grams) recover short phrases like <code>not working</code>, but only words that survive filtering can form them.</li>
+        <li><strong>TF-IDF = frequent here, rare elsewhere.</strong> A term in every document scores zero; a term shared by two documents can&rsquo;t tell them apart.</li>
+        <li><strong>Top terms describe the corpus you built, not the world.</strong> Four synthetic comments are not evidence about Berkeley students or campus opinion.</li>
+        <li><strong>Interpretation limits:</strong> a model cannot use evidence that preprocessing removed, so write claims that survive your preprocessing choices.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>COMPSS 211A &middot; UC Berkeley &middot; CC BY 4.0 &middot; Runs in your browser. Nothing you type here is recorded or sent anywhere.</p>
+  </footer>
+
+</div>
+
+<div id="announcer" class="sr-only" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============================================================
+     Setup
+     ============================================================ */
+  var N_DOCS = 4;
+
+  var DEFAULT_DOCS = [
+    "The library wifi is not working again this week.",
+    "Late night library wifi keeps dropping during finals.",
+    "The campus shuttle schedule is great this semester.",
+    "Great coffee near the shuttle stop makes mornings easier."
+  ];
+
+  var STOPWORDS = [
+    "a", "again", "an", "and", "are", "at", "be", "been", "but", "by",
+    "during", "for", "from", "if", "in", "is", "it", "its", "never",
+    "no", "nor", "not", "of", "on", "or", "that", "the", "these",
+    "this", "those", "to", "was", "were", "with"
+  ];
+  var NEGATIONS = { "not": true, "no": true, "never": true, "nor": true };
+
+  var MAX_COLS = 12;
+
+  var $ = function (sel) { return document.querySelector(sel); };
+  var docEls = [$("#doc0"), $("#doc1"), $("#doc2"), $("#doc3")];
+  var tgLower = $("#tg-lower");
+  var tgPunct = $("#tg-punct");
+  var tgStop = $("#tg-stop");
+  var tgKeepNeg = $("#tg-keepneg");
+  var tgBigrams = $("#tg-bigrams");
+  var stripsEl = $("#strips");
+  var countTable = $("#count-table");
+  var tfidfTable = $("#tfidf-table");
+  var vocabNote = $("#vocab-note");
+  var tfidfNote = $("#tfidf-note");
+  var topsEl = $("#tops");
+  var announcer = $("#announcer");
+
+  function motionOK() {
+    return window.matchMedia("(prefers-reduced-motion: no-preference)").matches;
+  }
+
+  /* ============================================================
+     Pipeline (the chips show exactly what the matrices count)
+     ============================================================ */
+  function readOpts() {
+    return {
+      lower: tgLower.checked,
+      punct: tgPunct.checked,
+      stop: tgStop.checked,
+      keepNeg: tgKeepNeg.checked,
+      bigrams: tgBigrams.checked
+    };
+  }
+
+  // The active stopword set for a given (stop, keepNeg) pair; null = filtering off.
+  function stopSetFor(stopOn, keepNeg) {
+    if (!stopOn) { return null; }
+    var s = {};
+    for (var i = 0; i < STOPWORDS.length; i++) {
+      var w = STOPWORDS[i];
+      if (keepNeg && NEGATIONS[w]) { continue; }
+      s[w] = true;
+    }
+    return s;
+  }
+
+  function isStopped(token, stopSet) {
+    return !!(stopSet && stopSet[token.toLowerCase()]);
+  }
+
+  // Toggle transformations, then a simple regex word split.
+  function baseTokens(text, opts) {
+    var t = text;
+    if (opts.lower) { t = t.toLowerCase(); }
+    if (opts.punct) { t = t.replace(/[^\p{L}\p{N}\s]/gu, " "); }
+    var parts = t.split(/\s+/);
+    var out = [];
+    for (var i = 0; i < parts.length; i++) {
+      if (parts[i].length > 0) { out.push(parts[i]); }
+    }
+    return out;
+  }
+
+  function applyStop(tokens, stopSet) {
+    if (!stopSet) { return tokens.slice(); }
+    var out = [];
+    for (var i = 0; i < tokens.length; i++) {
+      if (!isStopped(tokens[i], stopSet)) { out.push(tokens[i]); }
+    }
+    return out;
+  }
+
+  function bigramsOf(tokens) {
+    var out = [];
+    for (var i = 0; i < tokens.length - 1; i++) {
+      out.push(tokens[i] + " " + tokens[i + 1]);
+    }
+    return out;
+  }
+
+  function computeModel() {
+    var opts = readOpts();
+    var stopSet = stopSetFor(opts.stop, opts.keepNeg);
+    var perDoc = [];
+    var d, i;
+
+    for (d = 0; d < N_DOCS; d++) {
+      var uni = applyStop(baseTokens(docEls[d].value, opts), stopSet);
+      var bi = opts.bigrams ? bigramsOf(uni) : [];
+      perDoc.push({ uni: uni, bi: bi, terms: uni.concat(bi) });
+    }
+
+    // counts per doc, corpus totals, document frequency
+    var docCounts = [];
+    var totals = {};
+    var df = {};
+    var uniVocab = {};
+    var biVocab = {};
+
+    for (d = 0; d < N_DOCS; d++) {
+      var counts = {};
+      var terms = perDoc[d].terms;
+      for (i = 0; i < terms.length; i++) {
+        var t = terms[i];
+        counts[t] = (counts[t] || 0) + 1;
+        totals[t] = (totals[t] || 0) + 1;
+      }
+      for (var term in counts) {
+        if (Object.prototype.hasOwnProperty.call(counts, term)) {
+          df[term] = (df[term] || 0) + 1;
+        }
+      }
+      for (i = 0; i < perDoc[d].uni.length; i++) { uniVocab[perDoc[d].uni[i]] = true; }
+      for (i = 0; i < perDoc[d].bi.length; i++) { biVocab[perDoc[d].bi[i]] = true; }
+      docCounts.push(counts);
+    }
+
+    var allTerms = [];
+    for (var tt in totals) {
+      if (Object.prototype.hasOwnProperty.call(totals, tt)) { allTerms.push(tt); }
+    }
+    allTerms.sort(function (a, b) {
+      return (totals[b] - totals[a]) || a.localeCompare(b);
+    });
+
+    var columns = allTerms.slice(0, MAX_COLS);
+
+    var idf = {};
+    for (i = 0; i < allTerms.length; i++) {
+      idf[allTerms[i]] = Math.log(N_DOCS / df[allTerms[i]]);
+    }
+
+    // TF-IDF per doc for every term in that doc
+    var tfidf = [];
+    for (d = 0; d < N_DOCS; d++) {
+      var w = {};
+      for (var c in docCounts[d]) {
+        if (Object.prototype.hasOwnProperty.call(docCounts[d], c)) {
+          w[c] = docCounts[d][c] * idf[c];
+        }
+      }
+      tfidf.push(w);
+    }
+
+    // top-3 per doc over the full vocabulary
+    var tops = [];
+    for (d = 0; d < N_DOCS; d++) {
+      var entries = [];
+      for (var k in tfidf[d]) {
+        if (Object.prototype.hasOwnProperty.call(tfidf[d], k) && tfidf[d][k] > 0) {
+          entries.push([k, tfidf[d][k]]);
+        }
+      }
+      entries.sort(function (a, b) {
+        return (b[1] - a[1]) || a[0].localeCompare(b[0]);
+      });
+      tops.push(entries.slice(0, 3));
+    }
+
+    var uniCount = 0, biCount = 0, u2, b2;
+    for (u2 in uniVocab) { if (Object.prototype.hasOwnProperty.call(uniVocab, u2)) { uniCount++; } }
+    for (b2 in biVocab) { if (Object.prototype.hasOwnProperty.call(biVocab, b2)) { biCount++; } }
+
+    return {
+      opts: opts,
+      stopSet: stopSet,
+      perDoc: perDoc,
+      docCounts: docCounts,
+      totals: totals,
+      df: df,
+      idf: idf,
+      tfidf: tfidf,
+      tops: tops,
+      columns: columns,
+      vocabSize: allTerms.length,
+      uniCount: uniCount,
+      biCount: biCount
+    };
+  }
+
+  /* ============================================================
+     Rendering helpers
+     ============================================================ */
+  function el(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) { node.className = className; }
+    if (text !== undefined && text !== null) { node.textContent = text; }
+    return node;
+  }
+
+  function makeChip(text, kind, ghost) {
+    var cls = "chip";
+    if (kind === "bi") { cls += " bigram"; }
+    if (kind === "neg") { cls += " negkept"; }
+    if (ghost) { cls += " ghost"; }
+    var chip = el("span", cls, text);
+    chip.title = text;
+    return chip;
+  }
+
+  /* ---------- Stage A: token strips ----------
+     view = [{uni:[{text, ghost, neg}], bi:[{text, ghost}]}] */
+  function renderStrips(view) {
+    stripsEl.textContent = "";
+    for (var d = 0; d < N_DOCS; d++) {
+      var strip = el("div", "strip");
+      strip.appendChild(el("span", "doc-badge", "D" + (d + 1)));
+      var body = el("div", "strip-body");
+
+      var uniRow = el("div", "chips-row");
+      var uni = view[d].uni;
+      if (uni.length === 0) {
+        uniRow.appendChild(el("span", "empty-doc", "(no tokens survive)"));
+      } else {
+        for (var i = 0; i < uni.length; i++) {
+          uniRow.appendChild(makeChip(uni[i].text, uni[i].neg ? "neg" : "uni", uni[i].ghost));
+        }
+      }
+      body.appendChild(uniRow);
+
+      if (view[d].bi !== null) {
+        var biRow = el("div", "chips-row bi-row");
+        biRow.appendChild(el("span", "bigram-label", "bigrams"));
+        var bi = view[d].bi;
+        if (bi.length === 0) {
+          biRow.appendChild(el("span", "empty-doc", "(none: needs two surviving tokens in a row)"));
+        } else {
+          for (var j = 0; j < bi.length; j++) {
+            biRow.appendChild(makeChip(bi[j].text, "bi", bi[j].ghost));
+          }
+        }
+        body.appendChild(biRow);
+      }
+
+      strip.appendChild(body);
+      stripsEl.appendChild(strip);
+    }
+  }
+
+  // Build the plain (no-ghost) strip view from a computed model.
+  function stripViewFromModel(m) {
+    var view = [];
+    for (var d = 0; d < N_DOCS; d++) {
+      var uni = [];
+      for (var i = 0; i < m.perDoc[d].uni.length; i++) {
+        var tok = m.perDoc[d].uni[i];
+        var isKeptNeg = m.opts.stop && m.opts.keepNeg && NEGATIONS[tok.toLowerCase()];
+        uni.push({ text: tok, ghost: false, neg: !!isKeptNeg });
+      }
+      var bi = null;
+      if (m.opts.bigrams) {
+        bi = [];
+        for (var j = 0; j < m.perDoc[d].bi.length; j++) {
+          bi.push({ text: m.perDoc[d].bi[j], ghost: false });
+        }
+      }
+      view.push({ uni: uni, bi: bi });
+    }
+    return view;
+  }
+
+  /* ---------- Stage B: count matrix ---------- */
+  function renderCountTable(m) {
+    countTable.textContent = "";
+    var caption = el("caption", "sr-only", "Document-term matrix of raw counts");
+    countTable.appendChild(caption);
+
+    var thead = document.createElement("thead");
+    var hrow = document.createElement("tr");
+    var corner = el("th", "rowhead", "doc \\ term");
+    corner.scope = "col";
+    hrow.appendChild(corner);
+    for (var c = 0; c < m.columns.length; c++) {
+      var th = el("th", null, m.columns[c]);
+      th.scope = "col";
+      hrow.appendChild(th);
+    }
+    thead.appendChild(hrow);
+    countTable.appendChild(thead);
+
+    var tbody = document.createElement("tbody");
+    for (var d = 0; d < N_DOCS; d++) {
+      var tr = document.createElement("tr");
+      var rh = el("th", "rowhead", "D" + (d + 1));
+      rh.scope = "row";
+      tr.appendChild(rh);
+      for (var i = 0; i < m.columns.length; i++) {
+        var count = m.docCounts[d][m.columns[i]] || 0;
+        var td = el("td", count === 0 ? "zero" : null, String(count));
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+    countTable.appendChild(tbody);
+
+    var extra = m.vocabSize - m.columns.length;
+    var msg;
+    if (m.vocabSize === 0) {
+      msg = "The vocabulary is empty. Type something above.";
+    } else if (extra > 0) {
+      msg = "Showing the " + m.columns.length + " most frequent of " + m.vocabSize +
+        " vocabulary terms (" + m.uniCount + " unigrams" +
+        (m.opts.bigrams ? ", " + m.biCount + " bigrams" : "") +
+        "). Real document-term matrices are far wider than this, and mostly zeros (sparse).";
+    } else {
+      msg = "Showing all " + m.vocabSize + " vocabulary terms (" + m.uniCount + " unigrams" +
+        (m.opts.bigrams ? ", " + m.biCount + " bigrams" : "") +
+        "). Real document-term matrices are far wider than this, and mostly zeros (sparse).";
+    }
+    vocabNote.textContent = msg;
+  }
+
+  /* ---------- Stage C: TF-IDF matrix ---------- */
+  function fmt(x) {
+    return (Math.round(x * 100) / 100).toFixed(2);
+  }
+
+  function renderTfidfTable(m) {
+    tfidfTable.textContent = "";
+    tfidfTable.appendChild(el("caption", "sr-only", "TF-IDF weight matrix"));
+
+    // max weight among displayed cells, for the shading ramp
+    var maxW = 0;
+    var d, i, w;
+    for (d = 0; d < N_DOCS; d++) {
+      for (i = 0; i < m.columns.length; i++) {
+        w = m.tfidf[d][m.columns[i]] || 0;
+        if (w > maxW) { maxW = w; }
+      }
+    }
+
+    var thead = document.createElement("thead");
+    var hrow = document.createElement("tr");
+    var corner = el("th", "rowhead", "doc \\ term");
+    corner.scope = "col";
+    hrow.appendChild(corner);
+    for (i = 0; i < m.columns.length; i++) {
+      var th = el("th", null, m.columns[i]);
+      th.scope = "col";
+      th.title = "df = " + (m.df[m.columns[i]] || 0) + ", idf = " + fmt(m.idf[m.columns[i]] || 0);
+      hrow.appendChild(th);
+    }
+    thead.appendChild(hrow);
+    tfidfTable.appendChild(thead);
+
+    var tbody = document.createElement("tbody");
+    for (d = 0; d < N_DOCS; d++) {
+      var tr = document.createElement("tr");
+      var rh = el("th", "rowhead", "D" + (d + 1));
+      rh.scope = "row";
+      tr.appendChild(rh);
+
+      // strongest displayed cell in this row
+      var rowMax = 0, rowMaxIdx = -1;
+      for (i = 0; i < m.columns.length; i++) {
+        w = m.tfidf[d][m.columns[i]] || 0;
+        if (w > rowMax) { rowMax = w; rowMaxIdx = i; }
+      }
+
+      for (i = 0; i < m.columns.length; i++) {
+        w = m.tfidf[d][m.columns[i]] || 0;
+        var count = m.docCounts[d][m.columns[i]] || 0;
+        var td = el("td", null, count === 0 ? "0" : fmt(w));
+        if (count === 0 || w === 0) { td.classList.add("zero"); }
+        if (w > 0 && maxW > 0) {
+          var alpha = 0.08 + 0.72 * (w / maxW);
+          td.style.backgroundColor = "rgba(253, 181, 21, " + alpha.toFixed(3) + ")";
+        }
+        if (i === rowMaxIdx && rowMax > 0) {
+          td.classList.add("topcell");
+          td.title = "D" + (d + 1) + "'s strongest term shown";
+        }
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+    tfidfTable.appendChild(tbody);
+
+    tfidfNote.textContent = "Same " + m.columns.length + " columns as Stage B. weight = TF × ln(4 ÷ DF); hover a column header for its DF and IDF.";
+  }
+
+  /* ---------- Stage D: top terms ---------- */
+  function renderTops(m) {
+    topsEl.textContent = "";
+    for (var d = 0; d < N_DOCS; d++) {
+      var card = el("div", "top-card");
+      card.appendChild(el("span", "doc-badge", "D" + (d + 1)));
+      var raw = docEls[d].value.replace(/\s+/g, " ").trim();
+      if (raw.length > 52) { raw = raw.slice(0, 52) + "…"; }
+      var snip = el("p", "snippet", raw || "(empty document)");
+      snip.title = docEls[d].value;
+      card.appendChild(snip);
+
+      if (m.tops[d].length === 0) {
+        card.appendChild(el("p", "none", "no distinctive terms: every surviving term also appears elsewhere (or the document is empty)"));
+      } else {
+        var ol = document.createElement("ol");
+        for (var i = 0; i < m.tops[d].length; i++) {
+          var li = document.createElement("li");
+          var termSpan = el("span", "term", m.tops[d][i][0]);
+          termSpan.title = m.tops[d][i][0];
+          li.appendChild(termSpan);
+          li.appendChild(el("span", "wt", fmt(m.tops[d][i][1])));
+          ol.appendChild(li);
+        }
+        card.appendChild(ol);
+      }
+      topsEl.appendChild(card);
+    }
+  }
+
+  /* ---------- Stopword list display ---------- */
+  function renderStoplist() {
+    var box = $("#stoplist");
+    box.textContent = "";
+    var keepNegActive = tgStop.checked && tgKeepNeg.checked;
+    var sorted = STOPWORDS.slice().sort();
+    for (var i = 0; i < sorted.length; i++) {
+      var w = sorted[i];
+      var cls = "sw";
+      if (NEGATIONS[w]) {
+        cls += " neg";
+        if (keepNegActive) { cls += " off"; }
+      }
+      box.appendChild(el("span", cls, w));
+      box.appendChild(document.createTextNode(" "));
+    }
+  }
+
+  /* ============================================================
+     Announcements (aria-live, throttled)
+     ============================================================ */
+  var lastAnnounce = 0;
+  var announceTimer = null;
+  function announce(msg) {
+    var now = Date.now();
+    var push = function () {
+      lastAnnounce = Date.now();
+      announcer.textContent = msg;
+    };
+    if (now - lastAnnounce > 1200) {
+      push();
+    } else {
+      if (announceTimer) { clearTimeout(announceTimer); }
+      announceTimer = setTimeout(push, 1200 - (now - lastAnnounce));
+    }
+  }
+
+  /* ============================================================
+     Update orchestration (with ghost-then-remove transitions)
+     ============================================================ */
+  var renderGen = 0;
+
+  function renderAll(m, stripView) {
+    renderCountTable(m);
+    renderTfidfTable(m);
+    renderTops(m);
+    renderStoplist();
+    renderStrips(stripView || stripViewFromModel(m));
+    announce("Recomputed. Vocabulary: " + m.vocabSize + " terms (" + m.uniCount +
+      " unigrams" + (m.opts.bigrams ? ", " + m.biCount + " bigrams" : "") +
+      "). Matrix shows " + m.columns.length + " columns.");
+  }
+
+  function update() {
+    renderGen++;
+    renderAll(computeModel());
+  }
+
+  /* Ghost transition: chips that the NEW stopword set removes are shown
+     ghosted at 35%, then animated out, then the final state renders.
+     Tables update to the final state immediately (they always show the truth). */
+  function updateWithGhost(oldStopSet) {
+    if (!motionOK()) { update(); return; }
+
+    renderGen++;
+    var myGen = renderGen;
+    var m = computeModel(); // final model (new settings)
+    var newStopSet = m.stopSet;
+
+    // Build the "before" strip view under the OLD stopword set, marking doomed chips.
+    var view = [];
+    for (var d = 0; d < N_DOCS; d++) {
+      var base = baseTokens(docEls[d].value, m.opts);
+      var oldUni = applyStop(base, oldStopSet);
+      var uni = [];
+      for (var i = 0; i < oldUni.length; i++) {
+        uni.push({ text: oldUni[i], ghost: isStopped(oldUni[i], newStopSet), neg: false });
+      }
+      var bi = null;
+      if (m.opts.bigrams) {
+        bi = [];
+        var oldBi = bigramsOf(oldUni);
+        for (var j = 0; j < oldBi.length; j++) {
+          var parts = oldBi[j].split(" ");
+          var doomed = isStopped(parts[0], newStopSet) || isStopped(parts[1], newStopSet);
+          bi.push({ text: oldBi[j], ghost: doomed });
+        }
+      }
+      view.push({ uni: uni, bi: bi });
+    }
+
+    // Tables show the final truth right away; chips play the exit.
+    renderCountTable(m);
+    renderTfidfTable(m);
+    renderTops(m);
+    renderStoplist();
+    renderStrips(view);
+    announce("Stopword filtering changed. Ghosted chips are being removed. Vocabulary: " +
+      m.vocabSize + " terms.");
+
+    setTimeout(function () {
+      if (myGen !== renderGen) { return; }
+      var ghosts = stripsEl.querySelectorAll(".chip.ghost");
+      for (var g = 0; g < ghosts.length; g++) { ghosts[g].classList.add("vanish"); }
+      setTimeout(function () {
+        if (myGen !== renderGen) { return; }
+        renderStrips(stripViewFromModel(m));
+      }, 480);
+    }, 950);
+  }
+
+  /* ============================================================
+     Events
+     ============================================================ */
+  tgLower.addEventListener("change", update);
+  tgPunct.addEventListener("change", update);
+  tgBigrams.addEventListener("change", update);
+
+  tgStop.addEventListener("change", function () {
+    tgKeepNeg.disabled = !tgStop.checked;
+    if (tgStop.checked) {
+      // stopwords just turned ON: ghost the newly removed chips
+      updateWithGhost(null);
+    } else {
+      update();
+    }
+  });
+
+  tgKeepNeg.addEventListener("change", function () {
+    if (tgStop.checked && !tgKeepNeg.checked) {
+      // negations just lost protection: ghost them out
+      updateWithGhost(stopSetFor(true, true));
+    } else {
+      update();
+    }
+  });
+
+  var debounceTimer = null;
+  for (var d = 0; d < N_DOCS; d++) {
+    docEls[d].addEventListener("input", function () {
+      if (debounceTimer) { clearTimeout(debounceTimer); }
+      debounceTimer = setTimeout(update, 180);
+    });
+  }
+
+  $("#reset-btn").addEventListener("click", function () {
+    for (var i = 0; i < N_DOCS; i++) { docEls[i].value = DEFAULT_DOCS[i]; }
+    update();
+  });
+
+  /* ============================================================
+     Predict-then-reveal (gates nothing)
+     ============================================================ */
+  var PREDICTS = {
+    p1: {
+      answer: "the",
+      why: "On the page, “the” appears three times. But look at the count matrix: with lowercase off, the computer counts “The” (2) and “the” (1) as two different terms. Tokenization decides what counts as a word.",
+      nudge: "Try it: flip lowercase on and watch The + the merge into the (count 3). Then flip remove stopwords on and watch the corpus’s most frequent term vanish entirely. Raw frequency ≠ meaning."
+    },
+    p2: {
+      answer: "not-removed",
+      why: "Standard English stopword lists (scikit-learn’s included) usually contain “not”. With it gone, D1’s surviving tokens read library · wifi · working: the complaint now looks almost like praise. The negation was deleted before any model could see it.",
+      nudge: "Two fixes, both on this page: flip keep negations (a curated stopword list), or flip include bigrams so “not working” becomes one feature. Bigrams are built after stopword removal, so the bigram only exists if “not” survives filtering first."
+    },
+    p3: {
+      answer: "tie",
+      why: "“shuttle” appears in D3 and D4 (DF = 2), so its weight is identical in both: ln(4÷2) × 1 = 0.69 each. It cannot separate the two documents. Compare “coffee”: only in D4 (DF = 1), so its IDF is twice as large.",
+      nudge: "Shared terms discriminate less. TF-IDF surfaces distinctive terms rather than important ones. “shuttle” may matter most to riders, but it cannot point at one document."
+    }
+  };
+
+  var checkButtons = document.querySelectorAll("button.check");
+  for (var b = 0; b < checkButtons.length; b++) {
+    checkButtons[b].addEventListener("click", function () {
+      var id = this.getAttribute("data-predict");
+      var conf = PREDICTS[id];
+      var chosen = document.querySelector("input[name=\"" + id + "\"]:checked");
+      var verdict = $("#" + id + "-verdict");
+      verdict.classList.add("show");
+      verdict.textContent = "";
+
+      if (!chosen) {
+        verdict.className = "verdict show bad";
+        verdict.appendChild(el("span", "headline", "Pick an option first."));
+        return;
+      }
+
+      var right = chosen.value === conf.answer;
+      verdict.className = "verdict show " + (right ? "good" : "bad");
+      verdict.appendChild(el("span", "headline",
+        right ? "Correct." : "Not this time. Check the highlighted answer in the tables above."));
+      verdict.appendChild(el("span", "why", conf.why));
+      verdict.appendChild(el("span", "nudge", conf.nudge));
+    });
+  }
+
+  /* ============================================================
+     First render
+     ============================================================ */
+  tgKeepNeg.disabled = !tgStop.checked;
+  update();
+})();
+</script>
+</body>
+</html>

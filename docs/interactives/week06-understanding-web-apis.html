@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Understanding Web APIs · COMPSS 211A</title>
+<meta name="description" content="Assemble a bounded API request, read the response, page with cursors, handle a 429, and keep your key out of the URL. Fully simulated.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Inter+Tight:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --berkeley:#002676; --ink:#1A1A1A; --paper:#FFFFFF; --card:#FFFFFF;
+  --gold:#FDBA12; --gold-soft:#FFF1CC; --blue-mid:#2A4D9B; --line:#DDDDDD;
+  --ok:#1E7D4E; --err:#B3403A; --code-bg:#0E1B45; --code-ink:#E8EDF6;
+  --serif:"Inter Tight","Inter",-apple-system,"Segoe UI",sans-serif;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--sans);color:var(--ink);background:var(--paper);
+  line-height:1.6;font-size:16.5px;
+}
+.wrap{max-width:920px;margin:0 auto;padding:0 22px}
+a.back{display:inline-block;margin:18px 0 0;font-size:.85rem;font-weight:600;color:var(--blue-mid);text-decoration:none}
+a.back:hover{text-decoration:underline}
+a.back:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px}
+header{padding:18px 0 0}
+.eyebrow{font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:.78rem;color:var(--blue-mid)}
+h1{font-family:var(--serif);font-weight:600;color:var(--berkeley);font-size:clamp(2rem,5vw,2.9rem);line-height:1.12;margin:.35rem 0 .7rem;letter-spacing:-.01em}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin:.4rem 0 1rem}
+.chip{display:inline-flex;align-items:center;font-size:.78rem;font-weight:600;padding:4px 12px;border-radius:3px}
+.chip-gold{background:var(--gold);color:var(--berkeley)}
+.chip-line{border:1.5px solid var(--line);color:#51607A;background:var(--card)}
+.lede{max-width:680px;color:#3A4A63;margin-bottom:1.3rem}
+.rule{height:3px;background:var(--gold);border:0;margin:0 0 36px;border-radius:2px}
+h2{font-family:var(--serif);font-weight:600;color:var(--berkeley);font-size:1.5rem;margin:0 0 .35rem}
+h2 .step{color:var(--gold);margin-right:.35rem}
+.section-note{color:#3A4A63;font-size:.95rem;margin-bottom:1rem;max-width:700px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:22px 24px;box-shadow:0 1px 2px rgba(18,35,61,.05);margin-bottom:34px}
+/* param chips */
+.params{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.pchip{
+  display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.78rem;
+  border:1.5px solid var(--line);border-radius:4px;padding:7px 12px;background:#FAFAFA;cursor:pointer;
+  transition:border-color .15s ease, background .15s ease;
+  flex-wrap:wrap;max-width:100%;min-width:0;overflow-wrap:anywhere;
+}
+.pchip input{accent-color:var(--berkeley)}
+.pchip.on{border-color:var(--berkeley);background:#EEF3F9}
+.pchip.locked{cursor:default;border-style:dashed}
+.pchip .why{font-family:var(--sans);font-size:.72rem;color:#6B7890}
+.pchip:focus-within{outline:2px solid var(--gold);outline-offset:2px}
+.slider-row{display:flex;align-items:center;gap:14px;font-family:var(--mono);font-size:.8rem;margin-bottom:16px;flex-wrap:wrap}
+.slider-row input[type=range]{flex:1;min-width:180px;accent-color:var(--berkeley)}
+.slider-row .val{font-weight:500;min-width:8ch}
+.slider-row .warn{color:var(--err);font-family:var(--sans);font-size:.8rem;font-weight:600;display:none}
+.slider-row .warn.show{display:inline}
+/* URL panel */
+.urlpanel{
+  background:var(--code-bg);color:var(--code-ink);border-radius:4px;padding:14px 16px;
+  font-family:var(--mono);font-size:.78rem;line-height:1.8;overflow-x:auto;white-space:pre-wrap;word-break:break-all;
+  margin-bottom:16px;
+}
+.urlpanel .base{color:#9FB4D0}
+.urlpanel .fil{color:#F5C860}
+.urlpanel .pp{color:#8FD8B0}
+.urlpanel .cur{color:#A8C7EE}
+.urlpanel .keyleak{color:#FF9C93;text-decoration:underline wavy #FF6B5E 1.5px}
+/* response panel */
+.resp{background:var(--code-bg);color:var(--code-ink);border-radius:4px;padding:16px 18px;font-family:var(--mono);font-size:.78rem;line-height:1.7;overflow-x:auto;display:none}
+.resp.show{display:block}
+.statusline{display:flex;align-items:center;gap:10px;font-family:var(--sans);margin-bottom:10px;flex-wrap:wrap}
+.scode{font-family:var(--mono);font-weight:500;font-size:.82rem;border-radius:4px;padding:3px 12px}
+.s2xx{background:#1E7D4E;color:#EFFBF3}
+.s4xx,.s5xx{background:#B3403A;color:#FBEDEC}
+.simtag{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0E1B2C;background:var(--gold);border-radius:3px;padding:2px 10px}
+.hdrs{color:#7C8CA5;margin-bottom:10px}
+.hdrs b{color:#9FB4D0;font-weight:500}
+.resp details{margin-left:14px}
+.resp details>summary{cursor:pointer;list-style:none;color:#F5C860;user-select:none}
+.resp details>summary::before{content:"▸ ";color:#7C8CA5}
+.resp details[open]>summary::before{content:"▾ "}
+.resp summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px}
+.resp .k{color:#F5C860}.resp .s{color:#A8C7EE}.resp .n{color:#8FD8B0}.resp .p{color:#7C8CA5}
+.resp .note{font-family:var(--sans);color:#B8C6DC;background:#16273D;border-left:3px solid var(--gold);
+  border-radius:0 4px 4px 0;padding:8px 12px;margin:8px 0 8px 14px;font-size:.8rem;white-space:normal}
+.errbody{color:#FFB6AE}
+/* buttons */
+button.btn{
+  font-family:var(--sans);font-weight:600;font-size:.9rem;color:#fff;background:var(--berkeley);
+  border:none;border-radius:4px;padding:9px 18px;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease;
+}
+button.btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,38,118,.22)}
+button.btn:focus-visible{outline:2.5px solid var(--gold);outline-offset:2px}
+button.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+button.btn-ghost{background:#fff;color:var(--berkeley);border:1.5px solid var(--berkeley)}
+button.btn-err{background:#fff;color:var(--err);border:1.5px solid var(--err)}
+/* quiz cards */
+.qcard{border:1px solid var(--line);border-radius:4px;padding:18px 20px;margin:18px 0;background:#FAFAFA}
+.qcard h3{font-family:var(--serif);font-size:1.12rem;color:var(--berkeley);margin-bottom:8px}
+.qcard .opts{display:flex;flex-direction:column;gap:8px;margin:10px 0 14px}
+.qcard label{display:flex;gap:10px;align-items:flex-start;font-size:.93rem;cursor:pointer}
+.qcard input[type=radio]{margin-top:4px;accent-color:var(--berkeley)}
+.verdict{border-radius:4px;padding:10px 14px;font-size:.92rem;margin-top:10px;display:none}
+.verdict.show{display:block}
+.verdict.good{background:#E8F4EC;color:var(--ok);border:1px solid #BFE0CB}
+.verdict.bad{background:#F9E9E7;color:var(--err);border:1px solid #EAC7C3}
+/* pagination */
+.pgbar{height:14px;border-radius:3px;background:#E9EDF4;border:1px solid var(--line);overflow:hidden;margin:12px 0}
+.pgbar>div{height:100%;width:0%;background:linear-gradient(90deg,var(--blue-mid),var(--berkeley));transition:width .5s ease}
+.pglog{font-family:var(--mono);font-size:.76rem;background:var(--code-bg);color:var(--code-ink);border-radius:4px;padding:12px 16px;line-height:1.9;min-height:52px;overflow-x:auto}
+.pglog .okc{color:#8FD8B0}.pglog .curc{color:#A8C7EE}.pglog .stop{color:var(--gold)}
+.stopin{display:flex;align-items:center;gap:10px;font-size:.9rem;margin-bottom:8px;flex-wrap:wrap}
+.stopin input{font-family:var(--mono);width:64px;padding:6px 8px;border:1.5px solid var(--line);border-radius:4px;font-size:.85rem}
+.stopin input:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+/* drills */
+.drills{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.keycard{border:1px dashed #D9A73E;background:var(--gold-soft);border-radius:4px;padding:14px 16px;margin-top:14px;font-size:.9rem;color:#4A4020;display:none}
+.keycard.show{display:block}
+.provrec{font-family:var(--mono);font-size:.75rem;background:#fff;border:1px solid var(--line);border-radius:4px;padding:10px 14px;margin-top:10px;white-space:pre-wrap}
+/* recap */
+.recap{background:linear-gradient(0deg, rgba(0,38,118,.045), rgba(0,38,118,.045)),var(--card);border:1px solid var(--line)}
+.recap ul{margin:8px 0 0 20px}
+.recap li{margin-bottom:7px;font-size:.95rem}
+.recap li::marker{color:var(--gold)}
+footer{border-top:1px solid var(--line);padding:24px 0 44px;font-size:.85rem;color:#6B7890;margin-top:8px}
+@media (prefers-reduced-motion: no-preference){
+  .rise{opacity:0;transform:translateY(14px);animation:rise .6s ease forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+  .d1{animation-delay:.05s}.d2{animation-delay:.12s}.d3{animation-delay:.19s}.d4{animation-delay:.26s}
+  .spin{display:inline-block;width:14px;height:14px;border:2.5px solid #7C8CA5;border-top-color:var(--gold);border-radius:50%;animation:sp 0.8s linear infinite;vertical-align:-2px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+}
+@media (prefers-reduced-motion: reduce){.spin::after{content:"…"}}
+code.inl{font-family:var(--mono);font-size:.8em;background:#ECEFF5;border-radius:4px;padding:1px 6px}
+
+/* ═══ MaCSS skin, aligned with macss.berkeley.edu ═══ */
+html,body{overflow-x:clip}
+.mast{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:12px calc(50vw - 50%);display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.14)}
+.mast .brand{color:#fff;font-family:var(--sans);font-size:.9rem;font-weight:600;letter-spacing:.01em}
+.mast .brand .uc{font-family:Georgia,"Times New Roman",serif;color:var(--gold);font-size:1.04rem;font-weight:700;margin-right:7px}
+.mast a{color:#fff;font-family:var(--sans);font-weight:600;font-size:.83rem;text-decoration:none;border-bottom:1.5px solid rgba(255,255,255,.35);border-radius:0}
+.mast a:hover{border-bottom-color:var(--gold);color:#fff;text-decoration:none}
+.mast a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap>header,.page>header{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:30px calc(50vw - 50%) 28px;border-bottom:5px solid var(--gold);margin-bottom:40px}
+.wrap>header .eyebrow,.page>header .eyebrow{display:none}
+.wrap>header h1,.page>header h1{color:#fff;font-weight:800;letter-spacing:-.015em}
+.wrap>header .lede,.wrap>header .promise,.page>header .promise,.page>header .lede{color:rgba(255,255,255,.9)}
+.wrap>header .chip-line,.wrap>header .chip-outline,.page>header .chip-outline,.wrap>header .meta-chip.outline{border-color:rgba(255,255,255,.55);color:#fff;background:transparent}
+.rule,.goldrule,.gold-rule{display:none}
+.rise,.reveal,.fade{opacity:1!important;transform:none!important;animation:none!important}
+h2 .step{color:var(--berkeley)}
+footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(50% - 50vw) 0;padding:20px calc(50vw - 50%) 26px;border-top:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="mast"><span class="brand"><span class="uc">UC Berkeley</span>COMPSS 211A · Computing I</span><a href="../index.html">← All interactives</a></div>
+
+<header>
+  <p class="eyebrow rise d1">COMPSS 211A · Computing I</p>
+  <h1 class="rise d1">Understanding Web APIs</h1>
+  <div class="chips rise d2">
+    <span class="chip chip-gold">Week 6 · Web APIs</span>
+    <span class="chip chip-line">≈ 8 minutes</span>
+    <span class="chip chip-line">Fully simulated, no network requests</span>
+  </div>
+  <p class="lede rise d2">
+    An API is an interface with rules. Build a bounded request to a <em>simulated</em>
+    OpenAlex-style endpoint, read the response starting from the status code, and
+    practice the common failures on purpose.
+  </p>
+</header>
+<hr class="rule rise d2">
+
+<!-- ══════════════ 1 · request builder ══════════════ -->
+<section class="rise d3" aria-labelledby="s1">
+  <h2 id="s1"><span class="step">1·</span>Build the request</h2>
+  <p class="section-note">
+    This week’s case study asks OpenAlex for works with at least one UC Berkeley-affiliated
+    authorship. Toggle the parameters and watch the URL assemble. A request is an
+    <strong>endpoint, a method, parameters, and headers</strong>.
+  </p>
+  <div class="card">
+    <div class="params">
+      <label class="pchip on locked" title="This filter defines the population, so it stays on.">
+        <input type="checkbox" checked disabled aria-label="filter institutions.id, locked on">
+        filter=institutions.id:I95457486
+        <span class="why">population rule (locked)</span>
+      </label>
+      <label class="pchip on"><input type="checkbox" id="pFrom" checked> from_publication_date:2024-01-01 <span class="why">bound in time</span></label>
+      <label class="pchip on"><input type="checkbox" id="pAbs" checked> has_abstract:true <span class="why">only usable records</span></label>
+    </div>
+    <div class="slider-row">
+      <label for="perPage" style="font-family:var(--sans);font-weight:600;font-size:.85rem">per_page</label>
+      <input type="range" id="perPage" min="5" max="200" step="5" value="25" aria-describedby="ppWarn">
+      <span class="val" id="ppVal">25</span>
+      <span class="warn" id="ppWarn">above the API’s cap of 100. Send it anyway and see</span>
+    </div>
+    <div class="urlpanel" id="urlOut" aria-live="polite"></div>
+
+    <div class="qcard" style="margin-top:0">
+      <h3>Before you send: predict</h3>
+      <p style="font-size:.93rem">“A <code class="inl">200 OK</code> response proves the returned data are complete and representative.”</p>
+      <div class="opts" role="radiogroup">
+        <label><input type="radio" name="p1" value="t"> True: 200 means the data are good</label>
+        <label><input type="radio" name="p1" value="f"> False: 200 only means the server accepted this request</label>
+      </div>
+      <button class="btn" id="checkP1">Check</button>
+      <div class="verdict" id="v-p1" aria-live="polite"></div>
+    </div>
+
+    <button class="btn" id="sendBtn">Send request (GET)</button>
+    <div class="resp" id="respMain" style="margin-top:14px" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ══════════════ 2 · pagination ══════════════ -->
+<section class="rise d3" aria-labelledby="s2">
+  <h2 id="s2"><span class="step">2·</span>Page through results, with a stop rule</h2>
+  <p class="section-note">
+    The filters match <strong>412 works</strong>, but each response carries one page at most.
+    Cursor pagination starts at <code class="inl">cursor=*</code>, and each response hands you
+    <code class="inl">meta.next_cursor</code> for the next request. Decide your stopping rule
+    <em>before</em> you collect.
+  </p>
+  <div class="card">
+    <div class="stopin">
+      <label for="maxPages"><strong>My stop rule:</strong> collect at most</label>
+      <input type="number" id="maxPages" min="1" max="10" value="3"> pages of 25.
+    </div>
+    <div class="pgbar" role="progressbar" aria-valuemin="0" aria-valuemax="412" aria-valuenow="0" id="pgbar"><div id="pgfill"></div></div>
+    <p style="font-family:var(--mono);font-size:.8rem;margin-bottom:10px"><span id="pgCount">0</span> / 412 records collected</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <button class="btn" id="pgNext">Request next page</button>
+      <button class="btn btn-ghost" id="pgReset">Reset collection</button>
+    </div>
+    <div class="pglog" id="pglog" aria-live="polite">no requests yet</div>
+
+    <div class="qcard" id="claimCard" style="display:none">
+      <h3>What can you claim?</h3>
+      <p style="font-size:.93rem">Your notebook now holds the records you collected. Which claim do they support?</p>
+      <div class="opts" role="radiogroup">
+        <label><input type="radio" name="p2" value="a"> “These are papers by Berkeley faculty.”</label>
+        <label><input type="radio" name="p2" value="b"> “These are works with at least one UC Berkeley-affiliated authorship, collected under my stated filters and stop rule.”</label>
+        <label><input type="radio" name="p2" value="c"> “This is all Berkeley research from 2024.”</label>
+      </div>
+      <button class="btn" id="checkP2">Check</button>
+      <div class="verdict" id="v-p2" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 3 · failure drills ══════════════ -->
+<section class="rise d4" aria-labelledby="s3">
+  <h2 id="s3"><span class="step">3·</span>Practice the failures</h2>
+  <p class="section-note">
+    You will run into all of these at some point. Trigger each one now, and read the
+    status before the body.
+  </p>
+  <div class="card">
+    <div class="drills">
+      <button class="btn btn-err" id="d404">404 · typo the endpoint</button>
+      <button class="btn btn-err" id="d400">400 · per_page=500</button>
+      <button class="btn btn-err" id="d429">429 · request too fast</button>
+      <button class="btn btn-err" id="dTimeout">timeout · server hangs</button>
+      <button class="btn btn-err" id="d401">401 · key required</button>
+    </div>
+    <div class="resp" id="respDrill" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ══════════════ 4 · credentials ══════════════ -->
+<section class="rise d4" aria-labelledby="s4">
+  <h2 id="s4"><span class="step">4·</span>Keys leak through URLs</h2>
+  <p class="section-note">
+    OpenAlex accepts an optional key <em>as a query parameter</em>, which means
+    <code class="inl">response.url</code>, logs, error messages, and screenshots can leak it.
+  </p>
+  <div class="card">
+    <label class="pchip" id="keyChipWrap" style="margin-bottom:12px">
+      <input type="checkbox" id="keyToggle"> attach api_key to the request
+      <span class="why">simulated practice key</span>
+    </label>
+    <div class="urlpanel" id="urlKey" aria-live="polite"></div>
+    <div class="keycard" id="keyWarn">
+      <strong>That key is now part of the URL.</strong> Anything that prints the URL (a traceback,
+      a saved notebook output, a screenshot for your AI Usage Journal) exposes it. Keep keys in
+      environment variables or Colab Secrets, never in code or displayed URLs.
+      <div style="margin-top:10px"><button class="btn" id="redactBtn">Redact for provenance</button></div>
+      <div class="provrec" id="provRec" style="display:none"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ recap ══════════════ -->
+<section class="rise d4" aria-labelledby="s5">
+  <h2 id="s5"><span class="step">✓</span>Before Friday’s quiz</h2>
+  <div class="card recap">
+    <ul>
+      <li>A request is <strong>endpoint + method + parameters + headers</strong>; a response is <strong>status + headers + body</strong>. Read them in that order.</li>
+      <li><strong>200</strong> accepted · <strong>400</strong> your request is malformed · <strong>401</strong> credentials missing/invalid · <strong>404</strong> wrong path · <strong>429</strong> slow down · <strong>5xx</strong> their problem.</li>
+      <li>Cursor pagination: start at <code class="inl">cursor=*</code>, follow <code class="inl">meta.next_cursor</code>, and write the <strong>stop rule before collecting</strong>.</li>
+      <li>Handle 429 and transient 5xx with a <strong>small, bounded number of retries</strong> and a finite timeout, never an infinite loop. The cached fixture is the fallback in class.</li>
+      <li>Keys stay out of notebooks, URLs, logs, and screenshots. <strong>Redact before saving provenance.</strong></li>
+      <li>A 200 means the server accepted the request. Keep claims inside the filters.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>COMPSS 211A · UC Berkeley · CC BY 4.0 · Fully simulated. This page makes no network requests.</footer>
+</div>
+
+<script>
+"use strict";
+/* ---------------- URL builder ---------------- */
+const pFrom=document.getElementById("pFrom"), pAbs=document.getElementById("pAbs");
+const perPage=document.getElementById("perPage"), ppVal=document.getElementById("ppVal"), ppWarn=document.getElementById("ppWarn");
+const urlOut=document.getElementById("urlOut");
+function filters(){
+  const f=["institutions.id:I95457486"];
+  if(pFrom.checked) f.push("from_publication_date:2024-01-01");
+  if(pAbs.checked) f.push("has_abstract:true");
+  return f;
+}
+function renderURL(){
+  const pp=+perPage.value;
+  ppVal.textContent=pp;
+  ppWarn.classList.toggle("show",pp>100);
+  urlOut.innerHTML =
+    `<span class="base">GET https://api.openalex.org/works</span><span class="p">?</span>`+
+    `<span class="fil">filter=${filters().join(",")}</span>`+
+    `<span class="p">&amp;</span><span class="pp">per_page=${pp}</span>`+
+    `<span class="p">&amp;</span><span class="cur">cursor=*</span>`;
+  document.querySelectorAll(".pchip input:not([disabled])").forEach(i=>{
+    i.closest(".pchip").classList.toggle("on",i.checked);
+  });
+}
+[pFrom,pAbs].forEach(x=>x.addEventListener("change",renderURL));
+perPage.addEventListener("input",renderURL);
+renderURL();
+
+/* ---------------- fake works ---------------- */
+const WORKS=[
+ {id:"W4000000001",name:"Housing Instability and Transit Access in the East Bay",year:2024,auth:4},
+ {id:"W4000000002",name:"Measuring Discourse Change in Local Government Meetings",year:2024,auth:2},
+ {id:"W4000000003",name:"Wildfire Smoke Exposure and School Attendance Patterns",year:2024,auth:6}
+];
+function workHTML(w){
+  return `<details>
+  <summary><span class="p">{</span> <span class="k">"display_name"</span><span class="p">:</span> <span class="s">"${w.name}"</span> <span class="p">… }</span></summary>
+  <div style="margin-left:16px">
+  <span class="k">"id"</span><span class="p">:</span> <span class="s">"https://openalex.org/${w.id}"</span><span class="p">,</span><br>
+  <span class="k">"publication_year"</span><span class="p">:</span> <span class="n">${w.year}</span><span class="p">,</span><br>
+  <span class="k">"authorships"</span><span class="p">:</span> <span class="p">[</span> <span class="n">${w.auth}</span> entries, each with author, institutions, and positions <span class="p">]</span><span class="p">,</span><br>
+  <span class="k">"abstract_inverted_index"</span><span class="p">:</span> <span class="p">{</span><span class="s">"Housing"</span><span class="p">:</span> <span class="p">[</span><span class="n">0</span><span class="p">]</span><span class="p">,</span> <span class="s">"instability"</span><span class="p">:</span> <span class="p">[</span><span class="n">1</span><span class="p">,</span><span class="n">14</span><span class="p">]</span><span class="p">,</span> <span class="p">…}</span>
+  <div class="note">An <b>inverted index</b> maps each token to its positions. To rebuild the abstract, collect every (position, token) pair and sort by position. You will write this in the lab.</div>
+  </div>
+</details>`;
+}
+function statusLine(code,phrase,cls){
+  return `<div class="statusline"><span class="scode ${cls}">${code} ${phrase}</span><span class="simtag">Simulated response</span></div>`;
+}
+const respMain=document.getElementById("respMain");
+document.getElementById("sendBtn").addEventListener("click",()=>{
+  const pp=+perPage.value;
+  respMain.classList.add("show");
+  if(pp>100){
+    respMain.innerHTML = statusLine(400,"Bad Request","s4xx")+
+      `<div class="hdrs"><b>content-type:</b> application/json</div>`+
+      `<span class="p">{</span><span class="k">"error"</span><span class="p">:</span> <span class="errbody">"per_page must be a number within the range 1-100"</span><span class="p">}</span>`+
+      `<div class="note"><b>Read the error body:</b> the server told you the exact rule. Fix the <i>request</i> (lower per_page), don’t wrestle the parser.</div>`;
+    return;
+  }
+  respMain.innerHTML = statusLine(200,"OK","s2xx")+
+    `<div class="hdrs"><b>content-type:</b> application/json &nbsp;·&nbsp; <b>x-rate-limit-remaining:</b> 9</div>`+
+    `<details open><summary><span class="k">"meta"</span></summary><div style="margin-left:16px">`+
+    `<span class="k">"count"</span><span class="p">:</span> <span class="n">412</span><span class="p">,</span><br>`+
+    `<span class="k">"per_page"</span><span class="p">:</span> <span class="n">${pp}</span><span class="p">,</span><br>`+
+    `<span class="k">"next_cursor"</span><span class="p">:</span> <span class="s">"cur_2Ab9kQ"</span></div></details>`+
+    `<details open><summary><span class="k">"results"</span> <span class="p">(showing 3 of ${Math.min(pp,412)} for legibility)</span></summary>`+
+    `<div style="margin-left:4px">${WORKS.map(workHTML).join("")}</div></details>`+
+    `<div class="note"><b>Reading order:</b> status, then content-type, then body. count is the population your filters matched; results is just this page.</div>`;
+});
+
+/* prediction 1 */
+document.getElementById("checkP1").addEventListener("click",()=>{
+  const pick=document.querySelector("input[name=p1]:checked");
+  const v=document.getElementById("v-p1");
+  if(!pick){v.className="verdict show bad";v.textContent="Commit to an answer first.";return;}
+  const good=pick.value==="f";
+  v.className="verdict show "+(good?"good":"bad");
+  v.textContent=good
+    ? "✓ Right. A successful request only shows that the server accepted it. Whether the data are complete, representative, or appropriate for a claim is a separate question you answer with checks."
+    : "✗ No. 200 means the server accepted the request. Completeness and representativeness never appear in a status code. They are checks you run and document yourself.";
+});
+
+/* ---------------- pagination ---------------- */
+const pglog=document.getElementById("pglog"), pgfill=document.getElementById("pgfill"),
+      pgbar=document.getElementById("pgbar"), pgCount=document.getElementById("pgCount"),
+      pgNext=document.getElementById("pgNext"), maxPages=document.getElementById("maxPages"),
+      claimCard=document.getElementById("claimCard");
+const CURSORS=["*","cur_2Ab9kQ","cur_7pX21f","cur_9zL04m","cur_c55Rw2","cur_e81Ttq","cur_g12Vzn","cur_h77Bca","cur_j30Mfe","cur_k96Doh","cur_m41Squ"];
+let page=0, collected=0;
+function pgLine(html){ if(page===1) pglog.innerHTML=""; pglog.innerHTML+=html+"<br>"; pglog.scrollTop=pglog.scrollHeight; }
+pgNext.addEventListener("click",()=>{
+  const cap=Math.max(1,Math.min(10,+maxPages.value||3));
+  if(page>=cap) return;
+  const sent=CURSORS[page];
+  page++; collected=Math.min(412,collected+25);
+  pgLine(`GET …&amp;per_page=25&amp;<span class="curc">cursor=${sent}</span> → <span class="okc">200</span> · +25 records · meta.next_cursor: <span class="curc">"${CURSORS[page]}"</span>`);
+  pgfill.style.width=(collected/412*100)+"%";
+  pgbar.setAttribute("aria-valuenow",collected);
+  pgCount.textContent=collected;
+  if(page>=cap){
+    pgLine(`<span class="stop">■ Stopped by your rule: ${cap} page${cap>1?"s":""}, ${collected} of 412 records. The next cursor exists, but your rule says stop. Write both numbers in your acquisition record.</span>`);
+    pgNext.disabled=true;
+    claimCard.style.display="block";
+  }
+});
+document.getElementById("pgReset").addEventListener("click",()=>{
+  page=0;collected=0;pgNext.disabled=false;
+  pglog.innerHTML="no requests yet";
+  pgfill.style.width="0%";pgCount.textContent="0";pgbar.setAttribute("aria-valuenow",0);
+  claimCard.style.display="none";
+});
+document.getElementById("checkP2").addEventListener("click",()=>{
+  const pick=document.querySelector("input[name=p2]:checked");
+  const v=document.getElementById("v-p2");
+  if(!pick){v.className="verdict show bad";v.textContent="Commit to an answer first.";return;}
+  const good=pick.value==="b";
+  v.className="verdict show "+(good?"good":"bad");
+  v.textContent=good
+    ? "✓ Right. The filters define the population (works with at least one UC Berkeley-affiliated authorship) and your stop rule bounds the sample. State both."
+    : "✗ Too strong. Affiliation is not the same as faculty authorship, and your stop rule means you hold a sample, not the population. Name the filters and the bound.";
+});
+
+/* ---------------- failure drills ---------------- */
+const respDrill=document.getElementById("respDrill");
+function drill(html){respDrill.classList.add("show");respDrill.innerHTML=html;}
+document.getElementById("d404").addEventListener("click",()=>{
+  drill(statusLine(404,"Not Found","s4xx")+
+    `<div class="hdrs"><b>requested:</b> https://api.openalex.org/<span class="errbody">worksz</span></div>`+
+    `<span class="p">{</span><span class="k">"error"</span><span class="p">:</span> <span class="errbody">"404 Not Found"</span><span class="p">}</span>`+
+    `<div class="note"><b>What to do:</b> the <i>path</i> is wrong. Compare your endpoint against the documentation character by character before changing anything else.</div>`);
+});
+document.getElementById("d400").addEventListener("click",()=>{
+  drill(statusLine(400,"Bad Request","s4xx")+
+    `<div class="hdrs"><b>sent:</b> …&amp;per_page=<span class="errbody">500</span></div>`+
+    `<span class="p">{</span><span class="k">"error"</span><span class="p">:</span> <span class="errbody">"per_page must be a number within the range 1-100"</span><span class="p">}</span>`+
+    `<div class="note"><b>What to do:</b> your request broke a rule, and the body names it. Fix the parameter; page more times instead of asking for more at once.</div>`);
+});
+document.getElementById("d429").addEventListener("click",function(){
+  this.disabled=true;
+  drill(statusLine(429,"Too Many Requests","s4xx")+
+    `<div class="hdrs"><b>retry-after:</b> 4</div>`+
+    `<div class="note" id="rlNote"><b>Rate limited.</b> Wait as long as the header asks, then retry a bounded number of times. Waiting <span id="cd">4</span>s, then retrying (attempt 1 of 1)…</div>`);
+  let t=4;
+  const iv=setInterval(()=>{
+    t--;
+    const cd=document.getElementById("cd");
+    if(cd) cd.textContent=t;
+    if(t<=0){
+      clearInterval(iv);
+      drill(statusLine(200,"OK","s2xx")+
+        `<div class="hdrs"><b>x-rate-limit-remaining:</b> 10</div>`+
+        `<div class="note"><b>Retry succeeded.</b> One retry after the stated wait. Never retry in an infinite loop; if it fails again, switch to the cached fixture.</div>`);
+      this.disabled=false;
+    }
+  },1000);
+});
+document.getElementById("dTimeout").addEventListener("click",function(){
+  this.disabled=true;
+  drill(`<div class="statusline"><span class="spin" aria-hidden="true"></span><span style="color:#B8C6DC;font-size:.85rem">waiting… (timeout=2)</span><span class="simtag">Simulated response</span></div>`);
+  setTimeout(()=>{
+    drill(statusLine("n/a","ReadTimeout after 2s","s5xx")+
+      `<span class="errbody">requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='api.openalex.org'): Read timed out.</span>`+
+      `<div class="note"><b>The timeout did its job.</b> Because you passed a finite timeout, the notebook got control back instead of hanging. In class and grading, fall back to the cached fixture.</div>`);
+    this.disabled=false;
+  },2000);
+});
+document.getElementById("d401").addEventListener("click",()=>{
+  drill(statusLine(401,"Unauthorized","s4xx")+
+    `<div class="hdrs"><b>www-authenticate:</b> Bearer</div>`+
+    `<span class="p">{</span><span class="k">"error"</span><span class="p">:</span> <span class="errbody">"missing or invalid api_key"</span><span class="p">}</span>`+
+    `<div class="note"><b>Context:</b> OpenAlex allows small unauthenticated requests, but many research APIs do not, and this is what a refusal looks like. Supply a valid credential <i>from the environment</i>, never pasted into the notebook. Note in your provenance whether a key was used.</div>`);
+});
+
+/* ---------------- key hygiene ---------------- */
+const keyToggle=document.getElementById("keyToggle"), urlKey=document.getElementById("urlKey"),
+      keyWarn=document.getElementById("keyWarn"), keyChipWrap=document.getElementById("keyChipWrap");
+let redacted=false;
+function renderKeyURL(){
+  const base=`<span class="base">https://api.openalex.org/works</span><span class="p">?</span><span class="fil">filter=…</span><span class="p">&amp;</span><span class="pp">per_page=25</span>`;
+  if(!keyToggle.checked){urlKey.innerHTML=base;keyWarn.classList.remove("show");keyChipWrap.classList.remove("on");return;}
+  keyChipWrap.classList.add("on");
+  const key=redacted?`<span class="cur">api_key=[REDACTED]</span>`:`<span class="keyleak">api_key=sk_practice_9f3d…</span>`;
+  urlKey.innerHTML=base+`<span class="p">&amp;</span>`+key;
+  keyWarn.classList.add("show");
+}
+keyToggle.addEventListener("change",()=>{redacted=false;document.getElementById("provRec").style.display="none";renderKeyURL();});
+document.getElementById("redactBtn").addEventListener("click",()=>{
+  redacted=true;renderKeyURL();
+  const rec=document.getElementById("provRec");
+  rec.style.display="block";
+  rec.textContent=
+`acquisition record
+  retrieved_utc : 2026-10-16T18:42:07Z
+  endpoint      : https://api.openalex.org/works
+  params        : filter=institutions.id:I95457486,from_publication_date:2024-01-01,has_abstract:true
+                  per_page=25 · cursor pagination · api_key=[REDACTED]
+  status        : 200 · pages: 3 · records: 75
+  stated bound  : stop after 3 pages (documented before collection)
+  fallback      : none used (live response)`;
+});
+renderKeyURL();
+</script>
+</body>
+</html>

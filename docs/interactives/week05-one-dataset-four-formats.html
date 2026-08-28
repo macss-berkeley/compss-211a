@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Dataset, Four Formats · COMPSS 211A</title>
+<meta name="description" content="The same records as CSV, TSV, JSON, and XML: what each format preserves, loses, and quietly changes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Inter+Tight:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --berkeley:#002676; --ink:#1A1A1A; --paper:#FFFFFF; --card:#FFFFFF;
+  --gold:#FDBA12; --gold-soft:#FFF1CC; --blue-mid:#2A4D9B; --line:#DDDDDD;
+  --ok:#1E7D4E; --err:#B3403A; --code-bg:#0E1B45; --code-ink:#E8EDF6;
+  --serif:"Inter Tight","Inter",-apple-system,"Segoe UI",sans-serif;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:var(--sans);color:var(--ink);background:var(--paper);
+  line-height:1.6;font-size:16.5px;
+}
+.wrap{max-width:920px;margin:0 auto;padding:0 22px}
+a.back{
+  display:inline-block;margin:18px 0 0;font-size:.85rem;font-weight:600;
+  color:var(--blue-mid);text-decoration:none;
+}
+a.back:hover{text-decoration:underline}
+a.back:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px}
+header{padding:18px 0 0}
+.eyebrow{font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:.78rem;color:var(--blue-mid)}
+h1{font-family:var(--serif);font-weight:600;color:var(--berkeley);font-size:clamp(2rem,5vw,2.9rem);line-height:1.12;margin:.35rem 0 .7rem;letter-spacing:-.01em}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin:.4rem 0 1rem}
+.chip{display:inline-flex;align-items:center;font-size:.78rem;font-weight:600;padding:4px 12px;border-radius:3px}
+.chip-gold{background:var(--gold);color:var(--berkeley)}
+.chip-line{border:1.5px solid var(--line);color:#51607A;background:var(--card)}
+.lede{max-width:660px;color:#3A4A63;margin-bottom:1.3rem}
+.rule{height:3px;background:var(--gold);border:0;margin:0 0 36px;border-radius:2px}
+h2{font-family:var(--serif);font-weight:600;color:var(--berkeley);font-size:1.5rem;margin:0 0 .35rem}
+h2 .step{color:var(--gold);margin-right:.35rem}
+.section-note{color:#3A4A63;font-size:.95rem;margin-bottom:1rem;max-width:680px}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:4px;
+  padding:22px 24px;box-shadow:0 1px 2px rgba(18,35,61,.05);margin-bottom:34px;
+}
+.tag-synth{
+  display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:#7A5A00;background:var(--gold-soft);border-radius:3px;padding:3px 10px;margin-bottom:12px;
+}
+/* reference table */
+.tblwrap{overflow-x:auto}
+table.ref{border-collapse:collapse;width:100%;font-size:.88rem;min-width:640px}
+table.ref th{
+  text-align:left;font-size:.78rem;letter-spacing:.03em;color:var(--berkeley);
+  border-bottom:2px solid var(--berkeley);padding:8px 10px 4px;white-space:nowrap;
+}
+table.ref th .dtype{
+  display:block;font-family:var(--mono);font-weight:500;font-size:.68rem;color:#6B7280;
+  letter-spacing:0;text-transform:none;
+}
+table.ref td{
+  border-bottom:1px solid var(--line);padding:7px 10px;font-family:var(--mono);
+  font-size:.8rem;cursor:pointer;white-space:nowrap;
+}
+table.ref td:hover{background:var(--gold-soft)}
+table.ref td.sel{background:var(--gold);color:var(--berkeley);border-radius:4px}
+table.ref td:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+td.na{color:#98A2B5;font-style:italic}
+.hint{font-size:.85rem;color:#6B7890;margin-top:10px}
+/* caption line for missing-value explanations */
+.misscap{
+  margin-top:12px;padding:10px 14px;border-left:4px solid var(--gold);
+  background:var(--gold-soft);border-radius:0 4px 4px 0;font-size:.9rem;color:#4A4020;
+  min-height:1.4em;
+}
+/* format tabs */
+.tabs{display:flex;gap:6px;margin-bottom:0;flex-wrap:wrap}
+.tabs button{
+  font-family:var(--mono);font-weight:500;font-size:.85rem;
+  border:1px solid var(--line);border-bottom:none;background:#ECEFF5;color:#51607A;
+  padding:8px 18px;border-radius:4px 4px 0 0;cursor:pointer;
+}
+.tabs button[aria-selected="true"]{background:var(--code-bg);color:var(--gold);border-color:var(--code-bg)}
+.tabs button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.fmtpanel{
+  background:var(--code-bg);color:var(--code-ink);border-radius:0 4px 4px 4px;
+  padding:18px 20px;font-family:var(--mono);font-size:.8rem;line-height:1.75;
+  overflow-x:auto;white-space:pre;tab-size:8;
+}
+.fmtpanel .k{color:#F5C860}        /* keys / tags */
+.fmtpanel .s{color:#A8C7EE}        /* strings */
+.fmtpanel .n{color:#8FD8B0}        /* numbers */
+.fmtpanel .p{color:#7C8CA5}        /* punctuation */
+.fmtpanel .tab-glyph{color:#4E6078}
+.fmtpanel span.hl{background:var(--gold);color:#1A1A08;border-radius:3px;box-shadow:0 0 0 2px var(--gold)}
+@media (prefers-reduced-motion: no-preference){
+  .fmtpanel span.hl{animation:pulse .5s ease 1}
+  @keyframes pulse{0%{box-shadow:0 0 0 6px rgba(253,186,18,.55)}100%{box-shadow:0 0 0 2px var(--gold)}}
+}
+/* quiz cards */
+.qcard{border:1px solid var(--line);border-radius:4px;padding:18px 20px;margin-top:18px;background:#FAFAFA}
+.qcard h3{font-family:var(--serif);font-size:1.12rem;color:var(--berkeley);margin-bottom:8px}
+.qcard .opts{display:flex;flex-direction:column;gap:8px;margin:10px 0 14px}
+.qcard label{display:flex;gap:10px;align-items:flex-start;font-size:.93rem;cursor:pointer}
+.qcard input[type=radio]{margin-top:4px;accent-color:var(--berkeley)}
+button.btn{
+  font-family:var(--sans);font-weight:600;font-size:.9rem;color:#fff;background:var(--berkeley);
+  border:none;border-radius:4px;padding:9px 18px;cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+button.btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,38,118,.22)}
+button.btn:focus-visible{outline:2.5px solid var(--gold);outline-offset:2px}
+button.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+button.btn-ghost{background:#fff;color:var(--berkeley);border:1.5px solid var(--berkeley)}
+.verdict{border-radius:4px;padding:10px 14px;font-size:.92rem;margin-top:10px;display:none}
+.verdict.show{display:block}
+.verdict.good{background:#E8F4EC;color:var(--ok);border:1px solid #BFE0CB}
+.verdict.bad{background:#F9E9E7;color:var(--err);border:1px solid #EAC7C3}
+.splitviz{font-family:var(--mono);font-size:.8rem;margin-top:10px;display:none;flex-wrap:wrap;gap:6px}
+.splitviz.show{display:flex}
+.splitviz span{background:#E9EDF4;border:1px solid var(--line);border-radius:4px;padding:2px 8px}
+.splitviz span.broken{background:#F9E9E7;border-color:#EAC7C3;color:var(--err)}
+/* reconciliation */
+.recon .checkrow{display:flex;align-items:flex-start;gap:12px;border-top:1px solid var(--line);padding:14px 0}
+.recon .checkrow:first-of-type{border-top:none}
+.recon .status{
+  font-family:var(--mono);font-weight:500;font-size:.8rem;border-radius:4px;padding:3px 10px;white-space:nowrap;
+}
+.status.ok{background:#E8F4EC;color:var(--ok)}
+.status.warn{background:var(--gold-soft);color:#7A5A00}
+.status.fail{background:#F9E9E7;color:var(--err)}
+.recon h3{font-size:1rem;color:var(--berkeley);margin-bottom:2px}
+.recon p{font-size:.9rem;color:#3A4A63}
+.recon table.mini{border-collapse:collapse;margin-top:8px;font-family:var(--mono);font-size:.76rem}
+.recon table.mini th,.recon table.mini td{border:1px solid var(--line);padding:3px 10px;text-align:center}
+.recon table.mini th{background:#EFF1F5;font-weight:500}
+/* recap */
+.recap{background:linear-gradient(0deg, rgba(0,38,118,.045), rgba(0,38,118,.045)),var(--card);border:1px solid var(--line)}
+.recap ul{margin:8px 0 0 20px}
+.recap li{margin-bottom:7px;font-size:.95rem}
+.recap li::marker{color:var(--gold)}
+footer{border-top:1px solid var(--line);padding:24px 0 44px;font-size:.85rem;color:#6B7890;margin-top:8px}
+@media (prefers-reduced-motion: no-preference){
+  .rise{opacity:0;transform:translateY(14px);animation:rise .6s ease forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+  .d1{animation-delay:.05s}.d2{animation-delay:.12s}.d3{animation-delay:.19s}.d4{animation-delay:.26s}
+}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ═══ MaCSS skin, aligned with macss.berkeley.edu ═══ */
+html,body{overflow-x:clip}
+.mast{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:12px calc(50vw - 50%);display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.14)}
+.mast .brand{color:#fff;font-family:var(--sans);font-size:.9rem;font-weight:600;letter-spacing:.01em}
+.mast .brand .uc{font-family:Georgia,"Times New Roman",serif;color:var(--gold);font-size:1.04rem;font-weight:700;margin-right:7px}
+.mast a{color:#fff;font-family:var(--sans);font-weight:600;font-size:.83rem;text-decoration:none;border-bottom:1.5px solid rgba(255,255,255,.35);border-radius:0}
+.mast a:hover{border-bottom-color:var(--gold);color:#fff;text-decoration:none}
+.mast a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap>header,.page>header{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:30px calc(50vw - 50%) 28px;border-bottom:5px solid var(--gold);margin-bottom:40px}
+.wrap>header .eyebrow,.page>header .eyebrow{display:none}
+.wrap>header h1,.page>header h1{color:#fff;font-weight:800;letter-spacing:-.015em}
+.wrap>header .lede,.wrap>header .promise,.page>header .promise,.page>header .lede{color:rgba(255,255,255,.9)}
+.wrap>header .chip-line,.wrap>header .chip-outline,.page>header .chip-outline,.wrap>header .meta-chip.outline{border-color:rgba(255,255,255,.55);color:#fff;background:transparent}
+.rule,.goldrule,.gold-rule{display:none}
+.rise,.reveal,.fade{opacity:1!important;transform:none!important;animation:none!important}
+h2 .step{color:var(--berkeley)}
+footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(50% - 50vw) 0;padding:20px calc(50vw - 50%) 26px;border-top:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="mast"><span class="brand"><span class="uc">UC Berkeley</span>COMPSS 211A · Computing I</span><a href="../index.html">← All interactives</a></div>
+
+<header>
+  <p class="eyebrow rise d1">COMPSS 211A · Computing I</p>
+  <h1 class="rise d1">One Dataset, Four Formats</h1>
+  <div class="chips rise d2">
+    <span class="chip chip-gold">Week 5 · Structured Data</span>
+    <span class="chip chip-line">≈ 7 minutes</span>
+  </div>
+  <p class="lede rise d2">
+    CSV, TSV, JSON, and XML are four ways of writing down the same records. Each
+    format preserves some things and loses others. This page shows you which.
+  </p>
+</header>
+<hr class="rule rise d2">
+
+<!-- ══════════════ 1 · the records ══════════════ -->
+<section class="rise d3" aria-labelledby="s1">
+  <h2 id="s1"><span class="step">1·</span>What you mean</h2>
+  <p class="section-note">
+    Four service requests as a tidy table: one row per case, one type per column.
+    <strong>Click any cell</strong>, then find that value in each format below.
+  </p>
+  <div class="card">
+    <span class="tag-synth">Synthetic example, not real 311 records</span>
+    <div class="tblwrap">
+    <table class="ref" id="refTable">
+      <thead><tr>
+        <th>case_id<span class="dtype">string</span></th>
+        <th>date_opened<span class="dtype">date</span></th>
+        <th>category<span class="dtype">string</span></th>
+        <th>minutes_open<span class="dtype">int</span></th>
+        <th>lat<span class="dtype">float</span></th>
+        <th>lon<span class="dtype">float</span></th>
+        <th>description<span class="dtype">string</span></th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    </div>
+    <p class="hint">The interesting cells: the quoted description, the two kinds of missing value, and every <code>case_id</code>.</p>
+    <div class="misscap" id="missCap" aria-live="polite">Click a cell to trace it through the formats below.</div>
+  </div>
+</section>
+
+<!-- ══════════════ 2 · four costumes ══════════════ -->
+<section class="rise d3" aria-labelledby="s2">
+  <h2 id="s2"><span class="step">2·</span>How it gets written down</h2>
+  <p class="section-note">The same four records in each format. Your selection stays highlighted when you switch tabs.</p>
+  <div style="margin-bottom:34px">
+    <div class="tabs" role="tablist" aria-label="Data formats">
+      <button role="tab" id="tab-csv"  aria-selected="true"  aria-controls="panel-fmt">CSV</button>
+      <button role="tab" id="tab-tsv"  aria-selected="false" aria-controls="panel-fmt">TSV</button>
+      <button role="tab" id="tab-json" aria-selected="false" aria-controls="panel-fmt">JSON</button>
+      <button role="tab" id="tab-xml"  aria-selected="false" aria-controls="panel-fmt">XML</button>
+    </div>
+    <div class="fmtpanel" id="panel-fmt" role="tabpanel" aria-labelledby="tab-csv" tabindex="0"></div>
+  </div>
+</section>
+
+<!-- ══════════════ 3 · hazard drills ══════════════ -->
+<section class="rise d4" aria-labelledby="s3">
+  <h2 id="s3"><span class="step">3·</span>Three traps, three drills</h2>
+  <p class="section-note">Pick an answer before you check.</p>
+
+  <div class="qcard" id="q1">
+    <h3>Drill 1 · The comma trap</h3>
+    <p style="font-size:.93rem">Case 0042’s description is
+      <code style="font-family:var(--mono);font-size:.8rem">Broken light, near the "north path" entrance</code>.
+      A classmate skips the parser and writes <code style="font-family:var(--mono);font-size:.8rem">line.split(",")</code>
+      on its CSV row. The row has 7 columns. How many pieces does the split produce?</p>
+    <div class="opts" role="radiogroup" aria-labelledby="q1">
+      <label><input type="radio" name="q1" value="a"> 7, one per column</label>
+      <label><input type="radio" name="q1" value="b"> 8, because the comma inside the description also splits</label>
+      <label><input type="radio" name="q1" value="c"> 6, because quoted fields are skipped entirely</label>
+    </div>
+    <button class="btn" data-check="q1">Check</button>
+    <div class="verdict" id="v-q1" aria-live="polite"></div>
+    <div class="splitviz" id="splitviz" aria-hidden="true"></div>
+  </div>
+
+  <div class="qcard" id="q2">
+    <h3>Drill 2 · The leading-zero trap</h3>
+    <p style="font-size:.93rem">You load the CSV with a default <code style="font-family:var(--mono);font-size:.8rem">pd.read_csv("cases.csv")</code>
+      and print the first <code style="font-family:var(--mono);font-size:.8rem">case_id</code>. What do you see?</p>
+    <div class="opts" role="radiogroup" aria-labelledby="q2">
+      <label><input type="radio" name="q2" value="a"> <code style="font-family:var(--mono);font-size:.8rem">"0042"</code>, because CSV stores it as text</label>
+      <label><input type="radio" name="q2" value="b"> <code style="font-family:var(--mono);font-size:.8rem">42</code>, because pandas guesses integer and the zero is gone</label>
+      <label><input type="radio" name="q2" value="c"> an error, because pandas refuses ambiguous columns</label>
+    </div>
+    <button class="btn" data-check="q2">Check</button>
+    <div class="verdict" id="v-q2" aria-live="polite"></div>
+  </div>
+
+  <div class="qcard" id="q3">
+    <h3>Drill 3 · The nesting question</h3>
+    <p style="font-size:.93rem">Suppose you want <code style="font-family:var(--mono);font-size:.8rem">lat</code> and
+      <code style="font-family:var(--mono);font-size:.8rem">lon</code> grouped together under a single
+      <code style="font-family:var(--mono);font-size:.8rem">location</code>, the way a Python dictionary would hold them.
+      Which formats can express that grouping directly?</p>
+    <div class="opts" role="radiogroup" aria-labelledby="q3">
+      <label><input type="radio" name="q3" value="a"> All four, since grouping is just a naming convention</label>
+      <label><input type="radio" name="q3" value="b"> JSON and XML, which nest; CSV and TSV must flatten into extra columns</label>
+      <label><input type="radio" name="q3" value="c"> Only XML, because JSON is always flat</label>
+    </div>
+    <button class="btn" data-check="q3">Check</button>
+    <div class="verdict" id="v-q3" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ══════════════ 4 · reconciliation ══════════════ -->
+<section class="rise d4" aria-labelledby="s4">
+  <h2 id="s4"><span class="step">4·</span>Same data? Prove it.</h2>
+  <p class="section-note">
+    HW3 asks you to load one snapshot in all four formats and show they agree.
+    Run the three checks.
+  </p>
+  <div class="card recon">
+    <div class="checkrow">
+      <button class="btn btn-ghost" id="chkRows">Run</button>
+      <div style="flex:1">
+        <h3>Check 1 · Row counts</h3>
+        <p>Count records in each parsed file.</p>
+        <div id="outRows"></div>
+      </div>
+      <span class="status" id="stRows" hidden></span>
+    </div>
+    <div class="checkrow">
+      <button class="btn btn-ghost" id="chkMiss">Run</button>
+      <div style="flex:1">
+        <h3>Check 2 · Missingness</h3>
+        <p>Count missing values per column, and notice that the kinds of missing do not survive every format.</p>
+        <div id="outMiss"></div>
+      </div>
+      <span class="status" id="stMiss" hidden></span>
+    </div>
+    <div class="checkrow">
+      <button class="btn btn-ghost" id="chkTypes">Run</button>
+      <div style="flex:1">
+        <h3>Check 3 · Dtypes</h3>
+        <p>Compare column types after loading with defaults.</p>
+        <div id="outTypes"></div>
+        <button class="btn" id="fixTypes" style="display:none;margin-top:10px">Re-read with <span style="font-family:var(--mono);font-weight:500">dtype={"case_id": str}</span></button>
+      </div>
+      <span class="status" id="stTypes" hidden></span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ recap ══════════════ -->
+<section class="rise d4" aria-labelledby="s5">
+  <h2 id="s5"><span class="step">✓</span>Before Friday’s quiz</h2>
+  <div class="card recap">
+    <ul>
+      <li>Every format has parsing rules (quoting, escaping, nesting), and those rules are part of the data.</li>
+      <li><strong>CSV and TSV carry no type information.</strong> Check dtypes after reading, and force string dtypes for identifier columns like <code style="font-family:var(--mono);font-size:.8rem">case_id</code>.</li>
+      <li><strong>JSON</strong> distinguishes <code style="font-family:var(--mono);font-size:.8rem">"0042"</code> from <code style="font-family:var(--mono);font-size:.8rem">42</code>, nests like Python lists and dictionaries, and has an explicit <code style="font-family:var(--mono);font-size:.8rem">null</code>.</li>
+      <li><strong>XML</strong> nests with elements and attributes; absence can be an empty element or no element at all.</li>
+      <li>Missing values come in several forms (empty string, <code style="font-family:var(--mono);font-size:.8rem">null</code>, absent key), and flat formats collapse them into one.</li>
+      <li><strong>Reconciliation means comparing row counts, missingness, and dtypes</strong> in the notebook, not eyeballing the files.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>COMPSS 211A · UC Berkeley · CC BY 4.0 · Runs in your browser. Nothing you do here is recorded.</footer>
+</div>
+
+<script>
+"use strict";
+/* ---------- fixture ----------
+   Record 2 (0230): lon is null (recorded as unknown), description is ABSENT (never recorded).
+   Record 0 (0042): description contains a comma and inner quotes. */
+const FIELDS=["case_id","date_opened","category","minutes_open","lat","lon","description"];
+const RECORDS=[
+ {case_id:"0042",date_opened:"2025-03-04",category:"Streetlight",minutes_open:2880,lat:37.8768,lon:-122.2605,description:'Broken light, near the "north path" entrance'},
+ {case_id:"0117",date_opened:"2025-03-09",category:"Graffiti",minutes_open:1440,lat:37.8659,lon:-122.2588,description:"Tag on retaining wall"},
+ {case_id:"0230",date_opened:"2025-04-02",category:"Pothole",minutes_open:4320,lat:37.8702,lon:null},
+ {case_id:"0301",date_opened:"2025-04-15",category:"Illegal dumping",minutes_open:960,lat:37.8791,lon:-122.2856,description:"Mattress on sidewalk"}
+];
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const T=(rec,field,inner)=>`<span data-rec="${rec}" data-field="${field}">${inner}</span>`;
+
+/* ---------- reference table ---------- */
+const tbody=document.querySelector("#refTable tbody");
+RECORDS.forEach((r,i)=>{
+  const tr=document.createElement("tr");
+  FIELDS.forEach(f=>{
+    const td=document.createElement("td");
+    td.dataset.rec=i; td.dataset.field=f; td.tabIndex=0;
+    td.setAttribute("role","button");
+    if(f==="lon"&&r.lon===null){td.textContent="None";td.classList.add("na");td.setAttribute("aria-label","lon, recorded as null")}
+    else if(f==="description"&&!("description" in r)){td.textContent="not recorded";td.classList.add("na");td.setAttribute("aria-label","description, never recorded")}
+    else{td.textContent=r[f]}
+    tr.appendChild(td);
+  });
+  tbody.appendChild(tr);
+});
+
+/* ---------- format renderings (spans tagged per value) ---------- */
+function csvField(rec,i){
+  return f=>{
+    const r=RECORDS[i];
+    let v;
+    if(f==="lon"&&r.lon===null) v="";
+    else if(f==="description"&&!("description" in r)) v="";
+    else if(f==="description"&&/[",]/.test(r[f])) v='"'+r[f].replace(/"/g,'""')+'"';
+    else v=String(r[f]);
+    return T(i,f,`<span class="s">${esc(v)}</span>`);
+  };
+}
+function delimited(sep,glyph){
+  const head=`<span class="k">${FIELDS.join(glyph)}</span>`;
+  const rows=RECORDS.map((r,i)=>FIELDS.map(csvField(r,i)).join(glyph));
+  return head+"\n"+rows.join("\n");
+}
+const CSV=delimited(",",'<span class="p">,</span>');
+const TSV=delimited("\t",'<span class="tab-glyph">&nbsp;⇥&nbsp;</span>');
+
+function jsonVal(i,f){
+  const r=RECORDS[i];
+  if(f==="lon"&&r.lon===null) return T(i,f,'<span class="k">null</span>');
+  if(f==="description"&&!("description" in r)) return null;          // absent key
+  const v=r[f];
+  if(typeof v==="number") return T(i,f,`<span class="n">${v}</span>`);
+  return T(i,f,`<span class="s">"${esc(v).replace(/&quot;/g,'\\&quot;')}"</span>`);
+}
+const JSONTXT=(()=>{
+  const items=RECORDS.map((r,i)=>{
+    const lines=FIELDS.map(f=>{
+      const v=jsonVal(i,f);
+      if(v===null) return null;
+      return `    <span class="k">"${f}"</span><span class="p">:</span> ${v}`;
+    }).filter(Boolean);
+    return `  <span class="p">{</span>\n${lines.join('<span class="p">,</span>\n')}\n  <span class="p">}</span>`;
+  });
+  return `<span class="p">[</span>\n${items.join('<span class="p">,</span>\n')}\n<span class="p">]</span>`;
+})();
+
+const XMLTXT=(()=>{
+  const items=RECORDS.map((r,i)=>{
+    const lines=FIELDS.map(f=>{
+      if(f==="lon"&&r.lon===null) return `    ${T(i,f,'<span class="k">&lt;lon/&gt;</span>')}`;                     // empty element
+      if(f==="description"&&!("description" in r)) return null;                                                      // no element at all
+      const v=typeof r[f]==="number"?`<span class="n">${r[f]}</span>`:`<span class="s">${esc(String(r[f]))}</span>`;
+      return `    ${T(i,f,`<span class="k">&lt;${f}&gt;</span>${v}<span class="k">&lt;/${f}&gt;</span>`)}`;
+    }).filter(Boolean);
+    return `  <span class="k">&lt;case&gt;</span>\n${lines.join("\n")}\n  <span class="k">&lt;/case&gt;</span>`;
+  });
+  return `<span class="k">&lt;cases&gt;</span>\n${items.join("\n")}\n<span class="k">&lt;/cases&gt;</span>`;
+})();
+
+const PANELS={csv:CSV,tsv:TSV,json:JSONTXT,xml:XMLTXT};
+const panel=document.getElementById("panel-fmt");
+let activeTab="csv", sel=null;
+
+function renderPanel(){
+  panel.innerHTML=PANELS[activeTab];
+  panel.setAttribute("aria-labelledby","tab-"+activeTab);
+  applyHighlight();
+}
+function applyHighlight(){
+  panel.querySelectorAll("span.hl").forEach(s=>s.classList.remove("hl"));
+  if(!sel) return;
+  panel.querySelectorAll(`span[data-rec="${sel.rec}"][data-field="${sel.field}"]`)
+       .forEach(s=>s.classList.add("hl"));
+}
+
+/* missing-value captions */
+const CAPS={
+  "lon-2":"In the table this is <b>None</b>: the value was looked up and recorded as unknown. CSV and TSV write it as an empty field. JSON keeps an explicit <b>null</b>. XML uses an empty element <b>&lt;lon/&gt;</b>.",
+  "description-2":"This value was <b>never recorded</b>. JSON has no “description” key and XML has no element, but CSV and TSV still need an empty slot. So “never recorded” and “recorded as unknown” end up looking the same.",
+  "description-0":"A comma and quotes inside one value. CSV handles this with quoting rules; note the doubled <b>\"\"</b>. Use a real parser, not <code>split(\",\")</code>.",
+  "case_id":"Looks like a number, works as an identifier. JSON can mark it as a string with quotes. CSV and TSV cannot record types at all, so the reader has to already know.",
+  "minutes_open":"A true integer. JSON writes it bare (no quotes); in CSV/TSV it is indistinguishable from text until a parser guesses.",
+  "default":"Follow the highlight in each tab to see how each format writes this value."
+};
+const missCap=document.getElementById("missCap");
+function caption(rec,field){
+  const key1=`${field}-${rec}`;
+  missCap.innerHTML = CAPS[key1] || CAPS[field] || CAPS.default;
+}
+tbody.addEventListener("click",e=>{
+  const td=e.target.closest("td"); if(!td) return;
+  tbody.querySelectorAll("td.sel").forEach(x=>x.classList.remove("sel"));
+  td.classList.add("sel");
+  sel={rec:td.dataset.rec,field:td.dataset.field};
+  caption(+td.dataset.rec,td.dataset.field);
+  applyHighlight();
+});
+tbody.addEventListener("keydown",e=>{
+  if(e.key==="Enter"||e.key===" "){e.preventDefault();e.target.click();}
+});
+
+/* tabs */
+const tabBtns=[...document.querySelectorAll('.tabs [role=tab]')];
+tabBtns.forEach((b,idx)=>{
+  b.addEventListener("click",()=>{
+    tabBtns.forEach(x=>x.setAttribute("aria-selected","false"));
+    b.setAttribute("aria-selected","true");
+    activeTab=b.id.replace("tab-","");
+    renderPanel();
+  });
+  b.addEventListener("keydown",e=>{
+    if(e.key==="ArrowRight"||e.key==="ArrowLeft"){
+      e.preventDefault();
+      const next=(idx+(e.key==="ArrowRight"?1:tabBtns.length-1))%tabBtns.length;
+      tabBtns[next].focus(); tabBtns[next].click();
+    }
+  });
+});
+renderPanel();
+
+/* ---------- drills ---------- */
+const ANSWERS={
+  q1:{correct:"b",
+      good:"Right: 8 pieces. split(\",\") ignores quoting, so the comma inside the description breaks the row. Use pd.read_csv. TSV avoids commas, but every format still has parsing rules you have to respect.",
+      bad:"It makes 8 pieces. split(\",\") knows nothing about quoting, so the comma inside the description also splits. A real parser like pd.read_csv reads the quotes correctly."},
+  q2:{correct:"b",
+      good:"Right: pandas sees digits, guesses integer, and 0042 becomes 42 with no warning. Use dtype={\"case_id\": str} and check .dtypes after loading.",
+      bad:"It prints 42. CSV cannot mark a column as text, so pandas guesses integer from the digits and drops the leading zero without a warning. Fix: dtype={\"case_id\": str}, then check .dtypes."},
+  q3:{correct:"b",
+      good:"Right: JSON and XML nest the way lists and dictionaries do. CSV and TSV are flat, so the grouping has to be faked with column names like location_lat.",
+      bad:"JSON and XML can nest values the way Python dictionaries do. CSV and TSV are flat, so grouping has to be faked with column names like location_lat and location_lon."}
+};
+document.querySelectorAll("[data-check]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const q=btn.dataset.check;
+    const pick=document.querySelector(`input[name=${q}]:checked`);
+    const v=document.getElementById("v-"+q);
+    if(!pick){v.className="verdict show bad";v.textContent="Pick an answer first.";return;}
+    const a=ANSWERS[q]; const good=pick.value===a.correct;
+    v.className="verdict show "+(good?"good":"bad");
+    v.textContent=(good?"✓ ":"✗ ")+(good?a.good:a.bad);
+    if(q==="q1"){
+      const line='0042,2025-03-04,Streetlight,2880,37.8768,-122.2605,"Broken light, near the ""north path"" entrance"';
+      const parts=line.split(",");
+      const viz=document.getElementById("splitviz");
+      viz.innerHTML=parts.map((p,i)=>`<span class="${i>=6?"broken":""}">${esc(p)||"&nbsp;"}</span>`).join("");
+      viz.classList.add("show");
+      viz.setAttribute("aria-hidden","false");
+    }
+  });
+});
+
+/* ---------- reconciliation ---------- */
+const stRows=document.getElementById("stRows"), stMiss=document.getElementById("stMiss"), stTypes=document.getElementById("stTypes");
+document.getElementById("chkRows").addEventListener("click",function(){
+  document.getElementById("outRows").innerHTML =
+    `<table class="mini"><tr><th>CSV</th><th>TSV</th><th>JSON</th><th>XML</th></tr><tr><td>4</td><td>4</td><td>4</td><td>4</td></tr></table>`;
+  stRows.hidden=false; stRows.className="status ok"; stRows.textContent="MATCH";
+  this.disabled=true;
+});
+document.getElementById("chkMiss").addEventListener("click",function(){
+  document.getElementById("outMiss").innerHTML =
+    `<table class="mini"><tr><th></th><th>lon</th><th>description</th></tr>
+      <tr><th>CSV/TSV</th><td>1 empty</td><td>1 empty</td></tr>
+      <tr><th>JSON</th><td>1 null</td><td>1 absent key</td></tr>
+      <tr><th>XML</th><td>1 empty element</td><td>1 absent element</td></tr></table>
+     <p style="margin-top:8px">Counts agree, but only JSON and XML remember which kind of missing each one was. Note the difference before you convert between formats.</p>`;
+  stMiss.hidden=false; stMiss.className="status warn"; stMiss.textContent="MATCH, WITH A CATCH";
+  this.disabled=true;
+});
+const chkTypes=document.getElementById("chkTypes"), fixTypes=document.getElementById("fixTypes");
+chkTypes.addEventListener("click",function(){
+  document.getElementById("outTypes").innerHTML =
+    `<table class="mini"><tr><th>column</th><th>from CSV (default)</th><th>from JSON</th></tr>
+      <tr><td>case_id</td><td style="color:var(--err)">int64 → 42</td><td>string → "0042"</td></tr>
+      <tr><td>minutes_open</td><td>int64</td><td>int</td></tr>
+      <tr><td>lat / lon</td><td>float64</td><td>float / null</td></tr></table>`;
+  stTypes.hidden=false; stTypes.className="status fail"; stTypes.textContent="MISMATCH";
+  fixTypes.style.display="inline-block";
+  this.disabled=true;
+});
+fixTypes.addEventListener("click",function(){
+  document.getElementById("outTypes").innerHTML =
+    `<table class="mini"><tr><th>column</th><th>from CSV (dtype forced)</th><th>from JSON</th></tr>
+      <tr><td>case_id</td><td style="color:var(--ok)">string → "0042"</td><td>string → "0042"</td></tr>
+      <tr><td>minutes_open</td><td>int64</td><td>int</td></tr>
+      <tr><td>lat / lon</td><td>float64</td><td>float / null</td></tr></table>
+     <p style="margin-top:8px">Now the four loads agree, and you can show it.</p>`;
+  stTypes.className="status ok"; stTypes.textContent="RECONCILED";
+  this.style.display="none";
+});
+</script>
+</body>
+</html>

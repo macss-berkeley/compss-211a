@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A short interactive warmup on where your work lives in Git: the working directory, the staging area, your local repository, and the GitHub remote, plus what GitHub Pages actually publishes.">
+<title>How Git Thinks · COMPSS 211A</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Inter+Tight:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --berkeley:#002676; --ink:#1A1A1A; --paper:#FFFFFF; --card:#FFFFFF;
+    --gold:#FDBA12; --gold-soft:#FFF1CC; --blue-mid:#2A4D9B; --line:#DDDDDD;
+    --ok:#1E7D4E; --err:#B3403A; --code-bg:#0E1B45; --code-ink:#E8EDF6;
+    --serif:"Inter Tight","Inter",-apple-system,"Segoe UI",sans-serif;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  *{ box-sizing:border-box; }
+  [hidden]{ display:none !important; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{
+    margin:0; color:var(--ink); background-color:var(--paper);
+    font-family:var(--sans); font-size:16px; line-height:1.55;
+  }
+  .wrap{ max-width:880px; margin:0 auto; padding:20px 20px 48px; }
+  a{ color:var(--blue-mid); }
+  code{ font-family:var(--mono); font-size:.9em; background:rgba(18,35,61,.06); padding:.08em .3em; border-radius:4px; }
+
+  /* ---------- header ---------- */
+  .backlink{
+    display:inline-block; font-size:.85rem; font-weight:600; text-decoration:none;
+    color:var(--blue-mid); margin-bottom:18px; border-radius:4px; padding:2px 4px;
+  }
+  .backlink:hover{ text-decoration:underline; }
+  .eyebrow{
+    font-size:.72rem; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--blue-mid); margin:0 0 6px;
+  }
+  h1{
+    font-family:var(--serif); font-weight:650; font-size:clamp(2.05rem, 5.4vw, 2.9rem);
+    line-height:1.08; color:var(--berkeley); margin:0 0 14px; letter-spacing:-.01em;
+  }
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 14px; }
+  .chip{
+    display:inline-block; font-size:.78rem; font-weight:600; padding:5px 12px;
+    border-radius:3px; line-height:1.2;
+  }
+  .chip-gold{ background:var(--gold); color:var(--ink); }
+  .chip-outline{ background:var(--card); color:var(--ink); border:1px solid var(--line); }
+  .promise{ margin:0 0 18px; max-width:60ch; color:#3B4A63; }
+  .goldrule{ border:0; height:3px; background:var(--gold); margin:0 0 26px; border-radius:2px; }
+
+  /* ---------- cards ---------- */
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:4px;
+    box-shadow:0 1px 2px rgba(18,35,61,.05), 0 8px 24px rgba(18,35,61,.06);
+    padding:22px; margin:0 0 22px;
+  }
+  .card h2{
+    font-family:var(--serif); font-weight:620; color:var(--berkeley);
+    font-size:1.35rem; margin:0 0 6px; line-height:1.2;
+  }
+  .cardhead{ display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 14px; margin-bottom:6px; }
+  .hint{ font-size:.85rem; color:#51617B; margin:0 0 14px; }
+  .lede{ margin:.4em 0; max-width:66ch; }
+
+  /* ---------- mission brief ---------- */
+  .brief{
+    border-left:3px solid var(--gold); background:var(--gold-soft);
+    border-radius:0 4px 4px 0; padding:10px 14px; margin:0 0 16px; font-size:.95rem;
+  }
+  .brief strong{ font-family:var(--serif); font-weight:640; color:var(--berkeley); }
+
+  /* ---------- stations ---------- */
+  .stations{
+    display:grid; grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;
+    gap:6px; align-items:stretch; margin:0 0 16px;
+  }
+  .station{
+    border:1px solid var(--line); border-radius:4px; background:#FAFAFA;
+    padding:10px 10px 8px; display:flex; flex-direction:column; min-height:172px;
+  }
+  .station header{ display:flex; align-items:center; gap:7px; margin-bottom:2px; }
+  .stnum{
+    flex:none; width:20px; height:20px; border-radius:50%; background:var(--berkeley);
+    color:#fff; font-size:.7rem; font-weight:600; display:inline-flex;
+    align-items:center; justify-content:center;
+  }
+  .station h3{ margin:0; font-size:.92rem; font-weight:600; color:var(--berkeley); line-height:1.15; }
+  .stdesc{ margin:2px 0 8px; font-size:.76rem; color:#51617B; line-height:1.3; }
+  .stbody{ flex:1; display:flex; flex-direction:column; gap:6px; justify-content:flex-start; }
+  .stvocab{
+    margin:8px 0 0; font-size:.68rem; color:#6B7890; border-top:1px dashed var(--line);
+    padding-top:6px; font-family:var(--mono); line-height:1.35;
+  }
+  .arrow{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:2px; padding:0 2px; color:var(--blue-mid);
+  }
+  .arr{ font-size:1.05rem; line-height:1; }
+  .arrlabel{ font-family:var(--mono); font-size:.62rem; color:#6B7890; text-align:center; line-height:1.3; }
+
+  .filechip{
+    display:inline-flex; align-items:center; gap:6px; align-self:flex-start;
+    font-family:var(--mono); font-size:.78rem; background:#fff; border:1px solid var(--line);
+    border-radius:4px; padding:5px 8px; box-shadow:0 1px 2px rgba(18,35,61,.06);
+  }
+  .ficon{ color:var(--blue-mid); }
+  .fbadge{
+    font-size:.62rem; font-weight:600; font-family:var(--sans); color:var(--ink);
+    background:var(--gold); border-radius:4px; padding:1px 6px; white-space:nowrap;
+  }
+  .stnote{ margin:0; font-size:.7rem; color:#6B7890; line-height:1.35; }
+  .stagechip{
+    display:inline-flex; align-items:center; gap:6px; align-self:flex-start;
+    font-family:var(--mono); font-size:.78rem; background:var(--gold-soft);
+    border:1px solid var(--gold); border-radius:4px; padding:5px 8px;
+  }
+  .stagecheck{ color:var(--ok); font-weight:600; }
+  .emptynote{ font-size:.72rem; color:#8A93A5; font-style:italic; margin:0; }
+
+  .striplabel{ font-size:.66rem; font-family:var(--mono); color:#6B7890; margin:0 0 2px; }
+  .strip{ display:flex; flex-wrap:wrap; gap:5px; min-height:30px; align-items:center; }
+  .dot{
+    position:relative; width:26px; height:26px; border-radius:50%; background:var(--berkeley);
+    color:#fff; font-family:var(--mono); font-size:.72rem; display:inline-flex;
+    align-items:center; justify-content:center; box-shadow:0 1px 2px rgba(18,35,61,.25);
+  }
+  .dot.tdot{ background:#fff; color:var(--ink); border:2px solid var(--gold); box-shadow:0 1px 2px rgba(18,35,61,.15); }
+  .dot .tt{
+    position:absolute; top:-7px; right:-7px; width:14px; height:14px; border-radius:50%;
+    background:var(--gold); color:var(--ink); font-size:.56rem; font-weight:600;
+    font-style:normal; display:flex; align-items:center; justify-content:center;
+    border:1px solid #fff;
+  }
+  .striplegend{ margin:2px 0 0; font-size:.64rem; color:#6B7890; }
+
+  /* ---------- Pages panel ---------- */
+  .pages{
+    margin-top:8px; border-top:1px dashed var(--line); padding-top:8px;
+  }
+  .pages-label{ font-size:.66rem; font-family:var(--mono); color:#6B7890; margin:0 0 4px; }
+  .minisite{
+    width:100%; max-width:170px; background:#fff; border:1px solid var(--line);
+    border-radius:4px; overflow:hidden; box-shadow:0 1px 3px rgba(18,35,61,.08);
+  }
+  .minibar{ display:flex; gap:3px; padding:4px 6px; background:#EFEAE0; border-bottom:1px solid var(--line); }
+  .minibar i{ width:6px; height:6px; border-radius:50%; background:#C4C9D4; }
+  .minibody{ padding:7px 8px 8px; }
+  .minititle{ font-family:var(--serif); font-weight:640; font-size:.72rem; color:var(--berkeley); margin:0 0 5px; }
+  .miniline{ height:5px; border-radius:3px; background:#DDE5EF; margin:0 0 4px; }
+  .minibadge{
+    display:inline-block; margin-top:2px; font-family:var(--mono); font-size:.58rem;
+    color:#51617B; background:var(--paper); border:1px solid var(--line);
+    border-radius:4px; padding:1px 5px;
+  }
+
+  /* ---------- action buttons ---------- */
+  .actions{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 12px; }
+  .abtn{
+    font-family:var(--sans); text-align:left; cursor:pointer; border:0; border-radius:4px;
+    background:var(--berkeley); color:#fff; padding:8px 14px 7px;
+    box-shadow:0 1px 2px rgba(18,35,61,.25); min-width:118px;
+  }
+  .abtn .blabel{ display:block; font-weight:600; font-size:.9rem; }
+  .abtn .bsub{ display:block; font-size:.66rem; opacity:.85; margin-top:2px; line-height:1.3; }
+  .abtn:hover{ box-shadow:0 3px 10px rgba(18,35,61,.35); }
+  .abtn[aria-disabled="true"]{ opacity:.45; cursor:not-allowed; }
+  .actions.islocked .abtn{ opacity:.55; cursor:not-allowed; }
+  button:focus-visible, a:focus-visible, input:focus-visible{
+    outline:2px solid var(--gold); outline-offset:2px;
+  }
+  .sbtn{
+    font-family:var(--sans); cursor:pointer; border:1px solid var(--berkeley); border-radius:4px;
+    background:#fff; color:var(--berkeley); font-weight:600; font-size:.88rem; padding:8px 14px;
+  }
+  .sbtn:hover{ box-shadow:0 2px 8px rgba(18,35,61,.15); }
+
+  /* ---------- feedback + teammate view ---------- */
+  .feedback{
+    min-height:1.5em; font-size:.9rem; margin:0 0 12px; padding:2px 2px; color:var(--ink);
+  }
+  .fico{ display:inline-block; font-weight:600; margin-right:6px; }
+  .fico.ok{ color:var(--ok); } .fico.warn{ color:var(--err); } .fico.info{ color:var(--blue-mid); }
+  .tview{
+    background:var(--code-bg); color:var(--code-ink); border-radius:4px;
+    font-family:var(--mono); font-size:.8rem; line-height:1.5; padding:11px 14px; margin-top:4px;
+  }
+  .tview .tlabel{ color:var(--gold); font-weight:500; display:block; margin-bottom:2px; }
+
+  /* ---------- prompts ---------- */
+  .promptzone{ margin:14px 0 0; }
+  .prompt{
+    border:1px solid var(--line); border-left:3px solid var(--gold); border-radius:0 4px 4px 0;
+    background:#FAFAFA; padding:14px 16px;
+  }
+  .prompt fieldset{ border:0; margin:0; padding:0; }
+  .prompt legend{ font-weight:600; padding:0; margin-bottom:8px; font-size:.95rem; }
+  .opt{
+    display:flex; gap:9px; align-items:flex-start; padding:7px 9px; border-radius:4px;
+    border:1px solid transparent; margin:0 0 4px; font-size:.9rem; cursor:pointer;
+  }
+  .opt:hover{ background:rgba(18,35,61,.04); }
+  .opt input{ margin-top:3px; accent-color:var(--berkeley); flex:none; }
+  .opt.revealok{ border-color:var(--ok); background:rgba(30,125,78,.07); }
+  .opt.revealerr{ border-color:var(--err); background:rgba(179,64,58,.06); }
+  .opt .mark{ font-weight:600; flex:none; }
+  .opt.revealok .mark{ color:var(--ok); } .opt.revealerr .mark{ color:var(--err); }
+  .verdict{ margin:10px 0 0; font-size:.9rem; border-radius:4px; padding:9px 11px; }
+  .verdict.vok{ color:var(--ok); background:rgba(30,125,78,.08); }
+  .verdict.verr{ color:var(--err); background:rgba(179,64,58,.07); }
+  .prompt .checkrow{ margin-top:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .pickhint{ font-size:.82rem; color:var(--err); }
+  .scenedesc{ margin:6px 0 10px; font-size:.9rem; color:#3B4A63; }
+  .notecard{
+    border:1px solid var(--line); border-left:3px solid var(--blue-mid); border-radius:0 4px 4px 0;
+    background:#FAFAFA; padding:12px 16px; font-size:.9rem;
+  }
+  .notecard.finale{ border-left-color:var(--ok); }
+  .notecard.finale strong{ color:var(--ok); }
+
+  /* ---------- mission checklist ---------- */
+  .count{ font-size:.82rem; color:#51617B; font-family:var(--mono); }
+  .checklist{ list-style:none; margin:8px 0 0; padding:0; }
+  .checkitem{
+    display:flex; align-items:center; gap:11px; padding:9px 4px;
+    border-bottom:1px dashed var(--line); font-size:.94rem;
+  }
+  .checkitem:last-child{ border-bottom:0; }
+  .box{
+    flex:none; width:22px; height:22px; border-radius:4px; border:2px solid var(--line);
+    background:#fff; display:inline-flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:.85rem; color:transparent;
+  }
+  .checkitem.done .box{ background:var(--gold); border-color:var(--gold); color:var(--ink); }
+  .checkitem .mnum{ font-family:var(--mono); font-size:.72rem; color:#6B7890; flex:none; width:1.4em; }
+
+  /* ---------- recap ---------- */
+  .recap ul{ list-style:none; margin:10px 0 0; padding:0; }
+  .recap li{ display:flex; gap:12px; padding:10px 2px; border-bottom:1px dashed var(--line); }
+  .recap li:last-child{ border-bottom:0; }
+  .recap .rk{
+    flex:none; font-family:var(--mono); font-size:.74rem; color:var(--berkeley);
+    background:var(--gold-soft); border:1px solid var(--gold); border-radius:4px;
+    padding:3px 8px; height:fit-content; white-space:nowrap; margin-top:1px;
+  }
+  .recap p{ margin:0; font-size:.93rem; }
+
+  footer{
+    border-top:1px solid var(--line); margin-top:34px; padding-top:14px;
+    font-size:.78rem; color:#6B7890;
+  }
+
+  .visually-hidden{
+    position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden;
+    clip:rect(0 0 0 0); white-space:nowrap; border:0;
+  }
+
+  /* ---------- flyer (animated traveling chip/dot) ---------- */
+  .flyer{
+    position:fixed; z-index:60; pointer-events:none; margin:0;
+  }
+  .flyer.flydot{
+    width:26px; height:26px; border-radius:50%; background:var(--berkeley); color:#fff;
+    font-family:var(--mono); font-size:.72rem; display:inline-flex; align-items:center;
+    justify-content:center; box-shadow:0 3px 8px rgba(18,35,61,.35);
+  }
+  .flyer.flydot.tfly{ background:#fff; color:var(--ink); border:2px solid var(--gold); }
+  .flyer.flychip{
+    font-family:var(--mono); font-size:.74rem; background:var(--gold-soft);
+    border:1px solid var(--gold); border-radius:4px; padding:4px 8px;
+    box-shadow:0 3px 8px rgba(18,35,61,.25);
+  }
+
+  /* ---------- motion (only when the visitor allows it) ---------- */
+  @media (prefers-reduced-motion: no-preference){
+    .rise{ opacity:0; transform:translateY(10px); animation:rise .6s cubic-bezier(.2,.7,.2,1) forwards; }
+    .rise.d1{ animation-delay:.06s; } .rise.d2{ animation-delay:.14s; }
+    .rise.d3{ animation-delay:.22s; } .rise.d4{ animation-delay:.30s; }
+    @keyframes rise{ to{ opacity:1; transform:none; } }
+    .abtn{ transition:transform .15s ease, box-shadow .15s ease; }
+    .abtn:hover{ transform:translateY(-1px); }
+    .dot.pop{ animation:pop .45s cubic-bezier(.2,1.4,.4,1); }
+    @keyframes pop{ 0%{ transform:scale(.2); opacity:0; } 100%{ transform:scale(1); opacity:1; } }
+    .fbadge.pop, .stagechip.pop{ animation:pop .4s cubic-bezier(.2,1.4,.4,1); }
+    .flyer{ transition:transform .55s cubic-bezier(.3,.7,.25,1), opacity .55s ease; }
+    .checkitem.done .box{ animation:pop .5s cubic-bezier(.2,1.6,.4,1); }
+    .minisite.flash{ animation:flash 1s ease; }
+    @keyframes flash{
+      0%{ box-shadow:0 0 0 0 rgba(253,186,18,.9); }
+      100%{ box-shadow:0 0 0 14px rgba(253,186,18,0); }
+    }
+  }
+
+  /* ---------- narrow screens: stack the stations ---------- */
+  @media (max-width:719px){
+    .stations{ grid-template-columns:1fr; }
+    .station{ min-height:0; }
+    .arrow{ flex-direction:row; gap:8px; padding:2px 0; }
+    .arrow .arr{ transform:rotate(90deg); }
+  }
+
+/* ═══ MaCSS skin, aligned with macss.berkeley.edu ═══ */
+html,body{overflow-x:clip}
+.mast{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:12px calc(50vw - 50%);display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.14)}
+.mast .brand{color:#fff;font-family:var(--sans);font-size:.9rem;font-weight:600;letter-spacing:.01em}
+.mast .brand .uc{font-family:Georgia,"Times New Roman",serif;color:var(--gold);font-size:1.04rem;font-weight:700;margin-right:7px}
+.mast a{color:#fff;font-family:var(--sans);font-weight:600;font-size:.83rem;text-decoration:none;border-bottom:1.5px solid rgba(255,255,255,.35);border-radius:0}
+.mast a:hover{border-bottom-color:var(--gold);color:#fff;text-decoration:none}
+.mast a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap>header,.page>header{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:30px calc(50vw - 50%) 28px;border-bottom:5px solid var(--gold);margin-bottom:40px}
+.wrap>header .eyebrow,.page>header .eyebrow{display:none}
+.wrap>header h1,.page>header h1{color:#fff;font-weight:800;letter-spacing:-.015em}
+.wrap>header .lede,.wrap>header .promise,.page>header .promise,.page>header .lede{color:rgba(255,255,255,.9)}
+.wrap>header .chip-line,.wrap>header .chip-outline,.page>header .chip-outline,.wrap>header .meta-chip.outline{border-color:rgba(255,255,255,.55);color:#fff;background:transparent}
+.rule,.goldrule,.gold-rule{display:none}
+.rise,.reveal,.fade{opacity:1!important;transform:none!important;animation:none!important}
+h2 .step{color:var(--berkeley)}
+footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(50% - 50vw) 0;padding:20px calc(50vw - 50%) 26px;border-top:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="mast"><span class="brand"><span class="uc">UC Berkeley</span>COMPSS 211A · Computing I</span><a href="../index.html">← All interactives</a></div>
+
+  <header class="rise">
+    <p class="eyebrow">COMPSS 211A &middot; Computing I</p>
+    <h1>How Git Thinks</h1>
+    <div class="chips">
+      <span class="chip chip-gold">Week 3 &middot; GitHub Desktop &amp; Pages</span>
+      <span class="chip chip-outline">&asymp; 7 minutes</span>
+    </div>
+    <p class="promise">Learn where a change lives after each step, and what your teammate can and cannot see.</p>
+    <hr class="goldrule">
+  </header>
+
+  <section class="card rise d1" aria-labelledby="intro-h">
+    <h2 id="intro-h">Four places, one change</h2>
+    <p class="lede">Git records snapshots of a project's files. Each snapshot, or <strong>commit</strong>, has a message and a place in the project's history. Git is the version-control software; GitHub hosts the <strong>remote repository</strong>. The two copies do not synchronize automatically.</p>
+    <p class="lede">The part that trips people up is <em>where a change lives</em> after each click. Below, one file makes the full trip: your disk &rarr; the staging area &rarr; your local history &rarr; GitHub. Watch it move.</p>
+  </section>
+
+  <section class="card rise d2" aria-labelledby="sim-h">
+    <div class="cardhead">
+      <h2 id="sim-h">The four places your work lives</h2>
+    </div>
+    <p class="hint">Each button shows the GitHub Desktop action and the matching git verb. Missions guide you; the checklist below keeps score.</p>
+
+    <div class="brief" id="missionBrief"></div>
+
+    <div class="stations" id="stations">
+      <section class="station" aria-labelledby="st1h">
+        <header><span class="stnum" aria-hidden="true">1</span><h3 id="st1h">Working directory</h3></header>
+        <p class="stdesc">your files on disk</p>
+        <div class="stbody">
+          <span class="filechip" id="fileChip"><span class="ficon" aria-hidden="true">&#9636;</span>field_guide.md<span class="fbadge" id="fileBadge" hidden>M &middot; modified</span></span>
+          <p class="stnote" id="fileState">matches your last commit</p>
+        </div>
+        <p class="stvocab">what you see in VS Code or Finder</p>
+      </section>
+
+      <div class="arrow" aria-hidden="true"><span class="arr">&rarr;</span><span class="arrlabel">stage<br>git add</span></div>
+
+      <section class="station" aria-labelledby="st2h">
+        <header><span class="stnum" aria-hidden="true">2</span><h3 id="st2h">Staging area</h3></header>
+        <p class="stdesc">changes checked / selected for the next commit</p>
+        <div class="stbody" id="stageBody">
+          <span class="stagechip" id="stageChip" hidden><span class="stagecheck" aria-hidden="true">&#9745;</span>field_guide.md</span>
+          <p class="emptynote" id="stageEmpty">empty, nothing checked</p>
+        </div>
+        <p class="stvocab">Desktop: the checked file list</p>
+      </section>
+
+      <div class="arrow" aria-hidden="true"><span class="arr">&rarr;</span><span class="arrlabel">commit</span></div>
+
+      <section class="station" aria-labelledby="st3h">
+        <header><span class="stnum" aria-hidden="true">3</span><h3 id="st3h">Local repository</h3></header>
+        <p class="stdesc">commit history on <strong>your</strong> machine</p>
+        <div class="stbody">
+          <p class="striplabel">main &middot; commits</p>
+          <div class="strip" id="localStrip" aria-label="Local commit history"></div>
+        </div>
+        <p class="stvocab">Desktop: the History tab &middot; lives in .git</p>
+      </section>
+
+      <div class="arrow" aria-hidden="true"><span class="arr">&rarr;</span><span class="arrlabel">push &rarr;<br>&larr; pull</span></div>
+
+      <section class="station" aria-labelledby="st4h">
+        <header><span class="stnum" aria-hidden="true">4</span><h3 id="st4h">GitHub remote</h3></header>
+        <p class="stdesc">commit history everyone shares</p>
+        <div class="stbody">
+          <p class="striplabel">origin/main &middot; commits</p>
+          <div class="strip" id="remoteStrip" aria-label="Remote commit history on GitHub"></div>
+          <p class="striplegend" id="remoteLegend" hidden>The T-tagged outlined dot is your teammate's commit.</p>
+          <div class="pages">
+            <p class="pages-label">GitHub Pages &middot; publishes from here</p>
+            <div class="minisite" id="miniSite" role="img" aria-labelledby="pagesAlt">
+              <div class="minibar" aria-hidden="true"><i></i><i></i><i></i></div>
+              <div class="minibody">
+                <p class="minititle">The Field Guide</p>
+                <div id="pagesLines" aria-hidden="true"></div>
+                <span class="minibadge" id="pagesBadge">built from commit 1</span>
+              </div>
+            </div>
+            <span class="visually-hidden" id="pagesAlt">Thumbnail of the published Pages site, currently built from commit 1.</span>
+          </div>
+        </div>
+        <p class="stvocab">Desktop calls it "origin" &middot; github.com</p>
+      </section>
+    </div>
+
+    <div class="actions" id="actions" role="group" aria-label="Simulator actions">
+      <button type="button" class="abtn" id="btnEdit">
+        <span class="blabel">Edit file</span>
+        <span class="bsub">save in your editor &middot; changes your files on disk</span>
+      </button>
+      <button type="button" class="abtn" id="btnStage">
+        <span class="blabel">Stage change</span>
+        <span class="bsub">Desktop: check the file in the changes list &middot; git add</span>
+      </button>
+      <button type="button" class="abtn" id="btnCommit">
+        <span class="blabel">Commit</span>
+        <span class="bsub">Desktop: "Commit to main" &middot; git commit</span>
+      </button>
+      <button type="button" class="abtn" id="btnPush">
+        <span class="blabel">Push</span>
+        <span class="bsub">Desktop: "Push origin" &middot; git push</span>
+      </button>
+      <button type="button" class="abtn" id="btnPull" aria-disabled="true">
+        <span class="blabel">Pull</span>
+        <span class="bsub">Desktop: "Fetch origin", then "Pull origin" &middot; git pull</span>
+      </button>
+    </div>
+
+    <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
+
+    <div class="promptzone" id="promptZone"></div>
+
+    <p class="tview" id="teammateView" role="status" aria-live="polite">
+      <span class="tlabel">What does your teammate see right now?</span>
+      <span id="tviewText"></span>
+    </p>
+  </section>
+
+  <section class="card rise d3" aria-labelledby="missions-h">
+    <div class="cardhead">
+      <h2 id="missions-h">Missions</h2>
+      <span class="count" id="missionCount">0 / 4 complete</span>
+    </div>
+    <ol class="checklist" id="checklist">
+      <li class="checkitem" id="mi0"><span class="mnum" aria-hidden="true">1</span><span class="box" aria-hidden="true">&#10003;</span><span>Make your edit visible to a teammate</span><span class="visually-hidden mstate">, not yet complete</span></li>
+      <li class="checkitem" id="mi1"><span class="mnum" aria-hidden="true">2</span><span class="box" aria-hidden="true">&#10003;</span><span>Diagnose it: committed, but GitHub shows nothing new</span><span class="visually-hidden mstate">, not yet complete</span></li>
+      <li class="checkitem" id="mi2"><span class="mnum" aria-hidden="true">3</span><span class="box" aria-hidden="true">&#10003;</span><span>Bring a teammate's pushed commit to your machine</span><span class="visually-hidden mstate">, not yet complete</span></li>
+      <li class="checkitem" id="mi3"><span class="mnum" aria-hidden="true">4</span><span class="box" aria-hidden="true">&#10003;</span><span>Know where GitHub Pages publishes from</span><span class="visually-hidden mstate">, not yet complete</span></li>
+    </ol>
+  </section>
+
+  <section class="card recap rise d4" aria-labelledby="recap-h">
+    <h2 id="recap-h">Before Friday's quiz</h2>
+    <ul>
+      <li><span class="rk">save &ne; commit</span><p>Saving a file only changes your files on disk; a <strong>commit</strong> records selected changes, with a message, in your local history.</p></li>
+      <li><span class="rk">commit &ne; push</span><p>A commit records local history; a <strong>push</strong> transfers commits to the remote. GitHub sees nothing until you push.</p></li>
+      <li><span class="rk">pull is not optional</span><p><strong>Pull</strong> brings the remote's new commits to your local repository; a teammate's pushed work never appears on your machine by itself.</p></li>
+      <li><span class="rk">Pages = remote</span><p>GitHub Pages rebuilds the site from the pushed repository (the remote), not from the files on your laptop.</p></li>
+    </ul>
+  </section>
+
+  <footer>
+    COMPSS 211A &middot; UC Berkeley &middot; CC BY 4.0 &middot; Runs in your browser. Nothing you do here is recorded.
+  </footer>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var REDUCED = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ------------------------------------------------------------------ */
+  /* State                                                              */
+  /* ------------------------------------------------------------------ */
+  var S = {
+    dirty: false,          // saved edit in the working directory, not staged
+    staged: false,         // change checked for the next commit
+    local: [],             // commits in the local repository  [{n, mine}]
+    remote: [],            // commits on the GitHub remote
+    next: 2,               // next commit number
+    mission: 0,            // 1..4, 5 = all done
+    locked: false,         // actions locked while a question is open
+    pullArmed: false,      // Pull is only enabled in mission 3
+    m1: { edit:false, stage:false, commit:false, push:false },
+    m2ready: false,        // mission 2 question answered -> push allowed to finish it
+    m4ready: false,        // mission 4 question answered -> publish cycle
+    done: [false, false, false, false]
+  };
+
+  var COMMIT_MSG = {
+    1: 'Initial commit',
+    2: 'Add favorite tool to the guide',
+    3: 'Clarify the data sources section',
+    4: "Add Maya's field notes",
+    5: 'Update the site headline'
+  };
+  function msgFor(n){ return COMMIT_MSG[n] || ('Small update ' + n); }
+
+  function $(id){ return document.getElementById(id); }
+  var el = {
+    fileChip: $('fileChip'), fileBadge: $('fileBadge'), fileState: $('fileState'),
+    stageBody: $('stageBody'), stageChip: $('stageChip'), stageEmpty: $('stageEmpty'),
+    localStrip: $('localStrip'), remoteStrip: $('remoteStrip'), remoteLegend: $('remoteLegend'),
+    feedback: $('feedback'), tview: $('tviewText'), brief: $('missionBrief'),
+    zone: $('promptZone'), actions: $('actions'),
+    miniSite: $('miniSite'), pagesBadge: $('pagesBadge'), pagesLines: $('pagesLines'),
+    pagesAlt: $('pagesAlt'), count: $('missionCount'),
+    btnEdit: $('btnEdit'), btnStage: $('btnStage'), btnCommit: $('btnCommit'),
+    btnPush: $('btnPush'), btnPull: $('btnPull')
+  };
+
+  var qid = 0; // unique radio-group names
+
+  /* ------------------------------------------------------------------ */
+  /* Small helpers                                                      */
+  /* ------------------------------------------------------------------ */
+  function say(kind, html){
+    var icon = kind === 'ok' ? '&#10003;' : (kind === 'warn' ? '!' : '&rsaquo;');
+    el.feedback.innerHTML = '<span class="fico ' + kind + '" aria-hidden="true">' +
+      icon + '</span>' + html;
+  }
+
+  function nums(list){ return list.map(function(c){ return c.n; }).sort(function(a,b){ return a-b; }); }
+
+  function describe(ns){
+    if (!ns.length) return 'no commits';
+    if (ns.length === 1) return 'commit ' + ns[0];
+    var contiguous = ns[ns.length - 1] - ns[0] === ns.length - 1;
+    if (contiguous) return 'commits ' + ns[0] + '–' + ns[ns.length - 1];
+    return 'commits ' + ns.join(', ');
+  }
+
+  function updateTview(){
+    var rn = nums(S.remote), ln = nums(S.local);
+    var localOnly = ln.filter(function(n){ return rn.indexOf(n) === -1; });
+    var remoteOnly = rn.filter(function(n){ return ln.indexOf(n) === -1; });
+    var t = 'GitHub shows ' + describe(rn) + '.';
+    if (remoteOnly.length){
+      t += ' Your local repository is missing ' + describe(remoteOnly) + '. Pull to get it.';
+    }
+    if (localOnly.length){
+      t += ' ' + (localOnly.length > 1 ? 'Commits ' + localOnly.join(', ') + ' exist' :
+        'Commit ' + localOnly[0] + ' exists') + ' only on your machine, invisible to your teammate.';
+    } else if (S.staged){
+      t += ' Your checked change is invisible to them until you commit and push.';
+    } else if (S.dirty){
+      t += ' Your saved edit is invisible to them.';
+    } else if (!remoteOnly.length){
+      t += ' You and GitHub match.';
+    }
+    el.tview.textContent = t;
+  }
+
+  function updateFileState(){
+    el.fileState.textContent = S.dirty ? 'modified, not staged or committed' :
+      (S.staged ? 'edit is checked, see station 2' : 'matches your last commit');
+  }
+
+  function setBrief(html){ el.brief.innerHTML = html; }
+
+  function lock(v){
+    S.locked = v;
+    el.actions.classList.toggle('islocked', v);
+  }
+
+  function guardLocked(){
+    if (S.locked){
+      say('warn', 'One step at a time. Answer the question (or let the scene finish) first.');
+      return true;
+    }
+    return false;
+  }
+
+  function makeDot(commit){
+    var d = document.createElement('span');
+    d.className = 'dot' + (commit.mine ? '' : ' tdot');
+    d.textContent = commit.n;
+    d.title = 'Commit ' + commit.n + ': ' + msgFor(commit.n) +
+      (commit.mine ? '' : ' (teammate)');
+    if (!commit.mine){
+      var t = document.createElement('span');
+      t.className = 'tt';
+      t.textContent = 'T';
+      t.setAttribute('aria-hidden', 'true');
+      d.appendChild(t);
+      var sr = document.createElement('span');
+      sr.className = 'visually-hidden';
+      sr.textContent = ' (teammate’s commit)';
+      d.appendChild(sr);
+    }
+    return d;
+  }
+
+  function addDot(strip, commit, animate){
+    var d = makeDot(commit);
+    if (animate && !REDUCED) d.classList.add('pop');
+    strip.appendChild(d);
+  }
+
+  /* Traveling chip/dot animation between two stations. */
+  function fly(fromEl, toEl, text, cls, done){
+    if (REDUCED || !fromEl || !toEl){ if (done) done(); return; }
+    var f = fromEl.getBoundingClientRect(), t = toEl.getBoundingClientRect();
+    var node = document.createElement('span');
+    node.className = 'flyer ' + cls;
+    node.textContent = text;
+    node.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(node);
+    var w = node.offsetWidth, h = node.offsetHeight;
+    var sx = f.left + f.width / 2 - w / 2, sy = f.top + f.height / 2 - h / 2;
+    var ex = t.left + Math.min(t.width / 2, 40) - w / 2, ey = t.top + t.height / 2 - h / 2;
+    node.style.left = sx + 'px';
+    node.style.top = sy + 'px';
+    node.getBoundingClientRect(); // flush layout so the transition runs
+    node.style.transform = 'translate(' + (ex - sx) + 'px,' + (ey - sy) + 'px) scale(.92)';
+    node.style.opacity = '0.3';
+    var finished = false;
+    function finish(){
+      if (finished) return;
+      finished = true;
+      if (node.parentNode) node.parentNode.removeChild(node);
+      if (done) done();
+    }
+    node.addEventListener('transitionend', finish, { once: true });
+    setTimeout(finish, 700); // safety net if transitionend never fires
+  }
+
+  function renderPages(flash){
+    var built = Math.max.apply(null, nums(S.remote));
+    el.pagesBadge.textContent = 'built from commit ' + built;
+    el.pagesAlt.textContent = 'Thumbnail of the published Pages site, currently built from commit ' + built + '.';
+    var html = '';
+    for (var i = 0; i < 3; i++){
+      var wdt = 45 + ((built * 37 + i * 23) % 50);
+      html += '<div class="miniline" style="width:' + wdt + '%"></div>';
+    }
+    el.pagesLines.innerHTML = html;
+    if (flash && !REDUCED){
+      el.miniSite.classList.remove('flash');
+      void el.miniSite.offsetWidth;
+      el.miniSite.classList.add('flash');
+    }
+  }
+
+  function seq(steps){ // steps: array of [fn, delayAfterMs]
+    var i = 0;
+    (function next(){
+      if (i >= steps.length) return;
+      var step = steps[i++];
+      step[0]();
+      if (i < steps.length) setTimeout(next, REDUCED ? 0 : step[1]);
+    })();
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Prompt rendering (predict-then-reveal + multiple choice)           */
+  /* ------------------------------------------------------------------ */
+  function renderPrompt(cfg){
+    lock(true);
+    qid++;
+    var name = 'q' + qid;
+    var box = document.createElement('div');
+    box.className = 'prompt';
+    var fs = document.createElement('fieldset');
+    var lg = document.createElement('legend');
+    lg.textContent = cfg.question;
+    fs.appendChild(lg);
+
+    var optEls = cfg.options.map(function(text, i){
+      var lab = document.createElement('label');
+      lab.className = 'opt';
+      var input = document.createElement('input');
+      input.type = 'radio';
+      input.name = name;
+      input.value = i;
+      var mark = document.createElement('span');
+      mark.className = 'mark';
+      mark.setAttribute('aria-hidden', 'true');
+      var span = document.createElement('span');
+      span.textContent = text;
+      lab.appendChild(input); lab.appendChild(mark); lab.appendChild(span);
+      fs.appendChild(lab);
+      return { lab: lab, input: input, mark: mark };
+    });
+
+    var row = document.createElement('div');
+    row.className = 'checkrow';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'sbtn';
+    btn.textContent = 'Check';
+    var hint = document.createElement('span');
+    hint.className = 'pickhint';
+    row.appendChild(btn); row.appendChild(hint);
+    fs.appendChild(row);
+    box.appendChild(fs);
+
+    btn.addEventListener('click', function(){
+      var picked = -1;
+      optEls.forEach(function(o, i){ if (o.input.checked) picked = i; });
+      if (picked === -1){ hint.textContent = 'Choose one option first.'; return; }
+      hint.textContent = '';
+      var correct = picked === cfg.correct;
+      optEls.forEach(function(o, i){
+        o.input.disabled = true;
+        if (i === cfg.correct){ o.lab.classList.add('revealok'); o.mark.textContent = '✓'; }
+        else if (i === picked){ o.lab.classList.add('revealerr'); o.mark.textContent = '✗'; }
+      });
+      var v = document.createElement('p');
+      v.className = 'verdict ' + (correct ? 'vok' : 'verr');
+      v.textContent = (correct ? '✓ Correct. ' : '✗ Not quite. ') + cfg.why;
+      fs.appendChild(v);
+      btn.remove();
+      lock(false);
+      if (cfg.after) cfg.after(correct);
+      if (cfg.continueLabel && cfg.onContinue){
+        var go = document.createElement('button');
+        go.type = 'button';
+        go.className = 'sbtn';
+        go.style.marginTop = '10px';
+        go.textContent = cfg.continueLabel;
+        go.addEventListener('click', function(){ cfg.onContinue(); });
+        fs.appendChild(go);
+        go.focus();
+      }
+    });
+
+    el.zone.innerHTML = '';
+    el.zone.appendChild(box);
+  }
+
+  function renderScene(title, desc, onGo){
+    var box = document.createElement('div');
+    box.className = 'prompt';
+    var h = document.createElement('p');
+    h.style.margin = '0';
+    h.innerHTML = '<strong>' + title + '</strong>';
+    var d = document.createElement('p');
+    d.className = 'scenedesc';
+    d.textContent = desc;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'sbtn';
+    btn.textContent = 'Set the scene';
+    btn.addEventListener('click', function(){ btn.disabled = true; onGo(); });
+    box.appendChild(h); box.appendChild(d); box.appendChild(btn);
+    el.zone.innerHTML = '';
+    el.zone.appendChild(box);
+  }
+
+  function renderNote(html, finale){
+    el.zone.innerHTML = '<div class="notecard' + (finale ? ' finale' : '') + '">' + html + '</div>';
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Mission 1 predictions                                              */
+  /* ------------------------------------------------------------------ */
+  var M1_STEP_BRIEF = {
+    2: '<strong>Mission 1 &middot; Step 2 of 4.</strong> Stage the change: check <code>field_guide.md</code> in the changes list.',
+    3: '<strong>Mission 1 &middot; Step 3 of 4.</strong> Commit: record the checked change, with a message, in your local history.',
+    4: '<strong>Mission 1 &middot; Step 4 of 4.</strong> Push: send your local commits to GitHub, where your teammate can see them.'
+  };
+
+  var PREDICTIONS = {
+    1: {
+      question: 'Predict: you saved field_guide.md in your editor. Where does the change live right now?',
+      options: [
+        'Only in the working directory, my files on disk',
+        "In my local repository's history",
+        'On GitHub, where my teammate can see it'
+      ],
+      correct: 0,
+      why: 'saving a file only changes your files on disk; Git has not recorded anything yet.',
+      after: function(){ setBrief(M1_STEP_BRIEF[2]); }
+    },
+    2: {
+      question: 'Predict: you checked (staged) the file. Where does the change live now?',
+      options: [
+        'It is already a commit in my local history',
+        'It is selected for the next commit, but no commit exists yet',
+        'It has been sent to GitHub'
+      ],
+      correct: 1,
+      why: 'staging only marks which changes the next commit will record; nothing is in history yet.',
+      after: function(){ setBrief(M1_STEP_BRIEF[3]); }
+    },
+    3: {
+      question: 'Predict: commit 2 now exists. Where does it live?',
+      options: [
+        'In my local repository only, on my machine',
+        'On GitHub too, because committing uploads it',
+        'Nowhere yet, I still need to stage it'
+      ],
+      correct: 0,
+      why: 'a commit records local history; nothing reaches GitHub until you push.',
+      after: function(){ setBrief(M1_STEP_BRIEF[4]); }
+    },
+    4: {
+      question: 'Predict: you pushed. What can your teammate see on GitHub now?',
+      options: [
+        'Commits 1 and 2, because push sent my local commits to the remote',
+        'Still only commit 1, push just backs things up on my machine',
+        'My unsaved editor changes too'
+      ],
+      correct: 0,
+      why: 'push transfers local commits to the remote repository on GitHub. The change is now shared.',
+      after: function(){
+        markDone(0);
+        setBrief('<strong>Mission 1 complete.</strong> Your edit made the full trip: disk &rarr; staged &rarr; local history &rarr; GitHub.');
+      },
+      continueLabel: 'Continue to mission 2',
+      onContinue: function(){ startMission(2); }
+    }
+  };
+
+  /* ------------------------------------------------------------------ */
+  /* Missions                                                           */
+  /* ------------------------------------------------------------------ */
+  function markDone(i){
+    if (S.done[i]) return;
+    S.done[i] = true;
+    var li = $('mi' + i);
+    li.classList.add('done');
+    li.querySelector('.mstate').textContent = ', complete';
+    var total = S.done.filter(Boolean).length;
+    el.count.textContent = total + ' / 4 complete';
+  }
+
+  function startMission(n){
+    S.mission = n;
+    if (n === 1){
+      setBrief('<strong>Mission 1 &middot; Make your edit visible to a teammate.</strong> You just cloned this repository, so your local repository and GitHub both hold commit 1. Step 1 of 4: press <em>Edit file</em>.');
+      renderNote('After each step, predict where the change lives. Answer, read the reveal, then take the next step.');
+    } else if (n === 2){
+      setBrief('<strong>Mission 2 &middot; "GitHub shows nothing new."</strong> First, set the scene below.');
+      renderScene('Mission 2: the scene',
+        'You make and commit another change (commit 3). Then your teammate refreshes GitHub and says nothing new is there.',
+        runScene2);
+    } else if (n === 3){
+      setBrief('<strong>Mission 3 &middot; Your teammate pushed a commit.</strong> Set the scene, then make it appear on your machine.');
+      renderScene('Mission 3: the scene',
+        'Your teammate Maya commits on her machine and pushes. Watch what changes on GitHub, and what does not change on your machine.',
+        runScene3);
+    } else if (n === 4){
+      setBrief('<strong>Mission 4 &middot; Where does GitHub Pages publish from?</strong> Answer first; then prove it in the simulator.');
+      renderPrompt({
+        question: 'Your team’s site is published with GitHub Pages. Which copy of the repository does Pages build the site from?',
+        options: [
+          'The working directory on my laptop',
+          'My local repository’s commit history',
+          'The remote repository on GitHub, meaning whatever has been pushed'
+        ],
+        correct: 2,
+        why: 'GitHub Pages rebuilds from the pushed repository on GitHub; commits that stay local never reach the site.',
+        after: function(){
+          S.m4ready = true;
+          setBrief('<strong>Mission 4 &middot; Prove it.</strong> Edit, stage, and commit, and watch the Pages panel <em>not</em> change. Then push, and watch it rebuild.');
+        }
+      });
+    }
+  }
+
+  /* Scripted internals (no mission hooks, no guards) ----------------- */
+  function sEdit(){
+    S.dirty = true;
+    el.fileBadge.hidden = false;
+    if (!REDUCED) el.fileBadge.classList.add('pop');
+    updateFileState();
+    say('info', 'Scene: you save another change to <code>field_guide.md</code>&hellip;');
+    updateTview();
+  }
+  function sStage(){
+    S.dirty = false; S.staged = true;
+    el.fileBadge.hidden = true;
+    fly(el.fileChip, el.stageBody, 'field_guide.md', 'flychip', function(){
+      el.stageChip.hidden = false;
+      el.stageEmpty.hidden = true;
+    });
+    updateFileState();
+    say('info', 'Scene: &hellip;you check it in the changes list&hellip;');
+  }
+  function sCommit(){
+    S.staged = false;
+    var c = { n: S.next++, mine: true };
+    S.local.push(c);
+    el.stageChip.hidden = true;
+    el.stageEmpty.hidden = false;
+    fly(el.stageBody, el.localStrip, String(c.n), 'flydot', function(){
+      addDot(el.localStrip, c, true);
+      updateTview();
+    });
+    updateFileState();
+    say('info', 'Scene: &hellip;and press "Commit to main". Commit ' + c.n +
+      ' (“' + msgFor(c.n) + '”) is recorded locally. You do <em>not</em> push.');
+  }
+
+  function runScene2(){
+    lock(true);
+    seq([
+      [sEdit, 900],
+      [sStage, 900],
+      [sCommit, 1100],
+      [function(){
+        updateTview();
+        renderPrompt({
+          question: 'You committed, but your teammate says GitHub shows nothing new. What is missing?',
+          options: [
+            'Save the file again in the editor',
+            'Commit a second time, with a longer message',
+            'Push, because commits stay on my machine until I push them'
+          ],
+          correct: 2,
+          why: 'a commit records local history; a push transfers commits to the remote. GitHub cannot see unpushed commits.',
+          after: function(){
+            S.m2ready = true;
+            setBrief('<strong>Mission 2 &middot; Now do it.</strong> Press <em>Push</em> (Desktop: "Push origin") so commit 3 reaches GitHub.');
+          }
+        });
+      }, 0]
+    ]);
+  }
+
+  function runScene3(){
+    lock(true);
+    var c = { n: S.next++, mine: false };
+    S.remote.push(c);
+    addDot(el.remoteStrip, c, true);
+    el.remoteLegend.hidden = false;
+    renderPages(true);
+    updateTview();
+    say('info', 'Maya pushed commit ' + c.n + ' (“' + msgFor(c.n) +
+      '”). It reached GitHub, and Pages rebuilt, but nothing on <em>your</em> machine changed.');
+    setTimeout(function(){
+      S.pullArmed = true;
+      el.btnPull.setAttribute('aria-disabled', 'false');
+      setBrief('<strong>Mission 3 &middot; Bring commit ' + c.n +
+        ' to your machine.</strong> Press <em>Pull</em> (Desktop: "Fetch origin", then "Pull origin").');
+      renderNote('Notice the persistent line below: GitHub is ahead of your local repository. Nothing arrives on your machine until you pull.');
+      lock(false);
+    }, REDUCED ? 0 : 900);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Player actions                                                     */
+  /* ------------------------------------------------------------------ */
+  function doEdit(){
+    if (guardLocked()) return;
+    if (S.dirty){
+      say('info', '<code>field_guide.md</code> already has an uncommitted change. Next: check it in the changes list (Stage).');
+      return;
+    }
+    if (S.staged){
+      say('info', 'Your change is already staged. Next: Commit it.');
+      return;
+    }
+    S.dirty = true;
+    el.fileBadge.hidden = false;
+    if (!REDUCED){ el.fileBadge.classList.remove('pop'); void el.fileBadge.offsetWidth; el.fileBadge.classList.add('pop'); }
+    updateFileState();
+    say('ok', 'You saved a change to <code>field_guide.md</code>. GitHub Desktop now lists it under Changes. Nothing is recorded in history yet.');
+    updateTview();
+    if (S.mission === 1 && !S.m1.edit){
+      S.m1.edit = true;
+      renderPrompt(PREDICTIONS[1]);
+    }
+  }
+
+  function doStage(){
+    if (guardLocked()) return;
+    if (S.staged){
+      say('info', 'The change is already checked for the next commit. Next: Commit.');
+      return;
+    }
+    if (!S.dirty){
+      say('warn', 'Nothing to stage: the changes list is empty. Edit the file first, then check it.');
+      return;
+    }
+    S.dirty = false;
+    S.staged = true;
+    el.fileBadge.hidden = true;
+    fly(el.fileChip, el.stageBody, 'field_guide.md', 'flychip', function(){
+      el.stageChip.hidden = false;
+      el.stageEmpty.hidden = true;
+      if (!REDUCED){ el.stageChip.classList.remove('pop'); void el.stageChip.offsetWidth; el.stageChip.classList.add('pop'); }
+    });
+    updateFileState();
+    say('ok', 'The change is checked, meaning selected for the next commit (<code>git add</code>). Still not in history.');
+    updateTview();
+    if (S.mission === 1 && S.m1.edit && !S.m1.stage){
+      S.m1.stage = true;
+      renderPrompt(PREDICTIONS[2]);
+    }
+  }
+
+  function doCommit(){
+    if (guardLocked()) return;
+    if (!S.staged){
+      say('warn', 'Nothing is staged, so there is nothing to commit. A commit records the <em>checked</em> changes, and right now none are checked.');
+      return;
+    }
+    S.staged = false;
+    var c = { n: S.next++, mine: true };
+    S.local.push(c);
+    el.stageChip.hidden = true;
+    el.stageEmpty.hidden = false;
+    fly(el.stageBody, el.localStrip, String(c.n), 'flydot', function(){
+      addDot(el.localStrip, c, true);
+      updateTview();
+    });
+    updateFileState();
+    var extra = (S.mission === 4 && S.m4ready) ?
+      ' Look at the Pages panel: the published site has <em>not</em> changed.' : '';
+    say('ok', 'Commit ' + c.n + ' (“' + msgFor(c.n) +
+      '”) is recorded in your local repository (Desktop: "Commit to main").' + extra);
+    updateTview();
+    if (S.mission === 1 && S.m1.stage && !S.m1.commit){
+      S.m1.commit = true;
+      renderPrompt(PREDICTIONS[3]);
+    }
+  }
+
+  function doPush(){
+    if (guardLocked()) return;
+    var rn = nums(S.remote);
+    var unpushed = S.local.filter(function(c){ return rn.indexOf(c.n) === -1; });
+    if (!unpushed.length){
+      say('warn', 'Every local commit is already on GitHub, so there is nothing to push. (Desktop would only offer "Fetch origin".)');
+      return;
+    }
+    unpushed.forEach(function(c){ S.remote.push(c); });
+    fly(el.localStrip, el.remoteStrip, String(unpushed[0].n), 'flydot', function(){
+      unpushed.forEach(function(c){ addDot(el.remoteStrip, c, true); });
+      renderPages(true);
+      updateTview();
+    });
+    var list = describe(nums(unpushed));
+    var extra = (S.mission === 4 && S.m4ready) ?
+      ' GitHub Pages rebuilt the site from the pushed repository. Watch the panel.' : '';
+    say('ok', 'Pushed ' + list + ' to origin (Desktop: "Push origin"). GitHub now has your local history.' + extra);
+    updateTview();
+
+    if (S.mission === 1 && S.m1.commit && !S.m1.push){
+      S.m1.push = true;
+      renderPrompt(PREDICTIONS[4]);
+    } else if (S.mission === 2 && S.m2ready){
+      markDone(1);
+      startMission(3);
+    } else if (S.mission === 4 && S.m4ready){
+      markDone(3);
+      S.mission = 5;
+      setBrief('<strong>All four missions complete.</strong> Nicely done.');
+      renderNote('<strong>&#10003; Done.</strong> Read the recap card below once more; those four lines are the most common quiz mistakes. The simulator keeps working if you want to keep clicking.', true);
+    }
+  }
+
+  function doPull(){
+    if (guardLocked()) return;
+    var ln = nums(S.local);
+    var incoming = S.remote.filter(function(c){ return ln.indexOf(c.n) === -1; });
+    if (!S.pullArmed || !incoming.length){
+      say('warn', 'Nothing to pull right now: GitHub has no commits you are missing. Pull matters after a teammate pushes (that is mission 3).');
+      return;
+    }
+    incoming.forEach(function(c){ S.local.push(c); });
+    fly(el.remoteStrip, el.localStrip, String(incoming[0].n), 'flydot tfly', function(){
+      incoming.forEach(function(c){ addDot(el.localStrip, c, true); });
+      updateTview();
+    });
+    S.pullArmed = false;
+    el.btnPull.setAttribute('aria-disabled', 'true');
+    el.fileState.textContent = 'updated by pull. Maya’s change is now in your files';
+    say('ok', 'Pulled ' + describe(nums(incoming)) +
+      ' into your local repository, and your working directory files updated to match (Desktop: "Pull origin").');
+    updateTview();
+    if (S.mission === 3){
+      markDone(2);
+      startMission(4);
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Boot                                                               */
+  /* ------------------------------------------------------------------ */
+  el.btnEdit.addEventListener('click', doEdit);
+  el.btnStage.addEventListener('click', doStage);
+  el.btnCommit.addEventListener('click', doCommit);
+  el.btnPush.addEventListener('click', doPush);
+  el.btnPull.addEventListener('click', doPull);
+
+  S.local.push({ n: 1, mine: true });
+  S.remote.push({ n: 1, mine: true });
+  addDot(el.localStrip, S.local[0], false);
+  addDot(el.remoteStrip, S.remote[0], false);
+  renderPages(false);
+  updateFileState();
+  updateTview();
+  startMission(1);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COMPSS 211A Interactives</title>
+<meta name="description" content="Short interactive practice pages for COMPSS 211A: Computing I at UC Berkeley, covering Git, the command line, data formats, web APIs, TF-IDF, and embeddings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Inter+Tight:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --berkeley:#002676; --ink:#1A1A1A; --paper:#FFFFFF; --card:#FFFFFF;
+  --gold:#FDBA12; --gold-soft:#FFF1CC; --blue-mid:#2A4D9B; --line:#DDDDDD;
+  --ok:#1E7D4E; --err:#B3403A; --code-bg:#0E1B45; --code-ink:#E8EDF6;
+  --serif:"Inter Tight","Inter",-apple-system,"Segoe UI",sans-serif;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);color:var(--ink);background:var(--paper);
+  line-height:1.6;font-size:16.5px;
+}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px}
+/* ---------- header ---------- */
+header{padding:56px 0 0}
+.eyebrow{
+  font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  font-size:.78rem;color:var(--blue-mid);
+}
+h1{
+  font-family:var(--serif);font-weight:600;color:var(--berkeley);
+  font-size:clamp(2.3rem,5.5vw,3.4rem);line-height:1.12;margin:.35rem 0 .8rem;
+  letter-spacing:-.01em;
+}
+h1 .amp{color:var(--gold);font-style:italic}
+.lede{max-width:640px;font-size:1.06rem;color:#3A4A63}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin:1.1rem 0 1.6rem}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:.8rem;font-weight:600;padding:5px 12px;border-radius:3px;
+}
+.chip-gold{background:var(--gold);color:var(--berkeley)}
+.chip-line{border:1.5px solid var(--line);color:#51607A;background:var(--card)}
+.rule{height:3px;background:var(--gold);border:0;margin:0 0 44px;border-radius:2px}
+/* ---------- how-to strip ---------- */
+.howto{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:46px;
+}
+.howto div{
+  background:var(--card);border:1px solid var(--line);border-radius:4px;
+  padding:14px 16px;font-size:.92rem;color:#3A4A63;
+}
+.howto b{display:block;color:var(--berkeley);font-size:.95rem;margin-bottom:2px}
+.howto .n{
+  font-family:var(--serif);color:var(--gold);font-weight:700;font-size:1.15rem;
+  margin-right:6px;
+}
+/* ---------- cards ---------- */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:56px}
+a.card{
+  display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;
+  background:var(--card);border:1px solid var(--line);border-radius:4px;
+  padding:22px 24px 20px;box-shadow:0 1px 2px rgba(18,35,61,.05);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  position:relative;overflow:hidden;
+}
+a.card::before{
+  content:"";position:absolute;inset:0 auto 0 0;width:5px;background:var(--berkeley);
+  transform:scaleY(0);transform-origin:top;transition:transform .22s ease;
+}
+a.card:hover,a.card:focus-visible{
+  transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,38,118,.13);
+  border-color:#C4C9D4;
+}
+a.card:hover::before,a.card:focus-visible::before{transform:scaleY(1)}
+a.card:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.card .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.week{
+  font-size:.72rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  background:var(--gold-soft);color:#7A5A00;padding:3px 10px;border-radius:3px;
+}
+.mins{font-size:.72rem;font-weight:600;color:#51607A;border:1.5px solid var(--line);
+  padding:2.5px 10px;border-radius:3px}
+.card h2{
+  font-family:var(--serif);font-weight:600;color:var(--berkeley);
+  font-size:1.42rem;line-height:1.2;letter-spacing:-.005em;
+}
+.card p{font-size:.94rem;color:#3A4A63;flex:1}
+.card .go{
+  font-weight:600;font-size:.9rem;color:var(--berkeley);
+  display:inline-flex;align-items:center;gap:6px;
+}
+.card .go::after{content:"→";transition:transform .18s ease}
+a.card:hover .go::after{transform:translateX(4px)}
+.quiz{font-family:var(--mono);font-size:.76rem;color:#6B7890}
+/* ---------- note ---------- */
+.note{
+  background:linear-gradient(0deg, rgba(253,186,18,.07), rgba(253,186,18,.07)),var(--card);
+  border:1px solid #EAD9AC;border-radius:4px;padding:20px 24px;margin-bottom:56px;
+  font-size:.95rem;color:#3A4A63;
+}
+.note b{color:var(--berkeley)}
+/* ---------- footer ---------- */
+footer{
+  border-top:1px solid var(--line);padding:26px 0 44px;
+  font-size:.85rem;color:#6B7890;
+}
+/* ---------- motion ---------- */
+@media (prefers-reduced-motion: no-preference){
+  .rise{opacity:0;transform:translateY(14px);animation:rise .6s ease forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+  .d1{animation-delay:.05s}.d2{animation-delay:.12s}.d3{animation-delay:.19s}
+  .d4{animation-delay:.26s}.d5{animation-delay:.33s}.d6{animation-delay:.40s}
+  .d7{animation-delay:.47s}.d8{animation-delay:.54s}.d9{animation-delay:.61s}
+}
+@media (max-width:760px){
+  .grid{grid-template-columns:1fr}
+  .howto{grid-template-columns:1fr}
+  header{padding-top:40px}
+}
+
+/* ═══ MaCSS skin, aligned with macss.berkeley.edu ═══ */
+html,body{overflow-x:clip}
+.mast{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:12px calc(50vw - 50%);display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.14)}
+.mast .brand{color:#fff;font-family:var(--sans);font-size:.9rem;font-weight:600;letter-spacing:.01em}
+.mast .brand .uc{font-family:Georgia,"Times New Roman",serif;color:var(--gold);font-size:1.04rem;font-weight:700;margin-right:7px}
+.mast a{color:#fff;font-family:var(--sans);font-weight:600;font-size:.83rem;text-decoration:none;border-bottom:1.5px solid rgba(255,255,255,.35);border-radius:0}
+.mast a:hover{border-bottom-color:var(--gold);color:#fff;text-decoration:none}
+.mast a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap>header,.page>header{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:30px calc(50vw - 50%) 28px;border-bottom:5px solid var(--gold);margin-bottom:40px}
+.wrap>header .eyebrow,.page>header .eyebrow{display:none}
+.wrap>header h1,.page>header h1{color:#fff;font-weight:800;letter-spacing:-.015em}
+.wrap>header .lede,.wrap>header .promise,.page>header .promise,.page>header .lede{color:rgba(255,255,255,.9)}
+.wrap>header .chip-line,.wrap>header .chip-outline,.page>header .chip-outline,.wrap>header .meta-chip.outline{border-color:rgba(255,255,255,.55);color:#fff;background:transparent}
+.rule,.goldrule,.gold-rule{display:none}
+.rise,.reveal,.fade{opacity:1!important;transform:none!important;animation:none!important}
+h2 .step{color:var(--berkeley)}
+footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(50% - 50vw) 0;padding:20px calc(50vw - 50%) 26px;border-top:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="mast"><span class="brand"><span class="uc">UC Berkeley</span>COMPSS 211A · Computing I</span><a href="https://macss.berkeley.edu/">macss.berkeley.edu</a></div>
+
+<header>
+  <p class="eyebrow rise d1">COMPSS 211A &middot; Computing I &middot; UC Berkeley</p>
+  <h1 class="rise d2">Interactive Warmups</h1>
+  <p class="lede rise d3">
+    Short practice pages for the parts of this course that are easiest to get wrong.
+    Each one runs in your browser and takes 5 to 10 minutes. They use the same
+    vocabulary as the Friday quizzes and labs.
+  </p>
+  <div class="chips rise d4">
+    <span class="chip chip-gold">6 interactives</span>
+    <span class="chip chip-line">5 to 10 minutes each</span>
+    <span class="chip chip-line">Nothing you do here is recorded</span>
+  </div>
+</header>
+<hr class="rule rise d4">
+
+<section class="howto rise d5" aria-label="How to use these">
+  <div><b><span class="n">1</span>Pick your week</b>Open the page for the current week, ideally before Friday’s discussion.</div>
+  <div><b><span class="n">2</span>Answer before you check</b>When a question appears, pick an answer before revealing it. Wrong answers here cost nothing.</div>
+  <div><b><span class="n">3</span>Read the recap</b>Each page ends with a short summary in the same terms as the quiz and the lab.</div>
+</section>
+
+<main class="grid">
+  <a class="card rise d5" href="interactives/week03-how-git-thinks.html">
+    <span class="meta"><span class="week">Week 3</span><span class="mins">≈ 7 min</span></span>
+    <h2>How Git Thinks</h2>
+    <p>Where a change lives at each step (working directory, staging area, local repository, GitHub) and what commit, push, and pull actually move.</p>
+    <span class="quiz">pairs with: GitHub Desktop &middot; Pages &middot; HW2</span>
+    <span class="go">Open</span>
+  </a>
+
+  <a class="card rise d6" href="interactives/week04-terminal-navigator.html">
+    <span class="meta"><span class="week">Week 4</span><span class="mins">≈ 8 min</span></span>
+    <h2>Terminal Navigator</h2>
+    <p>A simulated shell that cannot touch your real files. Navigate a small project and see why a script runs from one folder but fails from another.</p>
+    <span class="quiz">pairs with: command line &middot; relative paths &middot; git status</span>
+    <span class="go">Open</span>
+  </a>
+
+  <a class="card rise d7" href="interactives/week05-one-dataset-four-formats.html">
+    <span class="meta"><span class="week">Week 5</span><span class="mins">≈ 7 min</span></span>
+    <h2>One Dataset, Four Formats</h2>
+    <p>The same records in CSV, TSV, JSON, and XML. Click a value to find it in each format, then work through the comma trap, the leading zero, and three kinds of missing values.</p>
+    <span class="quiz">pairs with: structured data &middot; reconciliation &middot; HW3</span>
+    <span class="go">Open</span>
+  </a>
+
+  <a class="card rise d7" href="interactives/week06-understanding-web-apis.html">
+    <span class="meta"><span class="week">Week 6</span><span class="mins">≈ 8 min</span></span>
+    <h2>Understanding Web APIs</h2>
+    <p>Build a bounded OpenAlex-style request, read the response starting from the status code, page with cursors, handle a 429, and keep your API key out of the URL.</p>
+    <span class="quiz">pairs with: web APIs &middot; pagination &middot; HW3</span>
+    <span class="go">Open</span>
+  </a>
+
+  <a class="card rise d8" href="interactives/week08-understanding-tf-idf.html">
+    <span class="meta"><span class="week">Week 8</span><span class="mins">≈ 8 min</span></span>
+    <h2>Understanding TF-IDF</h2>
+    <p>Four campus comments become tokens, counts, and TF-IDF weights as you type. Flip the preprocessing switches and watch the top terms change.</p>
+    <span class="quiz">pairs with: NLP fundamentals &middot; HW4</span>
+    <span class="go">Open</span>
+  </a>
+
+  <a class="card rise d8" href="interactives/week09-how-computers-learn-word-meanings.html">
+    <span class="meta"><span class="week">Week 9</span><span class="mins">≈ 8 min</span></span>
+    <h2>How Computers Learn Word Meanings</h2>
+    <p>Words as positions, similarity as angles. Compare words, average them into documents, run a small KMeans, and see why you read a cluster before naming it.</p>
+    <span class="quiz">pairs with: embeddings &middot; clustering &middot; lab 9</span>
+    <span class="go">Open</span>
+  </a>
+</main>
+
+<aside class="note rise d9">
+  <b>About the data.</b> Everything here is synthetic or simulated, so you can
+  experiment without accounts, API keys, or real records. The numbers are made up.
+  The methods are the same ones you will use on real data in the labs and homework.
+</aside>
+
+<footer class="rise d9">
+  COMPSS 211A &middot; UC Berkeley &middot; CC BY 4.0 &middot; Runs in your browser. Nothing you do here is recorded.
+</footer>
+
+</div>
+</body>
+</html>

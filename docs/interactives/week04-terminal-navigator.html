@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terminal Navigator · COMPSS 211A</title>
+<meta name="description" content="A safe, simulated terminal for practicing pwd, ls, cd, relative paths, running a Python script, and git status before Friday's quiz. COMPSS 211A, Week 4.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Inter+Tight:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   COMPSS 211A shared design system
+   ============================================================ */
+:root{
+  --berkeley:#002676;
+  --ink:#1A1A1A;
+  --paper:#FFFFFF;
+  --card:#FFFFFF;
+  --gold:#FDBA12;
+  --gold-soft:#FFF1CC;
+  --blue-mid:#2A4D9B;
+  --line:#DDDDDD;
+  --ok:#1E7D4E;
+  --err:#B3403A;
+  --code-bg:#0E1B45;
+  --code-ink:#E8EDF6;
+  --font-display:"Inter Tight","Inter",-apple-system,"Segoe UI",sans-serif;
+  --font-body:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --font-mono:"IBM Plex Mono", "SF Mono", Menlo, Consolas, monospace;
+}
+
+*{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.55;
+}
+/* very subtle pure-CSS grain */
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  z-index:0;
+  pointer-events:none;
+  background-size:7px 7px, 11px 11px;
+  background-position:0 0, 3px 5px;
+  opacity:.45;
+}
+.page{
+  position:relative; z-index:1;
+  max-width:980px;
+  margin:0 auto;
+  padding:20px 18px 40px;
+}
+
+a{ color:var(--blue-mid); }
+a:hover{ color:var(--berkeley); }
+:focus-visible{
+  outline:3px solid var(--gold);
+  outline-offset:2px;
+  border-radius:4px;
+}
+code{
+  font-family:var(--font-mono);
+  font-size:.9em;
+  background:rgba(18,35,61,.06);
+  border:1px solid rgba(18,35,61,.08);
+  border-radius:4px;
+  padding:.08em .34em;
+}
+.sr-only{
+  position:absolute; width:1px; height:1px;
+  padding:0; margin:-1px; overflow:hidden;
+  clip:rect(0 0 0 0); white-space:nowrap; border:0;
+}
+
+/* ---------- header ---------- */
+.backlink{
+  display:inline-block;
+  font-size:.85rem;
+  font-weight:600;
+  text-decoration:none;
+  margin-bottom:18px;
+}
+.backlink:hover{ text-decoration:underline; }
+header .eyebrow{
+  font-size:.78rem;
+  font-weight:600;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--blue-mid);
+  margin:0 0 6px;
+}
+header h1{
+  font-family:var(--font-display);
+  font-weight:650;
+  color:var(--berkeley);
+  font-size:clamp(1.9rem, 4.6vw, 2.6rem);
+  line-height:1.12;
+  margin:0 0 12px;
+}
+.chips{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 12px; }
+.chip{
+  display:inline-block;
+  font-size:.8rem;
+  font-weight:600;
+  padding:4px 12px;
+  border-radius:3px;
+}
+.chip-gold{ background:var(--gold); color:var(--ink); }
+.chip-outline{ background:transparent; color:var(--ink); border:1.5px solid var(--line); }
+.promise{
+  margin:0 0 16px;
+  max-width:62ch;
+  font-size:1.02rem;
+}
+.gold-rule{
+  height:3px;
+  background:var(--gold);
+  border:0;
+  margin:0 0 22px;
+  border-radius:2px;
+}
+
+/* ---------- cards ---------- */
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:4px;
+  box-shadow:0 1px 2px rgba(18,35,61,.05), 0 6px 18px rgba(18,35,61,.05);
+  padding:18px 20px;
+}
+.card h2{
+  font-family:var(--font-display);
+  font-weight:600;
+  color:var(--berkeley);
+  font-size:1.2rem;
+  margin:0 0 10px;
+}
+.card p{ margin:0 0 10px; }
+.card p:last-child{ margin-bottom:0; }
+
+/* ---------- intro ---------- */
+.intro{ margin-bottom:18px; }
+.anatomy{
+  display:flex; gap:10px; flex-wrap:wrap;
+  margin:14px 0;
+}
+.apart{
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  padding:8px 14px;
+  border:1px dashed var(--line);
+  border-radius:4px;
+  background:rgba(18,35,61,.02);
+}
+.apart code{ background:transparent; border:0; font-size:1rem; font-weight:500; padding:0; }
+.apart:nth-child(1) code{ color:var(--berkeley); }
+.apart:nth-child(2) code{ color:var(--blue-mid); }
+.apart:nth-child(3) code{ color:var(--ok); }
+.apart span{
+  font-size:.72rem; font-weight:600;
+  letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ink); opacity:.75;
+}
+.hintchips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+.hintchip{
+  font-size:.8rem;
+  border:1px solid var(--line);
+  background:var(--paper);
+  border-radius:3px;
+  padding:3px 11px;
+}
+.hintchip code{ background:transparent; border:0; padding:0; }
+
+/* ---------- layout ---------- */
+.layout{ display:grid; gap:18px; }
+@media (min-width:900px){
+  .layout{
+    grid-template-columns:minmax(0,1fr) 300px;
+    grid-template-areas:
+      "top side"
+      "missions side";
+    align-items:start;
+  }
+  .lay-top{ grid-area:top; }
+  .sidebar{ grid-area:side; }
+  .missions-card{ grid-area:missions; }
+  .sidebar-sticky{ position:sticky; top:14px; }
+}
+.lay-top{ display:grid; gap:14px; }
+.sidebar{ display:grid; gap:14px; align-content:start; }
+.sidebar-sticky{ display:grid; gap:14px; }
+
+/* ---------- mission strip ---------- */
+.strip{
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-left:5px solid var(--gold);
+  border-radius:4px;
+  padding:10px 14px;
+  font-size:.95rem;
+}
+.strip-badge{
+  flex:none;
+  font-size:.76rem; font-weight:600;
+  letter-spacing:.05em; text-transform:uppercase;
+  background:var(--gold-soft); color:var(--ink);
+  border-radius:3px; padding:3px 10px;
+}
+.strip.all-done{ border-left-color:var(--ok); }
+.strip.all-done .strip-badge{ background:var(--ok); color:#fff; }
+#strip-text code{ background:rgba(18,35,61,.06); }
+
+/* ---------- terminal ---------- */
+.term-card{
+  padding:0;
+  overflow:hidden;
+  background:var(--code-bg);
+  border-color:#2A3A52;
+}
+.term-head{
+  display:flex; align-items:center; gap:7px;
+  padding:10px 14px;
+  background:#0A1524;
+  border-bottom:1px solid #24344C;
+}
+.term-head .dot{ width:11px; height:11px; border-radius:50%; flex:none; }
+.dot-r{ background:#E0574F; } .dot-y{ background:#E9B64D; } .dot-g{ background:#5DBB63; }
+.term-title{
+  margin-left:8px;
+  font-family:var(--font-mono);
+  font-size:.76rem;
+  color:#8FA3C4;
+}
+.term-body{
+  height:340px;
+  overflow-y:auto;
+  padding:14px 16px 6px;
+  font-family:var(--font-mono);
+  font-size:.875rem;
+  line-height:1.55;
+  cursor:text;
+}
+.t-line{ white-space:pre-wrap; word-break:break-word; min-height:1.2em; color:#D7DFEF; }
+.t-cmd{ color:var(--code-ink); }
+.t-prompt{ color:var(--gold); font-weight:500; }
+.t-out{ color:#D7DFEF; }
+.t-err{ color:#FFA49B; }
+.t-ok{ color:#7BD8A0; }
+.t-note{ color:#8FA3C4; font-style:italic; }
+.t-dim{ color:#8FA3C4; }
+.t-dir{ color:#7CC0FF; font-weight:500; }
+.term-input-row{
+  display:flex; align-items:baseline; gap:8px;
+  padding:4px 16px 12px;
+  font-family:var(--font-mono);
+  font-size:.875rem;
+  background:var(--code-bg);
+  cursor:text;
+}
+.input-wrap{ position:relative; flex:1; min-width:0; }
+#term-in{
+  width:100%;
+  background:transparent;
+  border:0;
+  color:var(--code-ink);
+  font-family:var(--font-mono);
+  font-size:.875rem;
+  line-height:1.55;
+  padding:0;
+  caret-color:transparent;
+}
+#term-in:focus-visible{ outline:none; }
+.term-input-row:focus-within{ box-shadow:inset 0 -3px 0 rgba(253,186,18,.55); }
+.block-cursor{
+  position:absolute;
+  top:.08em; left:0;
+  width:1ch; height:1.35em;
+  background:rgba(253,186,18,.4);
+  border:1px solid var(--gold);
+  border-radius:1px;
+  pointer-events:none;
+}
+.block-cursor.idle{ opacity:.35; }
+.term-hints{
+  padding:9px 16px 12px;
+  border-top:1px solid #24344C;
+  font-size:.76rem;
+  color:#8FA3C4;
+  font-family:var(--font-mono);
+}
+
+/* ---------- tree sidebar ---------- */
+.tree-cwd{
+  font-size:.78rem;
+  color:var(--ink);
+  margin:0 0 10px;
+}
+.tree-cwd code{ font-size:.82rem; word-break:break-all; }
+.tree{
+  font-family:var(--font-mono);
+  font-size:.83rem;
+  line-height:1.35;
+  display:grid;
+  gap:2px;
+  margin-bottom:10px;
+}
+.trow{
+  display:flex; align-items:center; gap:7px;
+  padding:3px 8px 3px calc(var(--d) * 15px + 8px);
+  border-radius:4px;
+  border-left:3px solid transparent;
+}
+.trow .ticon{ flex:none; display:inline-flex; color:var(--blue-mid); }
+.trow.is-file .ticon{ color:#6B7A93; }
+.trow .tname{ word-break:break-all; }
+.trow .tmeta{ color:#6B7A93; font-size:.76rem; font-style:italic; }
+.trow.is-hidden .tname{ color:#6B7A93; }
+.trow.here{
+  background:var(--gold-soft);
+  border-left-color:var(--gold);
+}
+.here-pill{
+  margin-left:auto;
+  flex:none;
+  font-family:var(--font-body);
+  font-size:.66rem;
+  font-weight:600;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  background:var(--ink);
+  color:#FFE9BC;
+  border-radius:3px;
+  padding:1px 8px;
+}
+.tree-note{ font-size:.8rem; color:#4A5A74; margin:0; }
+
+/* ---------- four questions ---------- */
+.fourq ol{ margin:0; padding-left:20px; display:grid; gap:9px; font-size:.9rem; }
+.fourq li strong{ color:var(--berkeley); }
+.fourq li .fq-how{ display:block; font-size:.82rem; color:#4A5A74; }
+
+/* ---------- missions ---------- */
+.missions-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px; }
+.missions-head h2{ margin:0; }
+.mcount{
+  font-family:var(--font-mono);
+  font-size:.8rem;
+  font-weight:500;
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:3px;
+  padding:2px 10px;
+}
+ol.missions{ list-style:none; margin:0; padding:0; display:grid; gap:4px; }
+.mission{
+  display:grid;
+  grid-template-columns:26px minmax(0,1fr);
+  gap:10px;
+  padding:9px 8px;
+  border-radius:4px;
+  border-bottom:1px dashed var(--line);
+}
+ol.missions > .mission:last-child{ border-bottom:0; }
+.mission .mtext{ font-size:.93rem; }
+.mission .mtext strong{ color:var(--berkeley); }
+.mission .mq{ display:block; font-size:.8rem; color:#4A5A74; }
+.mission.done{ background:rgba(30,125,78,.05); }
+.mission.done .mtext{ opacity:.82; }
+.check{ margin-top:2px; }
+.check svg{ display:block; width:22px; height:22px; }
+.check .ring{ fill:#fff; stroke:var(--line); stroke-width:1.6; transition:none; }
+.check .tick{
+  fill:none; stroke:var(--ink); stroke-width:2.4;
+  stroke-linecap:round; stroke-linejoin:round;
+  stroke-dasharray:16; stroke-dashoffset:16;
+}
+.mission.done .ring{ fill:var(--gold); stroke:var(--gold); }
+.mission.done .tick{ stroke-dashoffset:0; }
+
+/* ---------- question cards ---------- */
+.qcard{
+  grid-column:1 / -1;
+  margin-top:8px;
+  border:1px solid var(--line);
+  border-left:4px solid var(--gold);
+  border-radius:4px;
+  background:var(--paper);
+  padding:13px 15px;
+}
+.qcard.locked{ border-left-color:var(--line); }
+.qcard.locked .qbody{ display:none; }
+.qcard .qlock{
+  margin:0; font-size:.83rem; color:#4A5A74; font-style:italic;
+}
+.qcard:not(.locked) .qlock{ display:none; }
+.qcard fieldset{ border:0; margin:0; padding:0; }
+.qcard legend{
+  font-weight:600; font-size:.93rem; color:var(--berkeley);
+  padding:0; margin-bottom:9px;
+}
+.qopt{
+  display:grid; grid-template-columns:auto minmax(0,1fr); gap:9px;
+  align-items:start;
+  font-size:.89rem;
+  padding:7px 9px;
+  border:1px solid var(--line);
+  border-radius:4px;
+  background:var(--card);
+  margin-bottom:7px;
+  cursor:pointer;
+}
+.qopt input{ accent-color:var(--berkeley); margin-top:3px; width:15px; height:15px; }
+.qopt.picked-ok{ border-color:var(--ok); box-shadow:inset 0 0 0 1px var(--ok); }
+.qopt.picked-err{ border-color:var(--err); box-shadow:inset 0 0 0 1px var(--err); }
+.qcheck{
+  font:inherit; font-size:.87rem; font-weight:600;
+  background:var(--berkeley); color:#fff;
+  border:0; border-radius:4px;
+  padding:8px 16px;
+  cursor:pointer;
+  margin-top:2px;
+}
+.qcheck:hover{ background:#00437F; }
+.qcheck:disabled{ opacity:.55; cursor:default; }
+.qfeedback{ margin:9px 0 0; font-size:.87rem; }
+.qfeedback.fok{ color:var(--ok); font-weight:600; }
+.qfeedback.ferr{ color:var(--err); font-weight:600; }
+.qfeedback .fwhy{ font-weight:400; color:var(--ink); }
+
+/* ---------- explainer ---------- */
+.explainer{
+  margin-top:12px;
+  border-top:1px solid var(--line);
+  padding-top:11px;
+}
+.explainer h3{
+  font-family:var(--font-display); font-weight:600;
+  font-size:1.02rem; color:var(--berkeley);
+  margin:0 0 8px;
+}
+.explainer p{ font-size:.89rem; margin:0 0 8px; }
+.pathmap{
+  font-family:var(--font-mono);
+  font-size:.8rem;
+  background:var(--code-bg);
+  color:var(--code-ink);
+  border-radius:4px;
+  padding:10px 13px;
+  margin:0 0 9px;
+  overflow-x:auto;
+}
+.pathmap .pm-ok{ color:#7BD8A0; }
+.pathmap .pm-err{ color:#FFA49B; }
+.pathmap .pm-dim{ color:#8FA3C4; }
+.pathmap div{ white-space:pre; }
+
+/* ---------- recap ---------- */
+.recap{ margin-top:18px; }
+.recap ul{ margin:0; padding-left:20px; display:grid; gap:8px; font-size:.93rem; }
+.recap li strong{ color:var(--berkeley); }
+
+/* ---------- footer ---------- */
+footer{
+  margin-top:30px;
+  border-top:1px solid var(--line);
+  padding-top:14px;
+  font-size:.8rem;
+  color:#4A5A74;
+}
+
+/* ---------- motion ---------- */
+@media (prefers-reduced-motion: no-preference){
+  .reveal{
+    opacity:0;
+    transform:translateY(9px);
+    animation:fadeUp .5s ease forwards;
+    animation-delay:calc(var(--i, 0) * 70ms);
+  }
+  @keyframes fadeUp{ to{ opacity:1; transform:none; } }
+  .block-cursor{ animation:blink 1.15s step-end infinite; }
+  @keyframes blink{ 0%,55%{ opacity:1; } 56%,100%{ opacity:.12; } }
+  .block-cursor.idle{ animation:none; }
+  .mission.done .tick{ transition:stroke-dashoffset .45s ease .1s; }
+  .mission.done .ring{ transition:fill .3s ease, stroke .3s ease; }
+  .trow{ transition:background .3s ease; }
+  .trow.flash{ animation:flashRow 1.4s ease; }
+  @keyframes flashRow{
+    0%{ background:var(--gold-soft); }
+    100%{ background:transparent; }
+  }
+  .qcard:not(.locked) .qbody{ animation:fadeUp .45s ease; }
+}
+
+@media (max-width:520px){
+  .page{ padding:16px 12px 32px; }
+  .card{ padding:15px 14px; }
+  .term-body{ height:300px; }
+}
+
+/* ═══ MaCSS skin, aligned with macss.berkeley.edu ═══ */
+html,body{overflow-x:clip}
+.mast{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:12px calc(50vw - 50%);display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.14)}
+.mast .brand{color:#fff;font-family:var(--sans);font-size:.9rem;font-weight:600;letter-spacing:.01em}
+.mast .brand .uc{font-family:Georgia,"Times New Roman",serif;color:var(--gold);font-size:1.04rem;font-weight:700;margin-right:7px}
+.mast a{color:#fff;font-family:var(--sans);font-weight:600;font-size:.83rem;text-decoration:none;border-bottom:1.5px solid rgba(255,255,255,.35);border-radius:0}
+.mast a:hover{border-bottom-color:var(--gold);color:#fff;text-decoration:none}
+.mast a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap>header,.page>header{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:30px calc(50vw - 50%) 28px;border-bottom:5px solid var(--gold);margin-bottom:40px}
+.wrap>header .eyebrow,.page>header .eyebrow{display:none}
+.wrap>header h1,.page>header h1{color:#fff;font-weight:800;letter-spacing:-.015em}
+.wrap>header .lede,.wrap>header .promise,.page>header .promise,.page>header .lede{color:rgba(255,255,255,.9)}
+.wrap>header .chip-line,.wrap>header .chip-outline,.page>header .chip-outline,.wrap>header .meta-chip.outline{border-color:rgba(255,255,255,.55);color:#fff;background:transparent}
+.rule,.goldrule,.gold-rule{display:none}
+.rise,.reveal,.fade{opacity:1!important;transform:none!important;animation:none!important}
+h2 .step{color:var(--berkeley)}
+footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(50% - 50vw) 0;padding:20px calc(50vw - 50%) 26px;border-top:0}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="mast"><span class="brand"><span class="uc">UC Berkeley</span>COMPSS 211A · Computing I</span><a href="../index.html">← All interactives</a></div>
+
+  <header>
+    <p class="eyebrow">COMPSS 211A &middot; COMPUTING I</p>
+    <h1>Terminal Navigator</h1>
+    <div class="chips">
+      <span class="chip chip-gold">Week 4 &middot; Command Line &amp; Git</span>
+      <span class="chip chip-outline">&asymp; 8 minutes</span>
+    </div>
+    <p class="promise">Practice moving around a file system in a shell that cannot touch your real computer, and see why the working directory decides what every relative path means.</p>
+    <hr class="gold-rule">
+  </header>
+
+  <noscript><div class="card" style="margin-bottom:18px;"><p>This practice page needs JavaScript to simulate the terminal. Enable JavaScript and reload.</p></div></noscript>
+
+  <!-- ============ intro ============ -->
+  <section class="card intro reveal" style="--i:0" aria-labelledby="intro-h">
+    <h2 id="intro-h">A shell you cannot break</h2>
+    <p>The <strong>terminal</strong> is the window where you type and see output; the <strong>shell</strong> is the program that reads your command and decides how to run it. The one below is simulated: it runs entirely on this page, it starts inside a small practice project, and nothing you type here can reach your real files. Every command follows the same anatomy from the primer:</p>
+    <div class="anatomy" role="img" aria-label="Command anatomy. In the command 'ls -lah data': ls is the command, -lah is an option, and data is an argument.">
+      <div class="apart"><code>ls</code><span>command</span></div>
+      <div class="apart"><code>-lah</code><span>option</span></div>
+      <div class="apart"><code>data</code><span>argument</span></div>
+    </div>
+    <div class="hintchips" aria-label="Terminal tips">
+      <span class="hintchip"><code>Tab</code> completes names</span>
+      <span class="hintchip"><code>&uarr;</code> replays earlier commands</span>
+      <span class="hintchip"><code>help</code> lists every command</span>
+    </div>
+  </section>
+
+  <!-- ============ main layout ============ -->
+  <div class="layout">
+
+    <div class="lay-top">
+
+      <div class="strip reveal" style="--i:1" role="status" id="strip">
+        <span class="strip-badge" id="strip-badge">Mission 1 of 8</span>
+        <span id="strip-text">Find out where you are: run <code>pwd</code>.</span>
+      </div>
+
+      <section class="card term-card reveal" style="--i:2" aria-label="Simulated terminal">
+        <div class="term-head" aria-hidden="true">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="term-title">you@laptop: zsh (simulated)</span>
+        </div>
+        <div class="term-body" id="term-body">
+          <div id="term-out" role="log" aria-live="polite" aria-label="Terminal output"></div>
+        </div>
+        <div class="term-input-row" id="term-input-row">
+          <span class="t-prompt" id="prompt-label" aria-hidden="true">you@laptop project %</span>
+          <div class="input-wrap">
+            <label class="sr-only" for="term-in">Terminal input. Type a command and press Enter. Tab completes names; the up and down arrow keys replay history.</label>
+            <input id="term-in" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send">
+            <span class="block-cursor idle" id="block-cursor" aria-hidden="true"></span>
+          </div>
+        </div>
+        <div class="term-hints">Tab completes names &middot; &uarr;/&darr; replay history &middot; type help for the full list &middot; rm stays disabled here</div>
+      </section>
+
+    </div>
+
+    <!-- ============ sidebar ============ -->
+    <aside class="sidebar" aria-label="Reference panel">
+      <div class="sidebar-sticky">
+
+        <section class="card reveal" style="--i:3" aria-labelledby="tree-h">
+          <h2 id="tree-h">The project, as a picture</h2>
+          <p class="tree-cwd">working directory: <code id="tree-cwd">/Users/you/project</code></p>
+          <div class="tree" id="tree"></div>
+          <p class="tree-note">This picture updates as you type. The highlighted row is where you are standing right now.</p>
+        </section>
+
+        <section class="card fourq reveal" style="--i:4" aria-labelledby="fourq-h">
+          <h2 id="fourq-h">The four questions</h2>
+          <ol>
+            <li><strong>Where am I?</strong> <span class="fq-how">Use <code>pwd</code>.</span></li>
+            <li><strong>What is here?</strong> <span class="fq-how">Use <code>ls</code> or <code>ls -lah</code>.</span></li>
+            <li><strong>What exact path will the command read or change?</strong> <span class="fq-how">Resolve relative paths from the current working directory.</span></li>
+            <li><strong>How will I check the result?</strong> <span class="fq-how">Inspect output, an exit status, or Git state.</span></li>
+          </ol>
+        </section>
+
+      </div>
+    </aside>
+
+    <!-- ============ missions ============ -->
+    <section class="card missions-card reveal" style="--i:5" aria-labelledby="missions-h">
+      <div class="missions-head">
+        <h2 id="missions-h">Missions</h2>
+        <span class="mcount" id="mcount">0 / 8 complete</span>
+      </div>
+      <ol class="missions" id="missions">
+
+        <li class="mission" id="mission-0">
+          <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
+          <div class="mtext"><strong>Find out where you are.</strong> Run <code>pwd</code>.
+            <span class="mq">Question 1: where am I?</span>
+          </div>
+          <span class="sr-only mstat"></span>
+        </li>
+
+        <li class="mission" id="mission-1">
+          <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
+          <div class="mtext"><strong>List what is here.</strong> Run <code>ls</code>, then try <code>ls -lah</code> for the long view, including hidden entries.
+            <span class="mq">Question 2: what is here?</span>
+          </div>
+          <span class="sr-only mstat"></span>
+        </li>
+
+        <li class="mission" id="mission-2">
+          <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
+          <div class="mtext"><strong>Step into <code>data/</code> and confirm the move.</strong> Run <code>cd data</code>, then <code>pwd</code>. The prompt changes, but confirm with <code>pwd</code> rather than trusting how the prompt looks.</div>
+          <span class="sr-only mstat"></span>
+        </li>
+
+        <li class="mission" id="mission-3">
+          <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
+          <div class="mtext"><strong>Peek at <code>sample.csv</code> without opening an editor.</strong> Run <code>head sample.csv</code> or <code>cat sample.csv</code>.
+            <span class="mq">Small views first: inspect before changing.</span>
+          </div>
+          <span class="sr-only mstat"></span>
+        </li>
+
+        <li class="mission" id="mission-4">
+          <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
+          <div class="mtext"><strong>Return to the project root.</strong> Run <code>cd ..</code>. Two dots mean the parent directory.</div>
+          <span class="sr-only mstat"></span>
+        </li>
+
+        <li class="mission" id="mission-5">
+          <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
+          <div class="mtext"><strong>Run the summarizer from the project root.</strong> Run <code>python3 scripts/summarize_csv.py</code> and watch <code>summary.txt</code> appear in the tree.
+            <span class="mq">Question 3: what exact path will this command read or change?</span>
+          </div>
+          <span class="sr-only mstat"></span>
+        </li>
+
+        <li class="mission" id="mission-6">
+          <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
+          <div class="mtext"><strong>Break it on purpose.</strong> Run <code>cd scripts</code>, then <code>python3 summarize_csv.py</code>. Read the error carefully, then answer below.</div>
+          <span class="sr-only mstat"></span>
+
+          <div class="qcard locked" id="qcard-1">
+            <p class="qlock">This question unlocks after you hit the error in mission 7.</p>
+            <div class="qbody">
+              <fieldset disabled id="q1-fs">
+                <legend>Predict, then check: the same script worked from <code>project/</code> a moment ago. Why did it fail from <code>scripts/</code>?</legend>
+                <label class="qopt"><input type="radio" name="q1" value="a"><span>Python can only run a script from inside the folder that contains it.</span></label>
+                <label class="qopt"><input type="radio" name="q1" value="b"><span>The script opens the relative path <code>data/sample.csv</code>, and relative paths resolve from the current working directory. From <code>scripts/</code> that means <code>scripts/data/sample.csv</code>, which does not exist.</span></label>
+                <label class="qopt"><input type="radio" name="q1" value="c"><span>Changing into <code>scripts/</code> moved the <code>data/</code> folder, so the file is gone.</span></label>
+                <button type="button" class="qcheck" id="q1-check">Check my prediction</button>
+                <p class="qfeedback" id="q1-feedback" aria-live="polite"></p>
+              </fieldset>
+              <div class="explainer" id="explainer-1" hidden>
+                <h3>Why the working directory decided everything</h3>
+                <p>Python found and ran the script both times, because you gave a correct path to the script itself. The failure happened <em>inside</em> the script, at <code>open("data/sample.csv")</code>. A relative path starts from your current working directory, not from the folder that contains the script.</p>
+                <div class="pathmap" role="img" aria-label="From /Users/you/project, the relative path data/sample.csv resolves to /Users/you/project/data/sample.csv, which exists. From /Users/you/project/scripts, the same relative path resolves to /Users/you/project/scripts/data/sample.csv, which does not exist.">
+<div><span class="pm-dim">from</span> ~/project          <span class="pm-dim">data/sample.csv &rarr;</span> <span class="pm-ok">~/project/data/sample.csv          exists</span></div>
+<div><span class="pm-dim">from</span> ~/project/scripts  <span class="pm-dim">data/sample.csv &rarr;</span> <span class="pm-err">~/project/scripts/data/sample.csv  missing</span></div>
+                </div>
+                <p>That is why the habit is: <strong>run project scripts from the repository root.</strong> When a path error appears, check <code>pwd</code> first and read the missing path in the error before touching the code. Try <code>cd ..</code> and rerun it to see the fix.</p>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li class="mission" id="mission-7">
+          <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
+          <div class="mtext"><strong>Tidy up, then check with Git.</strong> Move the summary into <code>results/</code>. From the root that is <code>mv summary.txt results/</code>; from elsewhere, build the path with <code>../</code>. Then run <code>git status</code> and answer below.
+            <span class="mq">Question 4: how will I check the result?</span>
+          </div>
+          <span class="sr-only mstat"></span>
+
+          <div class="qcard locked" id="qcard-2">
+            <p class="qlock">This question unlocks after <code>summary.txt</code> is inside <code>results/</code> and you have run <code>git status</code>.</p>
+            <div class="qbody">
+              <fieldset disabled id="q2-fs">
+                <legend><code>git status</code> lists <code>results/</code> under &ldquo;Untracked files&rdquo;. What does <em>untracked</em> mean here?</legend>
+                <label class="qopt"><input type="radio" name="q2" value="a"><span>Git found a file it cannot read properly, so the file may be corrupted.</span></label>
+                <label class="qopt"><input type="radio" name="q2" value="b"><span>The path is new to Git: it exists in the folder, but it is not part of any commit, and Git will not record its changes until you add it.</span></label>
+                <label class="qopt"><input type="radio" name="q2" value="c"><span>Git will delete the file the next time you run <code>git status</code>.</span></label>
+                <button type="button" class="qcheck" id="q2-check">Check my answer</button>
+                <p class="qfeedback" id="q2-feedback" aria-live="polite"></p>
+              </fieldset>
+            </div>
+          </div>
+        </li>
+
+      </ol>
+    </section>
+
+  </div><!-- /layout -->
+
+  <!-- ============ recap ============ -->
+  <section class="card recap reveal" style="--i:6" aria-labelledby="recap-h">
+    <h2 id="recap-h">Before Friday&rsquo;s quiz</h2>
+    <ul>
+      <li><strong><code>pwd</code>, <code>ls</code>, and <code>cd</code> are your compass:</strong> where am I, what is here, move.</li>
+      <li><strong>A relative path starts from the working directory;</strong> an absolute path starts from the file-system root.</li>
+      <li><strong><code>..</code> is the parent directory and <code>~</code> is your home directory.</strong> <code>cd -</code> returns to the previous one.</li>
+      <li><strong>Tab completion prevents typos.</strong> Use it whenever possible.</li>
+      <li><strong>Run project scripts from the repository root,</strong> so the relative paths inside them resolve correctly.</li>
+      <li><strong><code>git status</code> is the safe first move in any confusing situation:</strong> it reads state and changes nothing.</li>
+    </ul>
+  </section>
+
+  <footer>
+    COMPSS 211A &middot; UC Berkeley &middot; CC BY 4.0 &middot; Runs in your browser. Nothing you do here is recorded.
+  </footer>
+
+</div><!-- /page -->
+
+<script>
+(function(){
+'use strict';
+
+/* ============================================================
+   Virtual file system
+   ============================================================ */
+var SAMPLE_CSV = [
+  'id,category,minutes',
+  '1,walk,12',
+  '2,bus,34',
+  '3,bike,21',
+  '4,bus,41',
+  '5,walk,15',
+  '6,train,52'
+].join('\n');
+
+var SURVEY_CSV = [
+  'respondent,mode,satisfaction',
+  'r1,bus,3',
+  'r2,bike,5',
+  'r3,walk,4',
+  'r4,train,4'
+].join('\n');
+
+var NOTES_MD = [
+  '# Project notes',
+  '',
+  'Week 4 practice sandbox. Use it to rehearse navigation',
+  'before opening a real terminal. Nothing in this folder',
+  'is connected to your real computer.'
+].join('\n');
+
+var SCRIPT_PY = [
+  '"""Summarize a commute CSV.',
+  '',
+  'The input path is read RELATIVE to your current working',
+  'directory -- not relative to the folder holding this file.',
+  '"""',
+  'import sys',
+  '',
+  'path = sys.argv[1] if len(sys.argv) > 1 else "data/sample.csv"',
+  'rows = open(path).read().splitlines()',
+  'minutes = [int(r.split(",")[2]) for r in rows[1:]]',
+  '',
+  'print(f"Read {path}: {len(minutes)} rows, {len(rows[0].split(chr(44)))} columns.")',
+  'print(f"Total minutes: {sum(minutes)}; mean per trip: {sum(minutes)/len(minutes):.1f}.")',
+  '',
+  'with open("summary.txt", "w") as out:',
+  '    out.write(f"source: {path}\\n")',
+  '    out.write(f"rows: {len(minutes)}\\n")',
+  '    out.write(f"total_minutes: {sum(minutes)}\\n")',
+  '    out.write(f"mean_minutes: {sum(minutes)/len(minutes):.1f}\\n")',
+  'print("Wrote summary.txt in the current working directory.")'
+].join('\n');
+
+function mkFile(content){ return { type:'file', content:content }; }
+function mkDir(children){ return { type:'dir', children:children || {} }; }
+
+var FS = mkDir({
+  'Users': mkDir({
+    'you': mkDir({
+      'project': mkDir({
+        'data': mkDir({
+          'sample.csv': mkFile(SAMPLE_CSV),
+          'survey_2025.csv': mkFile(SURVEY_CSV)
+        }),
+        'scripts': mkDir({
+          'summarize_csv.py': mkFile(SCRIPT_PY)
+        }),
+        'notes.md': mkFile(NOTES_MD),
+        'results': mkDir({}),
+        '.venv': mkDir({})
+      })
+    })
+  })
+});
+
+var HOME = ['Users','you'];
+var PROJ = ['Users','you','project'];
+var PROJ_KEY = PROJ.join('/');
+var DATA_KEY = PROJ_KEY + '/data';
+var SCRIPTS_KEY = PROJ_KEY + '/scripts';
+
+var cwd = PROJ.slice();
+var prevDir = null;              /* for cd -            */
+var LS_DATE = 'Aug 22 09:14';    /* static mtime column */
+
+function key(segs){ return segs.join('/'); }
+function fmtAbs(segs){ return segs.length ? '/' + segs.join('/') : '/'; }
+function abbrevHome(segs){
+  var k = key(segs);
+  var hk = key(HOME);
+  if (k === hk) return '~';
+  if (k.indexOf(hk + '/') === 0) return '~/' + segs.slice(HOME.length).join('/');
+  return fmtAbs(segs);
+}
+
+/* Resolve a typed path (relative, absolute, ~, .., .) into segments. */
+function resolvePath(str){
+  var start;
+  if (str === '~' || str.indexOf('~/') === 0){
+    start = HOME.slice();
+    str = str.slice(1);
+  } else if (str.charAt(0) === '/'){
+    start = [];
+  } else {
+    start = cwd.slice();
+  }
+  var parts = str.split('/');
+  for (var i = 0; i < parts.length; i++){
+    var p = parts[i];
+    if (p === '' || p === '.') continue;
+    if (p === '..'){ start.pop(); }
+    else { start.push(p); }
+  }
+  return start;
+}
+
+function getNode(segs){
+  var node = FS;
+  for (var i = 0; i < segs.length; i++){
+    if (node.type !== 'dir') return null;
+    node = node.children[segs[i]];
+    if (!node) return null;
+  }
+  return node;
+}
+
+function nodeAt(pathStr){ return getNode(resolvePath(pathStr)); }
+
+function countFilesDeep(dir){
+  var n = 0;
+  var names = Object.keys(dir.children);
+  for (var i = 0; i < names.length; i++){
+    if (names[i].charAt(0) === '.') continue;
+    var c = dir.children[names[i]];
+    if (c.type === 'file') n++;
+    else n += countFilesDeep(c);
+  }
+  return n;
+}
+
+/* ============================================================
+   Terminal output
+   ============================================================ */
+var termBody = document.getElementById('term-body');
+var termOut = document.getElementById('term-out');
+var input = document.getElementById('term-in');
+var promptLabel = document.getElementById('prompt-label');
+var blockCursor = document.getElementById('block-cursor');
+
+function promptFolder(){
+  if (key(cwd) === key(HOME)) return '~';
+  if (cwd.length === 0) return '/';
+  return cwd[cwd.length - 1];
+}
+function promptText(){ return 'you@laptop ' + promptFolder() + ' %'; }
+
+/* addLine accepts a string (one class for the whole line)
+   or an array of {text, cls} spans. */
+function addLine(content, cls){
+  var div = document.createElement('div');
+  div.className = 't-line' + (cls ? ' ' + cls : '');
+  if (typeof content === 'string'){
+    div.textContent = content;
+  } else {
+    for (var i = 0; i < content.length; i++){
+      var sp = document.createElement('span');
+      if (content[i].cls) sp.className = content[i].cls;
+      sp.textContent = content[i].text;
+      div.appendChild(sp);
+    }
+  }
+  termOut.appendChild(div);
+}
+function out(text){ addLine(text, 't-out'); }
+function outErr(text){ addLine(text, 't-err'); }
+function outNote(text){ addLine(text, 't-note'); }
+function outOk(text){ addLine(text, 't-ok'); }
+function echoCommand(raw){
+  addLine([{text: promptText() + ' ', cls:'t-prompt'}, {text: raw, cls:'t-cmd'}]);
+}
+function scrollTerm(){ termBody.scrollTop = termBody.scrollHeight; }
+
+/* ============================================================
+   Command implementations
+   Each handler prints output and may add to EVENTS.
+   ============================================================ */
+var EVENTS = new Set();
+function emit(e){ EVENTS.add(e); }
+
+function splitFlags(argv){
+  /* returns {flags:Set of letters, operands:[], bad:letter|null} */
+  var flags = new Set(), operands = [], bad = null;
+  for (var i = 1; i < argv.length; i++){
+    var t = argv[i];
+    if (t.length > 1 && t.charAt(0) === '-' && !/^-?\d+$/.test(t)){
+      for (var j = 1; j < t.length; j++){
+        flags.add(t.charAt(j));
+      }
+    } else {
+      operands.push(t);
+    }
+  }
+  return { flags:flags, operands:operands, bad:bad };
+}
+
+function cmdPwd(){
+  out(fmtAbs(cwd));
+  emit('pwd');
+}
+
+function cmdCd(argv){
+  if (argv.length > 2){ outErr('cd: too many arguments'); return; }
+  var target = argv[1];
+  var segs, echoAfter = false;
+  if (target === undefined || target === '~'){
+    segs = HOME.slice();
+  } else if (target === '-'){
+    if (!prevDir){ outErr('cd: no previous directory'); return; }
+    segs = prevDir.slice();
+    echoAfter = true;
+  } else {
+    segs = resolvePath(target);
+  }
+  var node = getNode(segs);
+  if (!node){ outErr('cd: no such file or directory: ' + (target === undefined ? '~' : target)); return; }
+  if (node.type !== 'dir'){ outErr('cd: not a directory: ' + target); return; }
+  prevDir = cwd.slice();
+  cwd = segs;
+  if (echoAfter) out(abbrevHome(cwd));
+  emit('cd-ok');
+}
+
+function lsEntryNames(dirNode, showAll){
+  var names = Object.keys(dirNode.children).filter(function(n){
+    return showAll || n.charAt(0) !== '.';
+  });
+  names.sort();
+  if (showAll) names = ['.', '..'].concat(names);
+  return names;
+}
+
+function lsLong(dirNode, names, human){
+  var fileCount = 0;
+  names.forEach(function(n){
+    var node = (n === '.' || n === '..') ? {type:'dir', children:{}} : dirNode.children[n];
+    if (node.type === 'file') fileCount++;
+  });
+  out('total ' + (fileCount * 8));
+  names.forEach(function(n){
+    var node = (n === '.' || n === '..') ? null : dirNode.children[n];
+    var isDir = !node || node.type === 'dir';
+    var perms = isDir ? 'drwxr-xr-x' : '-rw-r--r--';
+    var links = isDir ? (node ? Object.keys(node.children).length + 2 : 2) : 1;
+    var size = isDir ? 128 : node.content.length;
+    var sizeStr = human ? (size >= 1024 ? (size/1024).toFixed(1) + 'K' : size + 'B') : String(size);
+    var line = perms + '  ' + String(links).padStart(2) + ' you  staff  ' +
+               sizeStr.padStart(5) + ' ' + LS_DATE + ' ';
+    addLine([{text: line, cls:'t-out'}, {text: n, cls: isDir ? 't-dir' : 't-out'}]);
+  });
+}
+
+function cmdLs(argv){
+  var parsed = splitFlags(argv);
+  var flags = parsed.flags, operands = parsed.operands;
+  var known = ['l','a','h'];
+  var illegal = null;
+  flags.forEach(function(f){ if (known.indexOf(f) === -1 && !illegal) illegal = f; });
+  if (illegal){
+    outErr('ls: illegal option -- ' + illegal);
+    outErr('usage: ls [-lah] [file ...]');
+    return;
+  }
+  var showAll = flags.has('a');
+  var longFmt = flags.has('l');
+  var human = flags.has('h');
+  var targets = operands.length ? operands : [''];
+  var multiple = operands.length > 1;
+  var anyOk = false;
+
+  targets.forEach(function(t, idx){
+    var segs = t === '' ? cwd.slice() : resolvePath(t);
+    var node = getNode(segs);
+    if (!node){ outErr('ls: ' + t + ': No such file or directory'); return; }
+    anyOk = true;
+    if (multiple && idx > 0) out('');
+    if (node.type === 'file'){
+      out(t === '' ? segs[segs.length-1] : t);
+      return;
+    }
+    if (multiple) out(t + ':');
+    var names = lsEntryNames(node, showAll);
+    if (longFmt){
+      lsLong(node, names, human);
+    } else if (names.length){
+      var spans = [];
+      names.forEach(function(n, i){
+        var child = (n === '.' || n === '..') ? null : node.children[n];
+        var isDir = !child || child.type === 'dir';
+        if (i > 0) spans.push({text:'  ', cls:'t-out'});
+        spans.push({text:n, cls: isDir ? 't-dir' : 't-out'});
+      });
+      addLine(spans);
+    }
+    if (showAll && key(segs) === PROJ_KEY) emit('ls-a-root');
+  });
+  if (anyOk) emit('ls-ok');
+}
+
+function readFileLines(t, cmdName){
+  var segs = resolvePath(t);
+  var node = getNode(segs);
+  if (!node){ outErr(cmdName + ': ' + t + ': No such file or directory'); return null; }
+  if (node.type !== 'file'){ outErr(cmdName + ': ' + t + ': Is a directory'); return null; }
+  if (key(segs) === DATA_KEY + '/sample.csv') emit('viewed-sample');
+  return node.content.split('\n');
+}
+
+function cmdCat(argv){
+  if (argv.length < 2){
+    outNote('cat: this sandbox cannot read from the keyboard -- pass a file path, like cat notes.md');
+    return;
+  }
+  for (var i = 1; i < argv.length; i++){
+    var lines = readFileLines(argv[i], 'cat');
+    if (lines) lines.forEach(function(l){ out(l); });
+  }
+}
+
+function parseHeadTail(argv, cmdName){
+  var n = 3, files = [];
+  for (var i = 1; i < argv.length; i++){
+    var t = argv[i];
+    if (t === '-n'){
+      var v = parseInt(argv[i+1], 10);
+      if (isNaN(v)){ outErr(cmdName + ': illegal line count -- ' + (argv[i+1] || '')); return null; }
+      n = v; i++;
+    } else if (/^-n\d+$/.test(t)){ n = parseInt(t.slice(2), 10); }
+    else if (/^-\d+$/.test(t)){ n = parseInt(t.slice(1), 10); }
+    else if (t.charAt(0) === '-'){ outErr(cmdName + ': illegal option -- ' + t.slice(1)); return null; }
+    else files.push(t);
+  }
+  if (!files.length){
+    outNote(cmdName + ': pass a file path, like ' + cmdName + ' data/sample.csv');
+    return null;
+  }
+  return { n:n, files:files };
+}
+
+function cmdHead(argv){
+  var p = parseHeadTail(argv, 'head');
+  if (!p) return;
+  p.files.forEach(function(f){
+    var lines = readFileLines(f, 'head');
+    if (lines) lines.slice(0, p.n).forEach(function(l){ out(l); });
+  });
+}
+
+function cmdTail(argv){
+  var p = parseHeadTail(argv, 'tail');
+  if (!p) return;
+  p.files.forEach(function(f){
+    var lines = readFileLines(f, 'tail');
+    if (lines) lines.slice(Math.max(0, lines.length - p.n)).forEach(function(l){ out(l); });
+  });
+}
+
+function cmdMkdir(argv){
+  var parsed = splitFlags(argv);
+  var pFlag = parsed.flags.has('p');
+  if (!parsed.operands.length){ outErr('usage: mkdir [-p] directory_name'); return; }
+  parsed.operands.forEach(function(t){
+    var segs = resolvePath(t);
+    var node = getNode(segs);
+    if (node){
+      if (!pFlag) outErr('mkdir: ' + t + ': File exists');
+      return;
+    }
+    var parent = getNode(segs.slice(0, -1));
+    if (!parent || parent.type !== 'dir'){
+      if (pFlag){
+        /* create parents */
+        var walk = FS;
+        for (var i = 0; i < segs.length; i++){
+          if (!walk.children[segs[i]]) walk.children[segs[i]] = mkDir({});
+          walk = walk.children[segs[i]];
+          if (walk.type !== 'dir'){ outErr('mkdir: ' + t + ': Not a directory'); return; }
+        }
+        return;
+      }
+      outErr('mkdir: ' + t + ': No such file or directory');
+      return;
+    }
+    parent.children[segs[segs.length - 1]] = mkDir({});
+  });
+}
+
+function cmdMv(argv){
+  if (argv.length !== 3){ outErr('usage: mv source target'); return; }
+  var src = argv[1], dst = argv[2];
+  var srcSegs = resolvePath(src);
+  var srcNode = getNode(srcSegs);
+  if (!srcNode){ outErr('mv: rename ' + src + ' to ' + dst + ': No such file or directory'); return; }
+  if (srcSegs.length === 0){ outErr('mv: cannot move the file-system root'); return; }
+  /* refuse to move the directory you are standing in (or an ancestor of it) */
+  var sk = key(srcSegs), ck = key(cwd);
+  if (srcNode.type === 'dir' && (ck === sk || ck.indexOf(sk + '/') === 0)){
+    outErr('mv: cannot move ' + src + ': you are currently standing inside it (cd out first)');
+    return;
+  }
+  var dstSegs = resolvePath(dst);
+  var dstNode = getNode(dstSegs);
+  var finalSegs;
+  if (dstNode && dstNode.type === 'dir'){
+    finalSegs = dstSegs.concat([srcSegs[srcSegs.length - 1]]);
+  } else {
+    finalSegs = dstSegs;
+  }
+  if (key(finalSegs) === sk) return; /* moving onto itself: no-op */
+  if (srcNode.type === 'dir' && key(finalSegs).indexOf(sk + '/') === 0){
+    outErr('mv: rename ' + src + ' to ' + dst + ': Invalid argument');
+    return;
+  }
+  var finalParent = getNode(finalSegs.slice(0, -1));
+  if (!finalParent || finalParent.type !== 'dir'){
+    outErr('mv: rename ' + src + ' to ' + dst + ': No such file or directory');
+    return;
+  }
+  var existing = finalParent.children[finalSegs[finalSegs.length - 1]];
+  if (existing && existing.type === 'dir'){
+    outErr('mv: rename ' + src + ' to ' + dst + ': Directory not empty');
+    return;
+  }
+  var srcParent = getNode(srcSegs.slice(0, -1));
+  delete srcParent.children[srcSegs[srcSegs.length - 1]];
+  finalParent.children[finalSegs[finalSegs.length - 1]] = srcNode;
+  emit('fs-changed');
+}
+
+function cmdCp(argv){
+  if (argv.length !== 3){ outErr('usage: cp source target'); return; }
+  var src = argv[1], dst = argv[2];
+  var srcNode = nodeAt(src);
+  if (!srcNode){ outErr('cp: ' + src + ': No such file or directory'); return; }
+  if (srcNode.type === 'dir'){ outErr('cp: ' + src + ' is a directory (not copied).'); return; }
+  var dstSegs = resolvePath(dst);
+  var dstNode = getNode(dstSegs);
+  var finalSegs;
+  if (dstNode && dstNode.type === 'dir'){
+    finalSegs = dstSegs.concat([resolvePath(src).pop()]);
+  } else {
+    finalSegs = dstSegs;
+  }
+  var parent = getNode(finalSegs.slice(0, -1));
+  if (!parent || parent.type !== 'dir'){ outErr('cp: ' + dst + ': No such file or directory'); return; }
+  var existing = parent.children[finalSegs[finalSegs.length - 1]];
+  if (existing && existing.type === 'dir'){ outErr('cp: ' + dst + ': Is a directory'); return; }
+  parent.children[finalSegs[finalSegs.length - 1]] = mkFile(srcNode.content);
+  emit('fs-changed');
+}
+
+function cmdTouch(argv){
+  if (argv.length < 2){ outErr('usage: touch file_name'); return; }
+  for (var i = 1; i < argv.length; i++){
+    var t = argv[i];
+    var segs = resolvePath(t);
+    if (getNode(segs)) continue; /* updates the timestamp; nothing visible here */
+    var parent = getNode(segs.slice(0, -1));
+    if (!parent || parent.type !== 'dir'){ outErr('touch: ' + t + ': No such file or directory'); continue; }
+    parent.children[segs[segs.length - 1]] = mkFile('');
+    emit('fs-changed');
+  }
+}
+
+/* ---------- python3 (simulated) ---------- */
+function cmdPython(argv, rawTarget){
+  if (argv.length < 2){
+    outNote('An interactive Python prompt is not simulated here -- this sandbox runs scripts only.');
+    outNote('Try: python3 scripts/summarize_csv.py');
+    return;
+  }
+  var target = argv[1];
+  var segs = resolvePath(target);
+  var node = getNode(segs);
+  if (!node || node.type !== 'file'){
+    outErr('python3: can\'t open file \'' + fmtAbs(segs) + '\': [Errno 2] No such file or directory');
+    return;
+  }
+  if (node.content !== SCRIPT_PY){
+    outNote('sandbox: only scripts/summarize_csv.py is simulated here.');
+    return;
+  }
+  var dataPathTyped = argv.length > 2 ? argv[2] : 'data/sample.csv';
+  var dataSegs = resolvePath(dataPathTyped);
+  var dataNode = getNode(dataSegs);
+  if (!dataNode || dataNode.type !== 'file'){
+    out('Traceback (most recent call last):');
+    out('  File "' + target + '", line 9, in <module>');
+    out('    rows = open(path).read().splitlines()');
+    outErr('FileNotFoundError: [Errno 2] No such file or directory: \'' + dataPathTyped + '\'');
+    emit('script-fail');
+    return;
+  }
+  var rows = dataNode.content.split('\n');
+  var records = rows.slice(1).filter(function(r){ return r.trim() !== ''; });
+  if (!records.length){
+    out('Traceback (most recent call last):');
+    out('  File "' + target + '", line 13, in <module>');
+    outErr('ZeroDivisionError: division by zero');
+    return;
+  }
+  var vals = [];
+  for (var i = 0; i < records.length; i++){
+    var fields = records[i].split(',');
+    if (fields.length < 3){
+      out('Traceback (most recent call last):');
+      out('  File "' + target + '", line 10, in <module>');
+      out('    minutes = [int(r.split(",")[2]) for r in rows[1:]]');
+      outErr('IndexError: list index out of range');
+      return;
+    }
+    var v = parseInt(fields[2], 10);
+    if (isNaN(v) || !/^\s*-?\d+\s*$/.test(fields[2])){
+      out('Traceback (most recent call last):');
+      out('  File "' + target + '", line 10, in <module>');
+      out('    minutes = [int(r.split(",")[2]) for r in rows[1:]]');
+      outErr('ValueError: invalid literal for int() with base 10: \'' + fields[2] + '\'');
+      return;
+    }
+    vals.push(v);
+  }
+  var total = vals.reduce(function(a,b){ return a + b; }, 0);
+  var mean = (total / vals.length).toFixed(1);
+  var cols = rows[0].split(',').length;
+  out('Read ' + dataPathTyped + ': ' + vals.length + ' rows, ' + cols + ' columns.');
+  out('Total minutes: ' + total + '; mean per trip: ' + mean + '.');
+  out('Wrote summary.txt in the current working directory.');
+  var cwdNode = getNode(cwd);
+  cwdNode.children['summary.txt'] = mkFile(
+    'source: ' + dataPathTyped + '\nrows: ' + vals.length +
+    '\ntotal_minutes: ' + total + '\nmean_minutes: ' + mean
+  );
+  emit('script-ok');
+  emit('fs-changed');
+}
+
+/* ---------- git status (read-only teaching device) ---------- */
+var TRACKED = ['data/sample.csv', 'data/survey_2025.csv', 'scripts/summarize_csv.py', 'notes.md'];
+
+function trackedExists(rel){
+  return !!getNode(PROJ.concat(rel.split('/')));
+}
+
+function relToCwd(relFromRoot){
+  /* git status shows paths relative to where you run it */
+  var absSegs = PROJ.concat(relFromRoot.split('/'));
+  var i = 0;
+  while (i < absSegs.length && i < cwd.length && absSegs[i] === cwd[i]) i++;
+  var ups = cwd.length - i;
+  var parts = [];
+  for (var u = 0; u < ups; u++) parts.push('..');
+  parts = parts.concat(absSegs.slice(i));
+  return parts.join('/');
+}
+
+function untrackedIn(dirNode, relPrefix){
+  var outList = [];
+  var names = Object.keys(dirNode.children).sort();
+  names.forEach(function(n){
+    if (n.charAt(0) === '.') return; /* treated as ignored */
+    var rel = relPrefix + n;
+    var node = dirNode.children[n];
+    if (node.type === 'file'){
+      if (TRACKED.indexOf(rel) === -1) outList.push({ rel:rel, isDir:false });
+    } else {
+      var hasTracked = TRACKED.some(function(t){
+        return t.indexOf(rel + '/') === 0 && trackedExists(t);
+      });
+      if (hasTracked){
+        outList = outList.concat(untrackedIn(node, rel + '/'));
+      } else if (countFilesDeep(node) > 0){
+        outList.push({ rel:rel, isDir:true });
+      }
+    }
+  });
+  return outList;
+}
+
+function cmdGit(argv){
+  var ck = key(cwd);
+  if (argv.length >= 2 && argv[1] === 'status'){
+    var extraBad = argv.slice(2).some(function(t){ return t !== '--short' && t !== '-s'; });
+    if (extraBad){
+      outNote('git: this sandbox supports git status and git status --short only.');
+      return;
+    }
+    if (ck !== PROJ_KEY && ck.indexOf(PROJ_KEY + '/') !== 0){
+      outErr('fatal: not a git repository (or any of the parent directories): .git');
+      outNote('(You are outside the project folder -- cd back into it first.)');
+      return;
+    }
+    var short = argv.indexOf('--short') !== -1 || argv.indexOf('-s') !== -1;
+    var projNode = getNode(PROJ);
+    var untracked = untrackedIn(projNode, '');
+    var deleted = TRACKED.filter(function(t){ return !trackedExists(t); });
+    if (short){
+      deleted.forEach(function(d){ out(' D ' + relToCwd(d)); });
+      untracked.forEach(function(u){ out('?? ' + relToCwd(u.rel) + (u.isDir ? '/' : '')); });
+      /* clean tree prints nothing in short mode, exactly like real git */
+    } else {
+      out('On branch main');
+      if (deleted.length){
+        out('Changes not staged for commit:');
+        outNote('  (use "git add/rm <file>..." to update what will be committed)');
+        outNote('  (use "git restore <file>..." to discard changes in working directory)');
+        deleted.forEach(function(d){ outErr('        deleted:    ' + relToCwd(d)); });
+        out('');
+      }
+      if (untracked.length){
+        out('Untracked files:');
+        outNote('  (use "git add <file>..." to include in what will be committed)');
+        untracked.forEach(function(u){ outErr('        ' + relToCwd(u.rel) + (u.isDir ? '/' : '')); });
+        out('');
+      }
+      if (!deleted.length && !untracked.length){
+        outOk('nothing to commit, working tree clean');
+      } else if (untracked.length){
+        out('nothing added to commit but untracked files present (use "git add" to track)');
+      } else {
+        out('no changes added to commit (use "git add" and/or "git commit -a")');
+      }
+    }
+    emit('git-status');
+    return;
+  }
+  if (argv.length === 1){
+    outNote('usage here: git status   (try it -- it reads state and changes nothing)');
+    return;
+  }
+  outNote('git ' + argv[1] + ': covered in the Git interactives -- this sandbox only supports git status.');
+}
+
+/* ---------- utility commands ---------- */
+var historyList = [];
+
+function cmdHistory(){
+  historyList.forEach(function(h, i){
+    out(String(i + 1).padStart(5) + '  ' + h);
+  });
+}
+
+function cmdEcho(argv){
+  out(argv.slice(1).join(' '));
+}
+
+function cmdClear(){
+  termOut.textContent = '';
+}
+
+function cmdHelp(){
+  var rows = [
+    ['pwd',                 'print the working directory'],
+    ['ls [-lah] [path]',    'list a directory (-a shows hidden entries)'],
+    ['cd [path]',           'change directory: a path, .., ~, or - for previous'],
+    ['cat <file>',          'print a whole file'],
+    ['head [-n N] <file>',  'first lines of a file (default 3)'],
+    ['tail [-n N] <file>',  'last lines of a file (default 3)'],
+    ['mkdir [-p] <name>',   'make a directory'],
+    ['mv <src> <dst>',      'move or rename'],
+    ['cp <src> <dst>',      'copy a file'],
+    ['touch <name>',        'create an empty file'],
+    ['python3 <script>',    'run a Python script (simulated)'],
+    ['git status',          'show repository state (read-only)'],
+    ['echo <text>',         'print text'],
+    ['history',             'show the commands you have run'],
+    ['clear',               'clear the screen'],
+    ['help',                'this list']
+  ];
+  rows.forEach(function(r){
+    addLine([{text:'  ' + r[0].padEnd(22), cls:'t-ok'}, {text:r[1], cls:'t-out'}]);
+  });
+  outNote('Tab completes names; the up and down arrows replay history.');
+  outNote('rm is deliberately disabled here. Pipes and redirection are in the primer, not this sandbox.');
+}
+
+function cmdRm(){
+  outErr('rm: disabled in this sandbox.');
+  outNote('Deleting is the one action this practice page refuses to simulate. In real work,');
+  outNote('run pwd and ls on the exact target first, and prefer moving files to the trash --');
+  outNote('the course references leave shell deletion commands out on purpose.');
+}
+
+/* Real commands that exist in a real shell but are out of scope here. */
+var NOT_INCLUDED = {
+  'grep':'searches inside files', 'wc':'counts lines, words, and bytes',
+  'find':'searches for files by name or type', 'less':'pages through a long file',
+  'more':'pages through a long file', 'man':'opens a manual page',
+  'nano':'opens a terminal text editor', 'vim':'opens a terminal text editor',
+  'vi':'opens a terminal text editor', 'open':'opens a file in a GUI app',
+  'code':'opens VS Code', 'curl':'downloads from a URL', 'wget':'downloads from a URL',
+  'ssh':'connects to a remote computer', 'chmod':'changes permissions',
+  'sudo':'runs a command as an administrator', 'ps':'lists processes',
+  'which':'locates a program', 'pip':'installs Python packages',
+  'jupyter':'starts a notebook server', 'exit':'closes a real shell session',
+  'whoami':'prints your username', 'mkdir-p':''
+};
+
+/* ============================================================
+   Tokenizer + dispatcher
+   ============================================================ */
+function tokenize(raw){
+  var toks = [], cur = '', q = null, has = false;
+  for (var i = 0; i < raw.length; i++){
+    var ch = raw.charAt(i);
+    if (q){
+      if (ch === q) q = null; else cur += ch;
+      has = true;
+      continue;
+    }
+    if (ch === '"' || ch === '\''){ q = ch; has = true; continue; }
+    if (ch === ' ' || ch === '\t'){
+      if (has){ toks.push(cur); cur = ''; has = false; }
+      continue;
+    }
+    if (ch === '|' || ch === '>' || ch === '<'){ return { err:'redir' }; }
+    if (ch === '&' && raw.charAt(i+1) === '&'){ return { err:'chain' }; }
+    cur += ch; has = true;
+  }
+  if (q) return { err:'quote' };
+  if (has) toks.push(cur);
+  return { toks:toks };
+}
+
+var HANDLERS = {
+  'pwd': cmdPwd, 'ls': cmdLs, 'cd': cmdCd, 'cat': cmdCat,
+  'head': cmdHead, 'tail': cmdTail, 'mkdir': cmdMkdir,
+  'mv': cmdMv, 'cp': cmdCp, 'touch': cmdTouch,
+  'python3': cmdPython, 'git': cmdGit, 'echo': cmdEcho,
+  'history': cmdHistory, 'clear': cmdClear, 'help': cmdHelp,
+  'rm': cmdRm, 'rmdir': cmdRm
+};
+
+var COMMAND_NAMES = ['pwd','ls','cd','cat','head','tail','mkdir','mv','cp','touch','python3','git','echo','history','clear','help'];
+
+function execute(raw){
+  echoCommand(raw);
+  var trimmed = raw.trim();
+  if (trimmed !== ''){
+    historyList.push(trimmed);
+  }
+  EVENTS = new Set();
+  var cwdBefore = cwd.slice();
+
+  if (trimmed !== ''){
+    var tk = tokenize(raw);
+    if (tk.err === 'redir' || tk.err === 'chain'){
+      outNote('sandbox: pipes, redirection, and command chaining (|, >, >>, &&) are introduced in the primer but disabled here.');
+    } else if (tk.err === 'quote'){
+      outNote('sandbox: that quote never closed. Close it on the same line and try again.');
+    } else if (tk.toks.length){
+      var argv = tk.toks;
+      /* course-style invocations: uv run python ... and python ... */
+      if (argv[0] === 'uv' && argv[1] === 'run' && (argv[2] === 'python' || argv[2] === 'python3')){
+        argv = ['python3'].concat(argv.slice(3));
+      } else if (argv[0] === 'uv'){
+        outNote('uv: environment syncing is covered in the setup guide -- here, run python3 directly.');
+        argv = null;
+      } else if (argv[0] === 'python'){
+        argv = ['python3'].concat(argv.slice(1));
+      }
+      if (argv){
+        var name = argv[0];
+        var handler = HANDLERS[name];
+        if (handler){
+          handler(argv);
+        } else if (Object.prototype.hasOwnProperty.call(NOT_INCLUDED, name)){
+          outNote('sandbox: ' + name + ' exists in a real shell (it ' + NOT_INCLUDED[name] + '), but it is not included here. Type help for what is.');
+        } else {
+          outErr('zsh: command not found: ' + name);
+        }
+      }
+    }
+  }
+
+  afterCommand(cwdBefore);
+  promptLabel.textContent = promptText();
+  renderTree();
+  scrollTerm();
+}
+
+/* ============================================================
+   Live file tree
+   ============================================================ */
+var treeEl = document.getElementById('tree');
+var treeCwdEl = document.getElementById('tree-cwd');
+var venvSeen = false;
+var lastTreeKeys = null;
+var motionOK = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+
+var ICON_DIR = '<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" focusable="false"><path d="M1.5 4c0-.8.7-1.5 1.5-1.5h3.2l1.4 1.6H13c.8 0 1.5.7 1.5 1.5v5.9c0 .8-.7 1.5-1.5 1.5H3c-.8 0-1.5-.7-1.5-1.5z" fill="currentColor"/></svg>';
+var ICON_FILE = '<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" focusable="false"><path d="M4 1h5l3.5 3.5V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z" fill="currentColor" opacity=".85"/></svg>';
+
+function treeRow(depth, name, k, isDir, opts){
+  opts = opts || {};
+  var row = document.createElement('div');
+  row.className = 'trow' + (isDir ? '' : ' is-file') + (opts.hidden ? ' is-hidden' : '');
+  row.style.setProperty('--d', depth);
+  row.setAttribute('data-key', k);
+  var icon = document.createElement('span');
+  icon.className = 'ticon';
+  icon.innerHTML = isDir ? ICON_DIR : ICON_FILE;
+  row.appendChild(icon);
+  var nm = document.createElement('span');
+  nm.className = 'tname';
+  nm.textContent = name;
+  row.appendChild(nm);
+  if (opts.meta){
+    var meta = document.createElement('span');
+    meta.className = 'tmeta';
+    meta.textContent = opts.meta;
+    row.appendChild(meta);
+  }
+  if (k === key(cwd)){
+    row.classList.add('here');
+    var pill = document.createElement('span');
+    pill.className = 'here-pill';
+    pill.textContent = 'you are here';
+    row.appendChild(pill);
+    var sr = document.createElement('span');
+    sr.className = 'sr-only';
+    sr.textContent = ' (current working directory)';
+    row.appendChild(sr);
+  }
+  return row;
+}
+
+function renderTree(){
+  treeCwdEl.textContent = fmtAbs(cwd);
+  var frag = document.createDocumentFragment();
+  var keys = [];
+
+  var homeKey = key(HOME);
+  keys.push(homeKey);
+  frag.appendChild(treeRow(0, '~', homeKey, true, { meta:'(/Users/you)' }));
+
+  function walk(dirNode, segs, depth){
+    var names = Object.keys(dirNode.children);
+    var dirs = names.filter(function(n){ return dirNode.children[n].type === 'dir'; }).sort();
+    var files = names.filter(function(n){ return dirNode.children[n].type !== 'dir'; }).sort();
+    dirs.concat(files).forEach(function(n){
+      var hidden = n.charAt(0) === '.';
+      if (hidden && !venvSeen) return;
+      var child = dirNode.children[n];
+      var childSegs = segs.concat([n]);
+      var k = childSegs.join('/');
+      keys.push(k);
+      var isDir = child.type === 'dir';
+      var opts = { hidden:hidden };
+      if (isDir && Object.keys(child.children).length === 0) opts.meta = '(empty)';
+      if (hidden) opts.meta = '(hidden)';
+      frag.appendChild(treeRow(depth, isDir ? n + '/' : n, k, isDir, opts));
+      if (isDir && !hidden) walk(child, childSegs, depth + 1);
+    });
+  }
+
+  var projNode = getNode(PROJ);
+  keys.push(PROJ_KEY);
+  frag.appendChild(treeRow(1, 'project/', PROJ_KEY, true));
+  walk(projNode, PROJ, 2);
+
+  treeEl.textContent = '';
+  treeEl.appendChild(frag);
+
+  /* flash rows that are new since the last render */
+  if (lastTreeKeys && motionOK){
+    keys.forEach(function(k){
+      if (!lastTreeKeys.has(k)){
+        var row = treeEl.querySelector('[data-key="' + k.replace(/"/g, '') + '"]');
+        if (row) row.classList.add('flash');
+      }
+    });
+  }
+  lastTreeKeys = new Set(keys);
+}
+
+/* ============================================================
+   Missions
+   ============================================================ */
+var MISSION_BRIEF = [
+  'Find out where you are: run pwd.',
+  'List what is here: run ls (try ls -lah too).',
+  'Run cd data, then pwd to confirm the move.',
+  'Peek at sample.csv with head or cat.',
+  'Return to the project root with cd ..',
+  'From the root, run python3 scripts/summarize_csv.py.',
+  'cd scripts, run python3 summarize_csv.py, then answer the question in the checklist.',
+  'Move summary.txt into results/, run git status, then answer the question in the checklist.'
+];
+var missionDone = [false,false,false,false,false,false,false,false];
+var q1Open = false, q2Open = false;
+var stripEl = document.getElementById('strip');
+var stripBadge = document.getElementById('strip-badge');
+var stripText = document.getElementById('strip-text');
+var mcountEl = document.getElementById('mcount');
+
+function doneCount(){
+  return missionDone.filter(Boolean).length;
+}
+
+function updateStrip(){
+  var n = doneCount();
+  mcountEl.textContent = n + ' / 8 complete';
+  if (n === 8){
+    stripEl.classList.add('all-done');
+    stripBadge.textContent = 'All done';
+    stripText.textContent = 'All 8 missions complete. Read the recap card below -- you are set for Friday.';
+    return;
+  }
+  var next = missionDone.indexOf(false);
+  stripBadge.textContent = 'Mission ' + (next + 1) + ' of 8';
+  stripText.textContent = MISSION_BRIEF[next];
+}
+
+function completeMission(i){
+  if (missionDone[i]) return;
+  missionDone[i] = true;
+  var li = document.getElementById('mission-' + i);
+  li.classList.add('done');
+  var stat = li.querySelector('.mstat');
+  if (stat) stat.textContent = 'Mission ' + (i + 1) + ' complete.';
+  updateStrip();
+}
+
+function unlockQ(n){
+  if (n === 1){
+    if (q1Open) return;
+    q1Open = true;
+    var c1 = document.getElementById('qcard-1');
+    c1.classList.remove('locked');
+    document.getElementById('q1-fs').disabled = false;
+    outNote('(A question just unlocked under mission 7 in the checklist below.)');
+    if (motionOK) c1.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  } else {
+    if (q2Open) return;
+    q2Open = true;
+    var c2 = document.getElementById('qcard-2');
+    c2.classList.remove('locked');
+    document.getElementById('q2-fs').disabled = false;
+    outNote('(A question just unlocked under mission 8 in the checklist below.)');
+    if (motionOK) c2.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }
+}
+
+function afterCommand(cwdBefore){
+  var ck = key(cwd);
+  if (EVENTS.has('pwd')){
+    completeMission(0);
+    if (ck === DATA_KEY) completeMission(2);
+  }
+  if (EVENTS.has('ls-ok')) completeMission(1);
+  if (EVENTS.has('ls-a-root') && !venvSeen){
+    venvSeen = true;
+    outNote('(The hidden .venv entry now shows in the tree on the right.)');
+  }
+  if (EVENTS.has('viewed-sample')) completeMission(3);
+  if (EVENTS.has('cd-ok') && ck === PROJ_KEY && key(cwdBefore) !== PROJ_KEY) completeMission(4);
+  if (EVENTS.has('script-ok') && ck === PROJ_KEY) completeMission(5);
+  if (EVENTS.has('script-fail') && ck === SCRIPTS_KEY) unlockQ(1);
+  if (EVENTS.has('git-status') && getNode(PROJ.concat(['results','summary.txt']))) unlockQ(2);
+}
+
+/* ============================================================
+   Predict-then-reveal questions
+   ============================================================ */
+function wireQuestion(qname, correct, feedbacks, onCorrect){
+  var btn = document.getElementById(qname + '-check');
+  var fb = document.getElementById(qname + '-feedback');
+  btn.addEventListener('click', function(){
+    var sel = document.querySelector('input[name="' + qname + '"]:checked');
+    document.querySelectorAll('input[name="' + qname + '"]').forEach(function(r){
+      r.closest('.qopt').classList.remove('picked-ok', 'picked-err');
+    });
+    if (!sel){
+      fb.className = 'qfeedback';
+      fb.textContent = 'Choose an answer first.';
+      return;
+    }
+    var opt = sel.closest('.qopt');
+    if (sel.value === correct){
+      opt.classList.add('picked-ok');
+      fb.className = 'qfeedback fok';
+      fb.innerHTML = 'Correct. <span class="fwhy">' + feedbacks[sel.value] + '</span>';
+      document.getElementById(qname + '-fs').querySelectorAll('input, button').forEach(function(el){ el.disabled = true; });
+      onCorrect();
+    } else {
+      opt.classList.add('picked-err');
+      fb.className = 'qfeedback ferr';
+      fb.innerHTML = 'Not yet. <span class="fwhy">' + feedbacks[sel.value] + '</span>';
+    }
+  });
+}
+
+wireQuestion('q1', 'b', {
+  a: 'Python ran the script happily both times -- the failure came from a path the script itself tried to open.',
+  b: 'The script&rsquo;s <code>open("data/sample.csv")</code> resolves from the working directory, so from <code>scripts/</code> Python looked for <code>scripts/data/sample.csv</code>.',
+  c: 'Nothing moved or disappeared -- check which directory the relative path <code>data/sample.csv</code> was resolved from.'
+}, function(){
+  completeMission(6);
+  var ex = document.getElementById('explainer-1');
+  ex.hidden = false;
+});
+
+wireQuestion('q2', 'b', {
+  a: 'Untracked is not an error -- Git read the path fine; it simply has no recorded history for it.',
+  b: 'Untracked means new-to-Git: the path exists but Git is not recording its changes, and nothing will happen to it on its own.',
+  c: '<code>git status</code> only reads and reports -- it never changes, moves, or removes files.'
+}, function(){
+  completeMission(7);
+});
+
+/* ============================================================
+   Input: enter, history, tab completion, block cursor
+   ============================================================ */
+var histIdx = null, histDraft = '';
+
+function updateCursor(){
+  var pos = input.selectionStart;
+  if (pos === null || pos === undefined) pos = input.value.length;
+  blockCursor.style.left = pos + 'ch';
+}
+
+function setInputValue(v){
+  input.value = v;
+  input.setSelectionRange(v.length, v.length);
+  updateCursor();
+}
+
+function longestCommonPrefix(arr){
+  if (!arr.length) return '';
+  var p = arr[0];
+  for (var i = 1; i < arr.length; i++){
+    while (arr[i].indexOf(p) !== 0) p = p.slice(0, -1);
+  }
+  return p;
+}
+
+function tabComplete(){
+  var val = input.value;
+  var idx = val.lastIndexOf(' ');
+  var before = idx === -1 ? '' : val.slice(0, idx + 1);
+  var tok = idx === -1 ? val : val.slice(idx + 1);
+  var cands = [];
+
+  if (idx === -1){
+    /* completing the command itself */
+    COMMAND_NAMES.forEach(function(c){
+      if (c.indexOf(tok) === 0) cands.push({ text:c, suffix:' ', display:c });
+    });
+  } else {
+    /* completing a path */
+    var slash = tok.lastIndexOf('/');
+    var dirPart = slash === -1 ? '' : tok.slice(0, slash + 1);
+    var base = slash === -1 ? tok : tok.slice(slash + 1);
+    var dirSegs = dirPart === '' ? cwd.slice() : resolvePath(dirPart);
+    var dnode = getNode(dirSegs);
+    if (!dnode || dnode.type !== 'dir') return;
+    var firstWord = val.trim().split(/\s+/)[0];
+    var names = Object.keys(dnode.children).filter(function(n){
+      if (n.charAt(0) === '.') return base.charAt(0) === '.';
+      return true;
+    });
+    if (firstWord === 'cd'){
+      names = names.filter(function(n){ return dnode.children[n].type === 'dir'; });
+    }
+    names.sort();
+    names.forEach(function(n){
+      if (n.indexOf(base) === 0){
+        var isDir = dnode.children[n].type === 'dir';
+        cands.push({ text: dirPart + n, suffix: isDir ? '/' : ' ', display: n + (isDir ? '/' : '') });
+      }
+    });
+  }
+
+  if (!cands.length) return;
+  if (cands.length === 1){
+    setInputValue(before + cands[0].text + cands[0].suffix);
+    return;
+  }
+  var common = longestCommonPrefix(cands.map(function(c){ return c.text; }));
+  if (common.length > tok.length){
+    setInputValue(before + common);
+  } else {
+    outNote(cands.map(function(c){ return c.display; }).join('  '));
+    scrollTerm();
+  }
+}
+
+input.addEventListener('keydown', function(e){
+  if (e.key === 'Enter'){
+    e.preventDefault();
+    var raw = input.value;
+    setInputValue('');
+    histIdx = null; histDraft = '';
+    execute(raw);
+    return;
+  }
+  if (e.key === 'Tab'){
+    e.preventDefault();
+    tabComplete();
+    return;
+  }
+  if (e.key === 'ArrowUp'){
+    e.preventDefault();
+    if (!historyList.length) return;
+    if (histIdx === null){ histDraft = input.value; histIdx = historyList.length - 1; }
+    else if (histIdx > 0){ histIdx--; }
+    setInputValue(historyList[histIdx]);
+    return;
+  }
+  if (e.key === 'ArrowDown'){
+    e.preventDefault();
+    if (histIdx === null) return;
+    if (histIdx < historyList.length - 1){
+      histIdx++;
+      setInputValue(historyList[histIdx]);
+    } else {
+      histIdx = null;
+      setInputValue(histDraft);
+    }
+    return;
+  }
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C')){
+    /* only intercept plain Ctrl-C with no selection to copy */
+    var hasSelection = input.selectionStart !== input.selectionEnd;
+    if (e.ctrlKey && !hasSelection){
+      e.preventDefault();
+      addLine([{text: promptText() + ' ', cls:'t-prompt'}, {text: input.value + '^C', cls:'t-dim'}]);
+      setInputValue('');
+      histIdx = null;
+      scrollTerm();
+    }
+    return;
+  }
+  if (e.ctrlKey && (e.key === 'l' || e.key === 'L')){
+    e.preventDefault();
+    cmdClear();
+    return;
+  }
+  window.requestAnimationFrame(updateCursor);
+});
+
+['input','keyup','click','select'].forEach(function(ev){
+  input.addEventListener(ev, updateCursor);
+});
+input.addEventListener('focus', function(){ blockCursor.classList.remove('idle'); updateCursor(); });
+input.addEventListener('blur', function(){ blockCursor.classList.add('idle'); });
+
+/* click anywhere on the terminal focuses the input (unless selecting text) */
+function focusTerm(){
+  var sel = window.getSelection();
+  if (sel && sel.type === 'Range') return;
+  input.focus({ preventScroll:true });
+}
+termBody.addEventListener('click', focusTerm);
+document.getElementById('term-input-row').addEventListener('click', focusTerm);
+
+/* ============================================================
+   Boot
+   ============================================================ */
+addLine([{text:'COMPSS 211A sandbox shell. ', cls:'t-out'}, {text:'Type ', cls:'t-out'}, {text:'help', cls:'t-ok'}, {text:' to see every supported command.', cls:'t-out'}]);
+outNote('This terminal is simulated -- nothing you type here can touch your real computer.');
+out('');
+promptLabel.textContent = promptText();
+renderTree();
+updateStrip();
+updateCursor();
+
+})();
+</script>
+</body>
+</html>
