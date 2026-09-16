@@ -1,5 +1,11 @@
 # GitHub Desktop fundamentals
 
+[Concept slides: keeping track of a research project](https://docs.google.com/presentation/d/1WlhH2rzUs7l7Xk1qYEAEDQI9GKQG5Oq3hd-hcYNSoXc/edit).
+
+For Monday's practice, open the [Week 3 practice template](https://github.com/macss-berkeley/week03-git-practice). Choose **Use this template → Create a new repository**, choose your own account, and create a public copy using the default branch. Clone your copy in GitHub Desktop. You will edit a short page about an imaginary text-research project and track your changes.
+
+Friday's [Lab 3](../../lab/lab03_hidden_berkeley_pages.ipynb) practises the same workflow with the supplied Hidden Berkeley page. HW2 uses that page too. HTML/CSS authoring is optional.
+
 ## What you will practice
 
 By the end of this lesson, you should be able to:
@@ -71,7 +77,7 @@ A **branch** is another line of development inside the same repository. A **fork
 
 <img src="../../img/collaborative.png" alt="Contributors develop changes separately and merge reviewed work into the main branch." width="55%">
 
-### Fork and clone the practice repository
+### Optional extra practice: fork and clone the playground
 
 1. Fork this [Git Playground](https://github.com/macss-berkeley/git-playground) to your account.
 2. In GitHub Desktop, select **File -> Clone Repository**.
@@ -79,7 +85,7 @@ A **branch** is another line of development inside the same repository. A **fork
 4. If GitHub Desktop asks how you plan to use the fork, select **To contribute to the parent project**.
 5. Read the playground README. Do not edit `conflicts/team_plan.md` until the merge-conflict exercise.
 
-### Make a branch and pull request
+### Optional playground continuation: make a branch and pull request
 
 This first branch exercise is intentionally conflict-free.
 
@@ -94,7 +100,7 @@ This first branch exercise is intentionally conflict-free.
 
 A pull request is a review conversation around a proposed merge. It does not automatically make the code correct.
 
-## Practice a controlled merge conflict
+## Optional: practise a controlled merge conflict
 
 A conflict occurs when Git cannot combine changes automatically, often because two branches edited the same lines. In this exercise, you will create a small conflict deliberately so you can recognize and resolve it without risking project work.
 

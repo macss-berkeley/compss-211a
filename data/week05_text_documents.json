@@ -1,0 +1,44 @@
+[
+  {
+    "document_id": "001",
+    "domain": "social",
+    "year": 2024,
+    "citations": 12,
+    "text": "The DATA describe bus delays."
+  },
+  {
+    "document_id": "002",
+    "domain": "social",
+    "year": 2024,
+    "citations": 0,
+    "text": "Our dataset lists rent prices."
+  },
+  {
+    "document_id": "003",
+    "domain": "social",
+    "year": 2023,
+    "citations": null,
+    "text": null
+  },
+  {
+    "document_id": "004",
+    "domain": "physical",
+    "year": 2024,
+    "citations": 4,
+    "text": "A model predicts river flow."
+  },
+  {
+    "document_id": "005",
+    "domain": "social",
+    "year": 2024,
+    "citations": 7,
+    "text": "   "
+  },
+  {
+    "document_id": "006",
+    "domain": "physical",
+    "year": 2023,
+    "citations": 2,
+    "text": "Survey maps distant stars."
+  }
+]
