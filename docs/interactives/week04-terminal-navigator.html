@@ -218,7 +218,7 @@ header h1{
 }
 .strip.all-done{ border-left-color:var(--ok); }
 .strip.all-done .strip-badge{ background:var(--ok); color:#fff; }
-#strip-text code{ background:rgba(18,35,61,.06); }
+#strip-text code{ background:#fff; border-color:rgba(18,35,61,.18); color:var(--berkeley); font-weight:500; padding:2px 7px; }
 
 /* ---------- terminal ---------- */
 .term-card{
@@ -567,7 +567,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
       <div class="strip reveal" style="--i:1" role="status" id="strip">
         <span class="strip-badge" id="strip-badge">Current mission 1 of 11</span>
-        <span id="strip-text">Find out where you are: run <code>pwd</code>.</span>
+        <span id="strip-text">Find out where you are: type <code>pwd</code> and press Enter.</span>
       </div>
 
       <section class="card term-card reveal" style="--i:2" aria-label="Simulated terminal">
@@ -1671,18 +1671,19 @@ function renderTree(){
 /* ============================================================
    Missions
    ============================================================ */
+/* Anything in <code> is typed exactly as shown, then Enter. */
 var MISSION_BRIEF = [
-  'Find out where you are: run pwd.',
-  'List what is here: run ls (try ls -lah too).',
-  'Run cd data, then pwd to confirm the move.',
-  'Peek at sample.csv with head or cat.',
-  'Return to the project root with cd ..',
-  'From the root, run python3 scripts/summarize_csv.py.',
-  'cd scripts, run python3 summarize_csv.py, then answer the question in the checklist.',
-  'From the root, run mv summary.txt results/ (keep the trailing slash).',
-  'Run the script again, then mv summary.txt result (no s, no slash), then answer the question in the checklist.',
-  'Run pwd, then ls -l result, then rm result, then answer the question in the checklist.',
-  'Run rm results and read the refusal, then rm -r results, then type reset.'
+  'Find out where you are: type <code>pwd</code> and press Enter.',
+  'List what is here: type <code>ls</code>, then try <code>ls -lah</code>.',
+  'Type <code>cd data</code>, then <code>pwd</code> to confirm the move.',
+  'Peek at the file: type <code>head sample.csv</code> or <code>cat sample.csv</code>.',
+  'Return to the project root: type <code>cd ..</code>',
+  'From the root, type <code>python3 scripts/summarize_csv.py</code>.',
+  'Type <code>cd scripts</code>, then <code>python3 summarize_csv.py</code>, then answer the question in the checklist.',
+  'From the root, type <code>mv summary.txt results/</code> (keep the trailing slash).',
+  'Run the script again, then type <code>mv summary.txt result</code> (no s, no slash), then answer the question in the checklist.',
+  'Type <code>pwd</code>, then <code>ls -l result</code>, then <code>rm result</code>, then answer the question in the checklist.',
+  'Type <code>rm results</code> and read the refusal, then <code>rm -r results</code>, then <code>reset</code>.'
 ];
 var TOTAL = MISSION_BRIEF.length;
 var missionDone = MISSION_BRIEF.map(function(){ return false; });
@@ -1710,7 +1711,7 @@ function updateStrip(){
   }
   var next = missionDone.indexOf(false);
   stripBadge.textContent = 'Current mission ' + (next + 1) + ' of ' + TOTAL;
-  stripText.textContent = MISSION_BRIEF[next];
+  stripText.innerHTML = MISSION_BRIEF[next];
   markCurrent(next);
 }
 
