@@ -23,8 +23,10 @@ remains.
 Choose one person to own the team's repository. If you already have a shared
 project repository, use it and continue with the invitations below.
 
+Note: A **template repository** is a starter repository on GitHub that anyone can copy into a brand-new repository of their own, getting its files and folder structure but none of its commit history or connection to the original. We have created a template repository for your final projects.
+
 1. The owner opens the [project template](https://github.com/macss-berkeley/compss-211a-project-template)
-   and chooses **Use this template → Create a new repository**.
+   and chooses **Use this template → Create a new repository**
 2. Under **Owner**, choose that person's account. Enter a team-specific name,
    such as `team-2-project`, and select **Public**. Leave **Include all branches**
    off, then select **Create repository**.
@@ -46,7 +48,7 @@ project repository, use it and continue with the invitations below.
 
 Making a repository public lets other people read it. Accepting the
 collaborator invitation also lets your teammates publish branches and merge
-PRs. They do not need separate forks for this exercise.
+PRs. **They do not need separate forks for this exercise.**
 
 ### Everyone, including the owner, clones it
 
@@ -182,9 +184,6 @@ each person still needs to pull to update their local copy.
 
 ## 3. Agree on the next project work
 
-Do this section if time remains; otherwise finish it with your team before
-Monday.
-
 Read each other's planning notes and agree on a tentative question, a possible
 data source, and one small next task per person. You can revise these later.
 
@@ -268,7 +267,7 @@ We'll discuss scripts and command-line work in
 [Week 4](../week04_command-line/README.md), and return to setting up and running
 Python in your team's repository then.
 
-## For next week: publish a website with GitHub Pages
+## Next week: publish a website with GitHub Pages
 
 Publishing a repository makes its files available on GitHub. **GitHub Pages**
 is a separate service that builds a website from a configured branch/folder
@@ -276,7 +275,8 @@ or workflow. A repository README and a published webpage are different views.
 
 Preview: [tab 5 of How Git Thinks](https://macss-berkeley.github.io/compss-211a/interactives/week03-how-git-thinks.html#pages).
 
-For a template already prepared to publish from `docs/`:
+Since our template was already prepared to be published as a website from the `docs/` folder, 
+we can do that now:
 
 1. In **your team's repository**, open **Settings → Pages**.
 2. Under **Build and deployment**, choose **Deploy from a branch**.
@@ -290,12 +290,3 @@ For a template already prepared to publish from `docs/`:
    replaces `[Project title]` in `docs/index.md` with your working title,
    commits, publishes the branch, and opens a PR. The reviewer merges it. Wait
    for the site to rebuild, then check that the page shows the new title.
-
-These choices assume the repository already contains the site's files in
-`docs/`; the small `week3-practice` repository from class does not.
-See [configuring a Pages publishing source](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
-
-A successful push or merge can still be waiting for a website build. If GitHub
-shows the new text but the site does not, check the publishing branch/folder,
-deployment status, and site URL. An edit to the root README does not update a
-page published from `docs/`.
