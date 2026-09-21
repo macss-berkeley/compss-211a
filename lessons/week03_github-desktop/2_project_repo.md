@@ -12,6 +12,10 @@ setup yet; we'll cover those next week.** The template README describes the
 whole project, including later Python setup. Follow this guide for today's
 exercise; no terminal commands or new Python environment are needed.
 
+**Timing for a 30-minute session:** about 10 minutes for section 1, 15 for
+section 2 with everyone authoring at the same time, and section 3 if time
+remains.
+
 ## 1. Create one shared repository and clone it
 
 ### One teammate creates the repository
@@ -35,7 +39,8 @@ project repository, use it and continue with the invitations below.
    Add people** and invites each teammate by their GitHub username.
    [Example invitation dialog](../../img/github-add-people.png).
 2. Each teammate opens the invitation in their email or GitHub notifications
-   and accepts it while signed in to their own account.
+   and accepts it while signed in to their own account. If the email has not
+   arrived, open `https://github.com/OWNER/REPOSITORY/invitations` while signed in.
 3. The owner checks that everyone has accepted. An invitation still marked
    pending has not yet given that teammate access to contribute.
 
@@ -45,17 +50,17 @@ PRs. They do not need separate forks for this exercise.
 
 ### Everyone, including the owner, clones it
 
-1. In Desktop, choose **File → Clone Repository → URL**. Paste the shared
+1. In GitHub Desktop, choose **File → Clone Repository → URL**. Paste the shared
    repository's URL, choose a local folder outside your course and practice
    repositories, and select **Clone**. If you already cloned this team
    repository, select that existing copy instead.
-2. Check **Current Repository** at the top of Desktop: it should show the
+2. Check **Current Repository** at the top of GitHub Desktop: it should show the
    team's repository. **Current Branch** should be `main`.
 3. Select **Repository → Open in Visual Studio Code**. If that option is not
    available, use VS Code's **File → Open Folder** and choose the cloned folder.
 4. In VS Code's Explorer, open `README.md`. This should be the project template's
    README, with prompts for your question, team members, and data source.
-5. In Desktop, use **Repository → View on GitHub**. Compare the address with
+5. In GitHub Desktop, use **Repository → View on GitHub**. Compare the address with
    your teammates: everyone should reach the same `OWNER/REPOSITORY`.
 
 **Check before continuing:** everyone can open the team's README on their
@@ -67,22 +72,23 @@ to the GitHub copy. Each teammate has a separate local copy of the same project.
 
 ## 2. Review and merge a teammate's pull request
 
-Each person will write one planning note and review someone else's. Decide
-who reviews whose note before starting. In a pair, review each other's work.
+Everyone writes a planning note at the same time and reviews one teammate's
+note. Decide the order before starting: A reviews B, B reviews C, and the last
+person reviews A. In a pair, review each other's work.
 The **author** proposes the change; the **reviewer** reads it and gives feedback.
 
-Optional preview: [tab 4 of How Git Thinks](https://macss-berkeley.github.io/compss-211a/interactives/week03-how-git-thinks.html#branches) shows the branch, pull request, merge, and pull sequence in about five minutes.
+Preview: [tab 4 of How Git Thinks](https://macss-berkeley.github.io/compss-211a/interactives/week03-how-git-thinks.html#branches).
 
 ### Author: create a branch
 
-1. In Desktop, check that **Current Repository** is your team's repository.
+1. In GitHub Desktop, check that **Current Repository** is your team's repository.
    Open **Changes**. If it lists unfinished edits, finish or get help preserving
    them before switching branches.
 2. Select **Current Branch → main**, then **Fetch origin** and **Pull origin**
    if offered. This brings your local starting point up to date.
 3. Select **Current Branch → New Branch**. Enter `plan-USERNAME`, replacing
    `USERNAME` with your GitHub username; for example, `plan-alex`.
-4. If Desktop asks which branch to start from, choose `main`. Select
+4. If GitHub Desktop asks which branch to start from, choose `main`. Select
    **Create Branch**. Check that **Current Branch** now shows your new name.
 
 ### Author: write and save a planning note
@@ -103,7 +109,7 @@ Optional preview: [tab 4 of How Git Thinks](https://macss-berkeley.github.io/com
    This is the repository's **top level**: the outer folder, outside its
    `data/`, `notebooks/`, and other subfolders. For `plan-alex`, use
    `plan-alex.md`. Each person uses their own filename.
-4. Return to Desktop. Under **Changes**, select your new file and read the
+4. Return to GitHub Desktop. Under **Changes**, select your new file and read the
    diff. Check that it contains the note you intended to write.
 
 **Check:** your file is listed under Changes, and Current Branch still shows
@@ -127,6 +133,8 @@ the branch has not added the note to `main`.
 ### Author: open the pull request
 
 1. In the team's GitHub repository, select **Pull requests → New pull request**.
+   Two shortcuts open the same form: the yellow **Compare & pull request**
+   banner GitHub shows after a push, and **Preview Pull Request** in GitHub Desktop.
 2. Set **base: `main`** and **compare: `plan-USERNAME`**. Base is the destination;
    compare is the branch containing your proposal. Both belong to the team's
    repository.
@@ -147,8 +155,8 @@ the branch has not added the note to `main`.
    **Comment**. Suggest a specific improvement, or explain why the proposal
    is ready to merge.
 3. **Author:** read the feedback and reply in the PR. If a revision is needed,
-   check that Desktop still shows your `plan-USERNAME` branch. Edit the same
-   file in VS Code, save it, inspect the diff in Desktop, commit, and select
+   check that GitHub Desktop still shows your `plan-USERNAME` branch. Edit the same
+   file in VS Code, save it, inspect the diff in GitHub Desktop, commit, and select
    **Push origin**.
 4. **Reviewer:** refresh the existing PR and read the revised diff. New commits
    on that branch update this PR; the author does not need to open another one.
@@ -161,18 +169,21 @@ the branch has not added the note to `main`.
    [the troubleshooting section below](#if-something-gets-stuck).
 2. On GitHub's **Code** tab, select `main` and check that the planning file
    appears there.
-3. **Everyone:** in Desktop, check that **Changes** has no unfinished edits.
+3. **Everyone:** in GitHub Desktop, check that **Changes** has no unfinished edits.
    Select **Current Branch → main**, then **Fetch origin** and **Pull origin**
    if offered.
 4. Open the team's folder in VS Code and read a teammate's planning file.
-   Repeat the author/reviewer steps until everyone has contributed and reviewed
-   a note. After a PR is merged, its finished branch can be deleted.
+   Everyone should now have authored one merged PR and reviewed one. After a
+   PR is merged, its finished branch can be deleted.
 
 **Check:** you can point to your merged PR, a PR where you left feedback, and
 a teammate's planning file on your computer. Merging updates GitHub's `main`;
 each person still needs to pull to update their local copy.
 
 ## 3. Agree on the next project work
+
+Do this section if time remains; otherwise finish it with your team before
+Monday.
 
 Read each other's planning notes and agree on a tentative question, a possible
 data source, and one small next task per person. You can revise these later.
@@ -188,11 +199,11 @@ data source, and one small next task per person. You can revise these later.
    more clearly, or documenting how to obtain the data.
 4. Save, inspect the diff, commit, publish the branch, and open a PR into `main`.
    The reviewer checks that it reflects the team's agreement, then merges it.
-5. Everyone returns to `main` in Desktop, fetches, and pulls. Open the local
+5. Everyone returns to `main` in GitHub Desktop, fetches, and pulls. Open the local
    README and check that it contains the agreed question and responsibilities.
 
-If class ends before you finish, complete this README contribution and any
-remaining planning-note reviews with your team before Friday's lab.
+If the session ends before you finish, complete this README contribution and
+any remaining planning-note reviews with your team before Monday.
 
 ## 4. Carry these habits into the project
 
@@ -218,11 +229,16 @@ remaining planning-note reviews with your team before Friday's lab.
 ## If something gets stuck
 
 **You cannot publish a branch or merge a PR:** check that you accepted the
-collaborator invitation, Desktop and your browser use the invited account,
+collaborator invitation, GitHub Desktop and your browser use the invited account,
 and you are in the team's repository. Ask the owner to check your access.
 If GitHub names a required review or check, read that message before continuing.
 
-**Desktop reports unfinished changes when you switch or pull:** keep your
+**You committed to `main` instead of your branch:** if you have not pushed,
+open **Changes** in GitHub Desktop and select **Undo** beneath the commit box.
+The commit comes back as unfinished changes. Create your branch, then commit
+again.
+
+**GitHub Desktop reports unfinished changes when you switch or pull:** keep your
 work and inspect the Changes list. See the earlier
 [stash exercise](1_github_basics.md#make-a-pull-fail-then-stash-and-resolve-a-conflict)
 or ask for help before continuing.
@@ -252,22 +268,7 @@ We'll discuss scripts and command-line work in
 [Week 4](../week04_command-line/README.md), and return to setting up and running
 Python in your team's repository then.
 
-## Optional: SSH keys
-
-GitHub Desktop uses **HTTPS**, so signing in to Desktop is enough for today's
-workflow; you do not need to create an SSH key. [Desktop connection reference](https://docs.github.com/en/desktop/installing-and-authenticating-to-github-desktop/about-connections-to-github-in-github-desktop).
-
-SSH is another way to authenticate when using Git from a terminal. If you
-choose it later, follow GitHub's
-[key-generation instructions](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
-Generate the key pair on your computer, then open your avatar → **Settings →
-SSH and GPG keys → New SSH key**. Give it a descriptive title, select
-**Authentication Key**, and paste the **public `.pub` key**.
-
-Keep the private key on your computer; never paste it into GitHub or commit it.
-See [adding the public key to GitHub](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
-
-## Optional: publish a website with GitHub Pages
+## For next week: publish a website with GitHub Pages
 
 Publishing a repository makes its files available on GitHub. **GitHub Pages**
 is a separate service that builds a website from a configured branch/folder
