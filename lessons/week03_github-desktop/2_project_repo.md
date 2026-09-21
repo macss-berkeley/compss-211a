@@ -274,15 +274,22 @@ Publishing a repository makes its files available on GitHub. **GitHub Pages**
 is a separate service that builds a website from a configured branch/folder
 or workflow. A repository README and a published webpage are different views.
 
+Preview: [tab 5 of How Git Thinks](https://macss-berkeley.github.io/compss-211a/interactives/week03-how-git-thinks.html#pages).
+
 For a template already prepared to publish from `docs/`:
 
 1. In **your team's repository**, open **Settings → Pages**.
 2. Under **Build and deployment**, choose **Deploy from a branch**.
 3. Select branch `main`, folder `/docs`, then **Save**.
 4. Wait for deployment, then use **Visit site** or the URL GitHub displays.
-   Check your team's URL, not the template author's example URL.
-5. For a later change to `docs/index.md`, use a branch and reviewed PR. After
-   merging to `main`, wait for the site to rebuild and check the rendered page.
+   Check your team's URL, not the template author's example URL. The first
+   version is a plain grey-and-white page titled "[Project title]" with the
+   headings and bracketed prompts from `docs/index.md`. That placeholder page
+   means publishing worked.
+5. If time remains, make the first real change. One teammate creates a branch,
+   replaces `[Project title]` in `docs/index.md` with your working title,
+   commits, publishes the branch, and opens a PR. The reviewer merges it. Wait
+   for the site to rebuild, then check that the page shows the new title.
 
 These choices assume the repository already contains the site's files in
 `docs/`; the small `week3-practice` repository from class does not.
