@@ -177,48 +177,38 @@ header h1{
 .hintchip code{ background:transparent; border:0; padding:0; }
 
 /* ---------- layout ---------- */
-/* The terminal, its file tree, and the mission checklist stay visible together:
-   from 1000px the checklist sits beside the terminal, and the terminal column
-   sticks while the checklist scrolls. */
+/* Tree beside the terminal; the checklist runs below the terminal. The strip
+   above the terminal always names the current mission. */
 .layout{ display:grid; gap:18px; }
+@media (min-width:900px){
+  .layout{
+    grid-template-columns:minmax(0,1fr) 300px;
+    grid-template-areas:
+      "top side"
+      "missions side";
+    align-items:start;
+  }
+  .lay-top{ grid-area:top; }
+  .sidebar{ grid-area:side; }
+  .missions-card{ grid-area:missions; }
+  .sidebar-sticky{ position:sticky; top:14px; }
+}
 .lay-top{ display:grid; gap:14px; }
 .sidebar{ display:grid; gap:14px; align-content:start; }
 .sidebar-sticky{ display:grid; gap:14px; }
-@media (min-width:900px){
-  .fourq ol{ grid-template-columns:repeat(4, minmax(0,1fr)); gap:14px; padding-left:0; list-style-position:inside; }
-}
-@media (min-width:1000px){
-  .page{ max-width:1240px; }
-  .layout{
-    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-    grid-template-areas:"top missions";
-    align-items:start;
-  }
-  .lay-top{
-    grid-area:top;
-    position:sticky; top:12px;
-    max-height:calc(100vh - 24px);
-    overflow:auto;
-  }
-  .missions-card{ grid-area:missions; }
-  .term-body{ height:300px; }
-}
-@media (min-width:1000px) and (max-height:820px){
-  /* short laptop screens: keep the whole terminal column on screen without an inner scrollbar */
-  .term-body{ height:240px; }
-  .tree{ font-size:.78rem; }
-}
 
 /* ---------- mission strip ---------- */
 .strip{
   display:flex; align-items:center; gap:12px; flex-wrap:wrap;
-  background:var(--card);
-  border:1px solid var(--line);
+  background:var(--gold-soft);
+  border:1px solid var(--gold);
   border-left:5px solid var(--gold);
   border-radius:4px;
-  padding:10px 14px;
-  font-size:.95rem;
+  padding:12px 14px;
+  font-size:1rem;
 }
+.mission.current{ background:var(--gold-soft); box-shadow:inset 3px 0 0 var(--gold); }
+.mission.current .mtext strong{ color:var(--ink); }
 .strip-badge{
   flex:none;
   font-size:.76rem; font-weight:600;
@@ -570,23 +560,13 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     </div>
   </section>
 
-  <section class="card fourq reveal" style="--i:1" aria-labelledby="fourq-h">
-    <h2 id="fourq-h">The four questions</h2>
-    <ol>
-      <li><strong>Where am I?</strong> <span class="fq-how">Use <code>pwd</code>.</span></li>
-      <li><strong>What is here?</strong> <span class="fq-how">Use <code>ls</code> or <code>ls -lah</code>.</span></li>
-      <li><strong>What exact path will the command read or change?</strong> <span class="fq-how">Resolve relative paths from the current working directory.</span></li>
-      <li><strong>How will I check the result?</strong> <span class="fq-how">Read the output, then <code>ls</code> the exact path you changed.</span></li>
-    </ol>
-  </section>
-
   <!-- ============ main layout ============ -->
   <div class="layout">
 
     <div class="lay-top">
 
       <div class="strip reveal" style="--i:1" role="status" id="strip">
-        <span class="strip-badge" id="strip-badge">Mission 1 of 11</span>
+        <span class="strip-badge" id="strip-badge">Current mission 1 of 11</span>
         <span id="strip-text">Find out where you are: run <code>pwd</code>.</span>
       </div>
 
@@ -609,23 +589,22 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
         <div class="term-hints">Tab completes names &middot; &uarr;/&darr; replay history &middot; type help for the full list &middot; reset restores the project</div>
       </section>
 
+
+    </div>
+
+    <!-- ============ sidebar ============ -->
     <aside class="sidebar" aria-label="Reference panel">
       <div class="sidebar-sticky">
 
         <section class="card reveal" style="--i:3" aria-labelledby="tree-h">
-          <h2 id="tree-h">The project, as a picture</h2>
+          <h2 id="tree-h">File tree</h2>
           <p class="tree-cwd">working directory: <code id="tree-cwd">/Users/you/project</code></p>
           <div class="tree" id="tree"></div>
-          <p class="tree-note">This picture updates as you type. The highlighted row is where you are standing right now.</p>
+          <p class="tree-note">Updates as you type. The highlighted row is where you are standing right now.</p>
         </section>
-
-
 
       </div>
     </aside>
-
-    </div>
-
 
     <!-- ============ missions ============ -->
     <section class="card missions-card reveal" style="--i:5" aria-labelledby="missions-h">
@@ -1713,6 +1692,7 @@ var stripEl = document.getElementById('strip');
 var stripBadge = document.getElementById('strip-badge');
 var stripText = document.getElementById('strip-text');
 var mcountEl = document.getElementById('mcount');
+markCurrent(0);
 
 function doneCount(){
   return missionDone.filter(Boolean).length;
@@ -1722,14 +1702,26 @@ function updateStrip(){
   var n = doneCount();
   mcountEl.textContent = n + ' / ' + TOTAL + ' complete';
   if (n === TOTAL){
+    markCurrent(-1);
     stripEl.classList.add('all-done');
     stripBadge.textContent = 'All done';
     stripText.textContent = 'All ' + TOTAL + ' missions complete. Read the recap card below -- you are set for Friday.';
     return;
   }
   var next = missionDone.indexOf(false);
-  stripBadge.textContent = 'Mission ' + (next + 1) + ' of ' + TOTAL;
+  stripBadge.textContent = 'Current mission ' + (next + 1) + ' of ' + TOTAL;
   stripText.textContent = MISSION_BRIEF[next];
+  markCurrent(next);
+}
+
+function markCurrent(next){
+  var items = document.querySelectorAll('ol.missions > .mission');
+  for (var i = 0; i < items.length; i++){
+    var isCur = i === next;
+    items[i].classList.toggle('current', isCur);
+    if (isCur) items[i].setAttribute('aria-current', 'step');
+    else items[i].removeAttribute('aria-current');
+  }
 }
 
 function completeMission(i){
