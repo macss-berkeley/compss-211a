@@ -19,7 +19,7 @@ page; you don't need to memorise it.
 
 ### Git
 
-Software that records the [history](#history) of a project's files. You can use Git on
+Software that records the [history](#history) of some project's files. You can use Git on
 your computer while offline, before putting anything on [GitHub](#github).
 
 ### GitHub
