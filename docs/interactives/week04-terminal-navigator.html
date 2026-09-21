@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Terminal Navigator · COMPSS 211A</title>
-<meta name="description" content="A safe, simulated terminal for practicing pwd, ls, cd, relative paths, running a Python script, and git status before Friday's quiz. COMPSS 211A, Week 4.">
+<meta name="description" content="A safe, simulated terminal for practicing pwd, ls, cd, relative paths, running a Python script, and moving, renaming, and deleting files before Friday's quiz. COMPSS 211A, Week 4.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Inter+Tight:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -531,10 +531,10 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     <p class="eyebrow">COMPSS 211A &middot; COMPUTING I</p>
     <h1>Terminal Navigator</h1>
     <div class="chips">
-      <span class="chip chip-gold">Week 4 &middot; Command Line &amp; Git</span>
-      <span class="chip chip-outline">&asymp; 8 minutes</span>
+      <span class="chip chip-gold">Week 4 &middot; Command Line</span>
+      <span class="chip chip-outline">&asymp; 12 minutes</span>
     </div>
-    <p class="promise">Practice moving around a file system in a shell that cannot touch your real computer, and see why the working directory decides what every relative path means.</p>
+    <p class="promise">Practice moving around a file system in a shell that cannot touch your real computer, see why the working directory decides what every relative path means, then move, rename, and delete files where a mistake costs nothing.</p>
     <hr class="gold-rule">
   </header>
 
@@ -543,7 +543,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
   <!-- ============ intro ============ -->
   <section class="card intro reveal" style="--i:0" aria-labelledby="intro-h">
     <h2 id="intro-h">A shell you cannot break</h2>
-    <p>The <strong>terminal</strong> is the window where you type and see output; the <strong>shell</strong> is the program that reads your command and decides how to run it. The one below is simulated: it runs entirely on this page, it starts inside a small practice project, and nothing you type here can reach your real files. Every command follows the same anatomy from the primer:</p>
+    <p>The <strong>terminal</strong> is the window where you type and see output; the <strong>shell</strong> is the program that reads your command and decides how to run it. The one below is simulated: it runs entirely on this page, it starts inside a small practice project, and nothing you type here can reach your real files. The course references leave <code>rm</code> out on purpose. This shell includes it, because a file deleted here costs nothing and <code>reset</code> puts the project back. Every command follows the same anatomy from the primer:</p>
     <div class="anatomy" role="img" aria-label="Command anatomy. In the command 'ls -lah data': ls is the command, -lah is an option, and data is an argument.">
       <div class="apart"><code>ls</code><span>command</span></div>
       <div class="apart"><code>-lah</code><span>option</span></div>
@@ -562,7 +562,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     <div class="lay-top">
 
       <div class="strip reveal" style="--i:1" role="status" id="strip">
-        <span class="strip-badge" id="strip-badge">Mission 1 of 8</span>
+        <span class="strip-badge" id="strip-badge">Mission 1 of 11</span>
         <span id="strip-text">Find out where you are: run <code>pwd</code>.</span>
       </div>
 
@@ -582,7 +582,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
             <span class="block-cursor idle" id="block-cursor" aria-hidden="true"></span>
           </div>
         </div>
-        <div class="term-hints">Tab completes names &middot; &uarr;/&darr; replay history &middot; type help for the full list &middot; rm stays disabled here</div>
+        <div class="term-hints">Tab completes names &middot; &uarr;/&darr; replay history &middot; type help for the full list &middot; reset restores the project</div>
       </section>
 
     </div>
@@ -604,7 +604,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
             <li><strong>Where am I?</strong> <span class="fq-how">Use <code>pwd</code>.</span></li>
             <li><strong>What is here?</strong> <span class="fq-how">Use <code>ls</code> or <code>ls -lah</code>.</span></li>
             <li><strong>What exact path will the command read or change?</strong> <span class="fq-how">Resolve relative paths from the current working directory.</span></li>
-            <li><strong>How will I check the result?</strong> <span class="fq-how">Inspect output, an exit status, or Git state.</span></li>
+            <li><strong>How will I check the result?</strong> <span class="fq-how">Read the output, then <code>ls</code> the exact path you changed.</span></li>
           </ol>
         </section>
 
@@ -615,7 +615,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     <section class="card missions-card reveal" style="--i:5" aria-labelledby="missions-h">
       <div class="missions-head">
         <h2 id="missions-h">Missions</h2>
-        <span class="mcount" id="mcount">0 / 8 complete</span>
+        <span class="mcount" id="mcount">0 / 11 complete</span>
       </div>
       <ol class="missions" id="missions">
 
@@ -694,24 +694,75 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
         <li class="mission" id="mission-7">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Tidy up, then check with Git.</strong> Move the summary into <code>results/</code>. From the root that is <code>mv summary.txt results/</code>; from elsewhere, build the path with <code>../</code>. Then run <code>git status</code> and answer below.
-            <span class="mq">Question 4: how will I check the result?</span>
+          <div class="mtext"><strong>Move the summary into <code>results/</code>.</strong> From the root, run <code>mv summary.txt results/</code>. Keep the trailing <code>/</code>: it tells <code>mv</code> the destination must be an existing folder.
+            <span class="mq">Question 4: how will I check the result? Run <code>ls results</code>.</span>
           </div>
+          <span class="sr-only mstat"></span>
+        </li>
+
+        <li class="mission" id="mission-8">
+          <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
+          <div class="mtext"><strong>Make the typo on purpose.</strong> Run the script again from the root so a fresh <code>summary.txt</code> appears, then run <code>mv summary.txt result</code> (no <code>s</code>, no <code>/</code>). Look at the tree, then answer below.</div>
           <span class="sr-only mstat"></span>
 
           <div class="qcard locked" id="qcard-2">
-            <p class="qlock">This question unlocks after <code>summary.txt</code> is inside <code>results/</code> and you have run <code>git status</code>.</p>
+            <p class="qlock">This question unlocks after the mistyped <code>mv</code> in mission 9.</p>
             <div class="qbody">
               <fieldset disabled id="q2-fs">
-                <legend><code>git status</code> lists <code>results/</code> under &ldquo;Untracked files&rdquo;. What does <em>untracked</em> mean here?</legend>
-                <label class="qopt"><input type="radio" name="q2" value="a"><span>Git found a file it cannot read properly, so the file may be corrupted.</span></label>
-                <label class="qopt"><input type="radio" name="q2" value="b"><span>The path is new to Git: it exists in the folder, but it is not part of any commit, and Git will not record its changes until you add it.</span></label>
-                <label class="qopt"><input type="radio" name="q2" value="c"><span>Git will delete the file the next time you run <code>git status</code>.</span></label>
+                <legend><code>mv</code> printed nothing, and <code>summary.txt</code> is no longer in the tree. Where did it go?</legend>
+                <label class="qopt"><input type="radio" name="q2" value="a"><span>It was deleted: <code>result</code> is not a folder, so <code>mv</code> had nowhere to put it.</span></label>
+                <label class="qopt"><input type="radio" name="q2" value="b"><span>It was renamed. Nothing called <code>result</code> existed, so <code>mv</code> used the second argument as a new file name in the current directory.</span></label>
+                <label class="qopt"><input type="radio" name="q2" value="c"><span>It moved into <code>results/</code>: <code>mv</code> matched the closest existing folder name.</span></label>
                 <button type="button" class="qcheck" id="q2-check">Check my answer</button>
                 <p class="qfeedback" id="q2-feedback" aria-live="polite"></p>
               </fieldset>
+              <div class="explainer" id="explainer-2" hidden>
+                <h3>Why the second argument decides what mv does</h3>
+                <p><code>mv</code> looks at its second argument. If that path is an existing folder, the file moves inside it. If it is anything else, the file is renamed to that path. It never asks which one you meant, and it prints nothing when it succeeds.</p>
+                <div class="pathmap" role="img" aria-label="mv summary.txt results/ : results/ is an existing folder, so the file moves to results/summary.txt. mv summary.txt result : nothing named result exists, so the file is renamed to result. mv summary.txt result/ : nothing named result exists, so mv refuses with No such file or directory.">
+<div><span class="pm-dim">mv summary.txt</span> results/  <span class="pm-dim">results/ is an existing folder &rarr;</span> <span class="pm-ok">moved to results/summary.txt</span></div>
+<div><span class="pm-dim">mv summary.txt</span> result   <span class="pm-dim">nothing named result exists   &rarr;</span> <span class="pm-err">renamed to result</span></div>
+<div><span class="pm-dim">mv summary.txt</span> result/  <span class="pm-dim">nothing named result exists   &rarr;</span> <span class="pm-ok">refused: No such file or directory</span></div>
+                </div>
+                <p>That is why the habit is: <strong>end a destination folder with <code>/</code>.</strong> With it, a typo in the folder name fails loudly instead of renaming your file. One more thing <code>mv</code> and <code>cp</code> do without asking: if the destination is an existing file, they replace it, and the old contents are gone. A misnamed file is fixed with another <code>mv</code>, but leave <code>result</code> where it is: the next mission removes it.</p>
+              </div>
             </div>
           </div>
+        </li>
+
+        <li class="mission" id="mission-9">
+          <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
+          <div class="mtext"><strong>Delete the stray file, in the careful order.</strong> Run <code>pwd</code>, then <code>ls -l result</code> to see the exact file you are about to remove, then <code>rm result</code>. Then answer below.
+            <span class="mq">Inspect before changing: name the exact path, then act on that same path.</span>
+          </div>
+          <span class="sr-only mstat"></span>
+
+          <div class="qcard locked" id="qcard-3">
+            <p class="qlock">This question unlocks after <code>rm</code> removes a file in mission 10.</p>
+            <div class="qbody">
+              <fieldset disabled id="q3-fs">
+                <legend><code>rm result</code> printed nothing. Where is the file now?</legend>
+                <label class="qopt"><input type="radio" name="q3" value="a"><span>In the Trash, the same as deleting it in Finder or Explorer.</span></label>
+                <label class="qopt"><input type="radio" name="q3" value="b"><span>Gone. <code>rm</code> does not use the Trash and prints nothing when it succeeds. The only way back is a copy made earlier.</span></label>
+                <label class="qopt"><input type="radio" name="q3" value="c"><span>Hidden. <code>rm</code> marks the file as hidden, and <code>ls -a</code> still shows it.</span></label>
+                <button type="button" class="qcheck" id="q3-check">Check my answer</button>
+                <p class="qfeedback" id="q3-feedback" aria-live="polite"></p>
+              </fieldset>
+              <div class="explainer" id="explainer-3" hidden>
+                <h3>Why rm gets the careful order</h3>
+                <p><code>rm</code> prints nothing when it succeeds. Nothing goes to the Trash, nothing asks for confirmation, and nothing undoes it. <code>rm</code> takes whatever path you give it, resolved from the working directory, so the order matters: <code>pwd</code> to know where you stand, <code>ls</code> on the exact path to see what will go, then <code>rm</code> on that same path. Do not <code>rm</code> a path you have not just listed.</p>
+                <p>Two options make it more dangerous. <code>-r</code> removes a folder and everything inside it. <code>-f</code> silences the errors that would otherwise stop it. <code>rm -rf</code> with the wrong path is how people lose a project. The course references leave <code>rm</code> out for this reason: on your own machine, move practice files to the Trash instead, where they can come back.</p>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li class="mission" id="mission-10">
+          <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
+          <div class="mtext"><strong>Remove a whole folder, then bring the project back.</strong> Run <code>rm results</code> and read the refusal. Then run <code>rm -r results</code> and watch the folder and everything in it leave the tree. Finally, type <code>reset</code>.
+            <span class="mq">This sandbox has <code>reset</code>. Your computer does not.</span>
+          </div>
+          <span class="sr-only mstat"></span>
         </li>
 
       </ol>
@@ -728,7 +779,10 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
       <li><strong><code>..</code> is the parent directory and <code>~</code> is your home directory.</strong> <code>cd -</code> returns to the previous one.</li>
       <li><strong>Tab completion prevents typos.</strong> Use it whenever possible.</li>
       <li><strong>Run project scripts from the repository root,</strong> so the relative paths inside them resolve correctly.</li>
-      <li><strong><code>git status</code> is the safe first move in any confusing situation:</strong> it reads state and changes nothing.</li>
+      <li><strong>End a destination folder with <code>/</code>.</strong> If the folder does not exist, <code>mv</code> refuses instead of renaming your file.</li>
+      <li><strong><code>mv</code> and <code>cp</code> replace an existing destination file without asking.</strong> Check the destination with <code>ls</code> first.</li>
+      <li><strong><code>rm</code> does not use the Trash.</strong> <code>pwd</code>, then <code>ls</code> the exact path, then <code>rm</code> that path. <code>-r</code> takes a whole folder.</li>
+      <li><strong>This sandbox has <code>reset</code>. Your computer does not.</strong> On your own machine, practice in a disposable copy and use the Finder or Explorer trash.</li>
     </ul>
   </section>
 
@@ -797,30 +851,34 @@ var SCRIPT_PY = [
 function mkFile(content){ return { type:'file', content:content }; }
 function mkDir(children){ return { type:'dir', children:children || {} }; }
 
-var FS = mkDir({
-  'Users': mkDir({
-    'you': mkDir({
-      'project': mkDir({
-        'data': mkDir({
-          'sample.csv': mkFile(SAMPLE_CSV),
-          'survey_2025.csv': mkFile(SURVEY_CSV)
-        }),
-        'scripts': mkDir({
-          'summarize_csv.py': mkFile(SCRIPT_PY)
-        }),
-        'notes.md': mkFile(NOTES_MD),
-        'results': mkDir({}),
-        '.venv': mkDir({})
+function buildFS(){
+  return mkDir({
+    'Users': mkDir({
+      'you': mkDir({
+        'project': mkDir({
+          'data': mkDir({
+            'sample.csv': mkFile(SAMPLE_CSV),
+            'survey_2025.csv': mkFile(SURVEY_CSV)
+          }),
+          'scripts': mkDir({
+            'summarize_csv.py': mkFile(SCRIPT_PY)
+          }),
+          'notes.md': mkFile(NOTES_MD),
+          'results': mkDir({}),
+          '.venv': mkDir({})
+        })
       })
     })
-  })
-});
+  });
+}
+var FS = buildFS();
 
 var HOME = ['Users','you'];
 var PROJ = ['Users','you','project'];
 var PROJ_KEY = PROJ.join('/');
 var DATA_KEY = PROJ_KEY + '/data';
 var SCRIPTS_KEY = PROJ_KEY + '/scripts';
+var RESULTS_KEY = PROJ_KEY + '/results';
 
 var cwd = PROJ.slice();
 var prevDir = null;              /* for cd -            */
@@ -1027,7 +1085,14 @@ function cmdLs(argv){
     anyOk = true;
     if (multiple && idx > 0) out('');
     if (node.type === 'file'){
-      out(t === '' ? segs[segs.length-1] : t);
+      var shown = t === '' ? segs[segs.length-1] : t;
+      if (longFmt){
+        var fsize = node.content.length;
+        var fsizeStr = human ? (fsize >= 1024 ? (fsize/1024).toFixed(1) + 'K' : fsize + 'B') : String(fsize);
+        out('-rw-r--r--   1 you  staff  ' + fsizeStr.padStart(5) + ' ' + LS_DATE + ' ' + shown);
+      } else {
+        out(shown);
+      }
       return;
     }
     if (multiple) out(t + ':');
@@ -1152,6 +1217,12 @@ function cmdMv(argv){
   }
   var dstSegs = resolvePath(dst);
   var dstNode = getNode(dstSegs);
+  var dstWantsDir = dst.length > 1 && dst.charAt(dst.length - 1) === '/';
+  if (dstWantsDir && (!dstNode || dstNode.type !== 'dir')){
+    /* a trailing slash means "this must be a folder": real mv refuses too */
+    outErr('mv: rename ' + src + ' to ' + dst + ': No such file or directory');
+    return;
+  }
   var finalSegs;
   if (dstNode && dstNode.type === 'dir'){
     finalSegs = dstSegs.concat([srcSegs[srcSegs.length - 1]]);
@@ -1176,8 +1247,12 @@ function cmdMv(argv){
   var srcParent = getNode(srcSegs.slice(0, -1));
   delete srcParent.children[srcSegs[srcSegs.length - 1]];
   finalParent.children[finalSegs[finalSegs.length - 1]] = srcNode;
+  /* real mv is silent on success, even when it just replaced a file */
+  MV_LAST = { from: sk, to: key(finalSegs), renamed: !dstNode };
+  emit('mv-ok');
   emit('fs-changed');
 }
+var MV_LAST = null;
 
 function cmdCp(argv){
   if (argv.length !== 3){ outErr('usage: cp source target'); return; }
@@ -1187,6 +1262,11 @@ function cmdCp(argv){
   if (srcNode.type === 'dir'){ outErr('cp: ' + src + ' is a directory (not copied).'); return; }
   var dstSegs = resolvePath(dst);
   var dstNode = getNode(dstSegs);
+  var dstWantsDir = dst.length > 1 && dst.charAt(dst.length - 1) === '/';
+  if (dstWantsDir && (!dstNode || dstNode.type !== 'dir')){
+    outErr('cp: directory ' + dst.replace(/\/+$/, '') + ' does not exist');
+    return;
+  }
   var finalSegs;
   if (dstNode && dstNode.type === 'dir'){
     finalSegs = dstSegs.concat([resolvePath(src).pop()]);
@@ -1286,102 +1366,6 @@ function cmdPython(argv, rawTarget){
   emit('fs-changed');
 }
 
-/* ---------- git status (read-only teaching device) ---------- */
-var TRACKED = ['data/sample.csv', 'data/survey_2025.csv', 'scripts/summarize_csv.py', 'notes.md'];
-
-function trackedExists(rel){
-  return !!getNode(PROJ.concat(rel.split('/')));
-}
-
-function relToCwd(relFromRoot){
-  /* git status shows paths relative to where you run it */
-  var absSegs = PROJ.concat(relFromRoot.split('/'));
-  var i = 0;
-  while (i < absSegs.length && i < cwd.length && absSegs[i] === cwd[i]) i++;
-  var ups = cwd.length - i;
-  var parts = [];
-  for (var u = 0; u < ups; u++) parts.push('..');
-  parts = parts.concat(absSegs.slice(i));
-  return parts.join('/');
-}
-
-function untrackedIn(dirNode, relPrefix){
-  var outList = [];
-  var names = Object.keys(dirNode.children).sort();
-  names.forEach(function(n){
-    if (n.charAt(0) === '.') return; /* treated as ignored */
-    var rel = relPrefix + n;
-    var node = dirNode.children[n];
-    if (node.type === 'file'){
-      if (TRACKED.indexOf(rel) === -1) outList.push({ rel:rel, isDir:false });
-    } else {
-      var hasTracked = TRACKED.some(function(t){
-        return t.indexOf(rel + '/') === 0 && trackedExists(t);
-      });
-      if (hasTracked){
-        outList = outList.concat(untrackedIn(node, rel + '/'));
-      } else if (countFilesDeep(node) > 0){
-        outList.push({ rel:rel, isDir:true });
-      }
-    }
-  });
-  return outList;
-}
-
-function cmdGit(argv){
-  var ck = key(cwd);
-  if (argv.length >= 2 && argv[1] === 'status'){
-    var extraBad = argv.slice(2).some(function(t){ return t !== '--short' && t !== '-s'; });
-    if (extraBad){
-      outNote('git: this sandbox supports git status and git status --short only.');
-      return;
-    }
-    if (ck !== PROJ_KEY && ck.indexOf(PROJ_KEY + '/') !== 0){
-      outErr('fatal: not a git repository (or any of the parent directories): .git');
-      outNote('(You are outside the project folder -- cd back into it first.)');
-      return;
-    }
-    var short = argv.indexOf('--short') !== -1 || argv.indexOf('-s') !== -1;
-    var projNode = getNode(PROJ);
-    var untracked = untrackedIn(projNode, '');
-    var deleted = TRACKED.filter(function(t){ return !trackedExists(t); });
-    if (short){
-      deleted.forEach(function(d){ out(' D ' + relToCwd(d)); });
-      untracked.forEach(function(u){ out('?? ' + relToCwd(u.rel) + (u.isDir ? '/' : '')); });
-      /* clean tree prints nothing in short mode, exactly like real git */
-    } else {
-      out('On branch main');
-      if (deleted.length){
-        out('Changes not staged for commit:');
-        outNote('  (use "git add/rm <file>..." to update what will be committed)');
-        outNote('  (use "git restore <file>..." to discard changes in working directory)');
-        deleted.forEach(function(d){ outErr('        deleted:    ' + relToCwd(d)); });
-        out('');
-      }
-      if (untracked.length){
-        out('Untracked files:');
-        outNote('  (use "git add <file>..." to include in what will be committed)');
-        untracked.forEach(function(u){ outErr('        ' + relToCwd(u.rel) + (u.isDir ? '/' : '')); });
-        out('');
-      }
-      if (!deleted.length && !untracked.length){
-        outOk('nothing to commit, working tree clean');
-      } else if (untracked.length){
-        out('nothing added to commit but untracked files present (use "git add" to track)');
-      } else {
-        out('no changes added to commit (use "git add" and/or "git commit -a")');
-      }
-    }
-    emit('git-status');
-    return;
-  }
-  if (argv.length === 1){
-    outNote('usage here: git status   (try it -- it reads state and changes nothing)');
-    return;
-  }
-  outNote('git ' + argv[1] + ': covered in the Git interactives -- this sandbox only supports git status.');
-}
-
 /* ---------- utility commands ---------- */
 var historyList = [];
 
@@ -1408,11 +1392,13 @@ function cmdHelp(){
     ['head [-n N] <file>',  'first lines of a file (default 3)'],
     ['tail [-n N] <file>',  'last lines of a file (default 3)'],
     ['mkdir [-p] <name>',   'make a directory'],
-    ['mv <src> <dst>',      'move or rename'],
-    ['cp <src> <dst>',      'copy a file'],
+    ['mv <src> <dst>',      'move or rename; an existing file at dst is replaced'],
+    ['cp <src> <dst>',      'copy a file; an existing file at dst is replaced'],
     ['touch <name>',        'create an empty file'],
+    ['rm [-r] <path>',      'remove a file; -r removes a folder and its contents'],
+    ['rmdir <dir>',         'remove an empty directory'],
     ['python3 <script>',    'run a Python script (simulated)'],
-    ['git status',          'show repository state (read-only)'],
+    ['reset',               'restore the practice project (this sandbox only)'],
     ['echo <text>',         'print text'],
     ['history',             'show the commands you have run'],
     ['clear',               'clear the screen'],
@@ -1422,14 +1408,77 @@ function cmdHelp(){
     addLine([{text:'  ' + r[0].padEnd(22), cls:'t-ok'}, {text:r[1], cls:'t-out'}]);
   });
   outNote('Tab completes names; the up and down arrows replay history.');
-  outNote('rm is deliberately disabled here. Pipes and redirection are in the primer, not this sandbox.');
+  outNote('rm is real here and has no trash, as on your own machine. reset exists only in this sandbox.');
+  outNote('Pipes and redirection are in the primer, not this sandbox.');
 }
 
-function cmdRm(){
-  outErr('rm: disabled in this sandbox.');
-  outNote('Deleting is the one action this practice page refuses to simulate. In real work,');
-  outNote('run pwd and ls on the exact target first, and prefer moving files to the trash --');
-  outNote('the course references leave shell deletion commands out on purpose.');
+function insideCwd(segs){
+  /* true when segs is the working directory or one of its ancestors */
+  var sk = key(segs), ck = key(cwd);
+  return ck === sk || ck.indexOf(sk + '/') === 0;
+}
+
+function cmdRm(argv){
+  var parsed = splitFlags(argv);
+  var flags = parsed.flags, operands = parsed.operands;
+  var illegal = null;
+  flags.forEach(function(f){ if ('rRfi'.indexOf(f) === -1 && !illegal) illegal = f; });
+  if (illegal){
+    outErr('rm: illegal option -- ' + illegal);
+    outErr('usage: rm [-rf] file ...');
+    return;
+  }
+  if (flags.has('i')){
+    outNote('rm -i asks before each removal on a real machine. This sandbox cannot ask, so nothing was removed. Run it without -i.');
+    return;
+  }
+  var recursive = flags.has('r') || flags.has('R');
+  var force = flags.has('f');
+  if (!operands.length){ outErr('usage: rm [-rf] file ...'); return; }
+  operands.forEach(function(t){
+    if (t === '.' || t === '..' || /\/\.\.?$/.test(t)){ outErr('rm: "." and ".." may not be removed'); return; }
+    var segs = resolvePath(t);
+    if (segs.length === 0){ outErr('rm: "/" may not be removed'); return; }
+    var node = getNode(segs);
+    if (!node){
+      if (!force) outErr('rm: ' + t + ': No such file or directory');
+      return;
+    }
+    if (node.type === 'dir'){
+      if (!recursive){ outErr('rm: ' + t + ': is a directory'); return; }
+      if (insideCwd(segs)){ outErr('rm: ' + t + ': you are standing inside it (cd out first)'); return; }
+    }
+    var parent = getNode(segs.slice(0, -1));
+    delete parent.children[segs[segs.length - 1]];
+    /* real rm prints nothing on success */
+    emit(node.type === 'dir' ? 'rm-dir' : 'rm-file');
+    emit('fs-changed');
+  });
+}
+
+function cmdRmdir(argv){
+  if (argv.length < 2){ outErr('usage: rmdir directory ...'); return; }
+  argv.slice(1).forEach(function(t){
+    var segs = resolvePath(t);
+    var node = getNode(segs);
+    if (!node){ outErr('rmdir: ' + t + ': No such file or directory'); return; }
+    if (node.type !== 'dir'){ outErr('rmdir: ' + t + ': Not a directory'); return; }
+    if (Object.keys(node.children).length){ outErr('rmdir: ' + t + ': Directory not empty'); return; }
+    if (insideCwd(segs)){ outErr('rmdir: ' + t + ': you are standing inside it (cd out first)'); return; }
+    var parent = getNode(segs.slice(0, -1));
+    delete parent.children[segs[segs.length - 1]];
+    emit('fs-changed');
+  });
+}
+
+function cmdReset(){
+  FS = buildFS();
+  cwd = PROJ.slice();
+  prevDir = null;
+  outOk('Practice project restored to its starting state.');
+  outNote('On a real machine, reset only fixes a garbled terminal display. It does not bring files back.');
+  emit('reset');
+  emit('fs-changed');
 }
 
 /* Real commands that exist in a real shell but are out of scope here. */
@@ -1444,7 +1493,8 @@ var NOT_INCLUDED = {
   'sudo':'runs a command as an administrator', 'ps':'lists processes',
   'which':'locates a program', 'pip':'installs Python packages',
   'jupyter':'starts a notebook server', 'exit':'closes a real shell session',
-  'whoami':'prints your username', 'mkdir-p':''
+  'whoami':'prints your username', 'git':'manages version history',
+  'mkdir-p':''
 };
 
 /* ============================================================
@@ -1477,12 +1527,12 @@ var HANDLERS = {
   'pwd': cmdPwd, 'ls': cmdLs, 'cd': cmdCd, 'cat': cmdCat,
   'head': cmdHead, 'tail': cmdTail, 'mkdir': cmdMkdir,
   'mv': cmdMv, 'cp': cmdCp, 'touch': cmdTouch,
-  'python3': cmdPython, 'git': cmdGit, 'echo': cmdEcho,
+  'python3': cmdPython, 'echo': cmdEcho,
   'history': cmdHistory, 'clear': cmdClear, 'help': cmdHelp,
-  'rm': cmdRm, 'rmdir': cmdRm
+  'rm': cmdRm, 'rmdir': cmdRmdir, 'reset': cmdReset
 };
 
-var COMMAND_NAMES = ['pwd','ls','cd','cat','head','tail','mkdir','mv','cp','touch','python3','git','echo','history','clear','help'];
+var COMMAND_NAMES = ['pwd','ls','cd','cat','head','tail','mkdir','mv','cp','touch','rm','rmdir','python3','reset','echo','history','clear','help'];
 
 function execute(raw){
   echoCommand(raw);
@@ -1582,8 +1632,9 @@ function renderTree(){
   var keys = [];
 
   var homeKey = key(HOME);
+  var homeNode = getNode(HOME);
   keys.push(homeKey);
-  frag.appendChild(treeRow(0, '~', homeKey, true, { meta:'(/Users/you)' }));
+  frag.appendChild(treeRow(0, '~', homeKey, true, { meta: homeNode ? '(/Users/you)' : '(gone -- type reset)' }));
 
   function walk(dirNode, segs, depth){
     var names = Object.keys(dirNode.children);
@@ -1605,10 +1656,7 @@ function renderTree(){
     });
   }
 
-  var projNode = getNode(PROJ);
-  keys.push(PROJ_KEY);
-  frag.appendChild(treeRow(1, 'project/', PROJ_KEY, true));
-  walk(projNode, PROJ, 2);
+  if (homeNode) walk(homeNode, HOME, 1);
 
   treeEl.textContent = '';
   treeEl.appendChild(frag);
@@ -1636,10 +1684,15 @@ var MISSION_BRIEF = [
   'Return to the project root with cd ..',
   'From the root, run python3 scripts/summarize_csv.py.',
   'cd scripts, run python3 summarize_csv.py, then answer the question in the checklist.',
-  'Move summary.txt into results/, run git status, then answer the question in the checklist.'
+  'From the root, run mv summary.txt results/ (keep the trailing slash).',
+  'Run the script again, then mv summary.txt result (no s, no slash), then answer the question in the checklist.',
+  'Run pwd, then ls -l result, then rm result, then answer the question in the checklist.',
+  'Run rm results and read the refusal, then rm -r results, then type reset.'
 ];
-var missionDone = [false,false,false,false,false,false,false,false];
-var q1Open = false, q2Open = false;
+var TOTAL = MISSION_BRIEF.length;
+var missionDone = MISSION_BRIEF.map(function(){ return false; });
+var qOpen = { 1:false, 2:false, 3:false };
+var dirRemoved = false, rmDirNoted = false;
 var stripEl = document.getElementById('strip');
 var stripBadge = document.getElementById('strip-badge');
 var stripText = document.getElementById('strip-text');
@@ -1651,15 +1704,15 @@ function doneCount(){
 
 function updateStrip(){
   var n = doneCount();
-  mcountEl.textContent = n + ' / 8 complete';
-  if (n === 8){
+  mcountEl.textContent = n + ' / ' + TOTAL + ' complete';
+  if (n === TOTAL){
     stripEl.classList.add('all-done');
     stripBadge.textContent = 'All done';
-    stripText.textContent = 'All 8 missions complete. Read the recap card below -- you are set for Friday.';
+    stripText.textContent = 'All ' + TOTAL + ' missions complete. Read the recap card below -- you are set for Friday.';
     return;
   }
   var next = missionDone.indexOf(false);
-  stripBadge.textContent = 'Mission ' + (next + 1) + ' of 8';
+  stripBadge.textContent = 'Mission ' + (next + 1) + ' of ' + TOTAL;
   stripText.textContent = MISSION_BRIEF[next];
 }
 
@@ -1673,25 +1726,17 @@ function completeMission(i){
   updateStrip();
 }
 
-function unlockQ(n){
-  if (n === 1){
-    if (q1Open) return;
-    q1Open = true;
-    var c1 = document.getElementById('qcard-1');
-    c1.classList.remove('locked');
-    document.getElementById('q1-fs').disabled = false;
-    outNote('(A question just unlocked under mission 7 in the checklist below.)');
-    if (motionOK) c1.scrollIntoView({ behavior:'smooth', block:'nearest' });
-  } else {
-    if (q2Open) return;
-    q2Open = true;
-    var c2 = document.getElementById('qcard-2');
-    c2.classList.remove('locked');
-    document.getElementById('q2-fs').disabled = false;
-    outNote('(A question just unlocked under mission 8 in the checklist below.)');
-    if (motionOK) c2.scrollIntoView({ behavior:'smooth', block:'nearest' });
-  }
+function unlockQ(n, missionNo){
+  if (qOpen[n]) return;
+  qOpen[n] = true;
+  var card = document.getElementById('qcard-' + n);
+  card.classList.remove('locked');
+  document.getElementById('q' + n + '-fs').disabled = false;
+  outNote('(A question just unlocked under mission ' + missionNo + ' in the checklist below.)');
+  if (motionOK) card.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
+
+function baseOf(k){ return k.slice(k.lastIndexOf('/') + 1); }
 
 function afterCommand(cwdBefore){
   var ck = key(cwd);
@@ -1707,8 +1752,22 @@ function afterCommand(cwdBefore){
   if (EVENTS.has('viewed-sample')) completeMission(3);
   if (EVENTS.has('cd-ok') && ck === PROJ_KEY && key(cwdBefore) !== PROJ_KEY) completeMission(4);
   if (EVENTS.has('script-ok') && ck === PROJ_KEY) completeMission(5);
-  if (EVENTS.has('script-fail') && ck === SCRIPTS_KEY) unlockQ(1);
-  if (EVENTS.has('git-status') && getNode(PROJ.concat(['results','summary.txt']))) unlockQ(2);
+  if (EVENTS.has('script-fail') && ck === SCRIPTS_KEY) unlockQ(1, 7);
+  if (EVENTS.has('mv-ok') && MV_LAST){
+    if (MV_LAST.to === RESULTS_KEY + '/summary.txt') completeMission(7);
+    var typo = MV_LAST.to === PROJ_KEY + '/result' ||
+               (MV_LAST.renamed && baseOf(MV_LAST.from) === 'summary.txt' && baseOf(MV_LAST.to) !== 'summary.txt');
+    if (typo) unlockQ(2, 9);
+  }
+  if (EVENTS.has('rm-file')) unlockQ(3, 10);
+  if (EVENTS.has('rm-dir')){
+    dirRemoved = true;
+    if (!rmDirNoted){
+      rmDirNoted = true;
+      outNote('(The folder and everything in it are gone. Type reset to bring the project back.)');
+    }
+  }
+  if (EVENTS.has('reset') && dirRemoved) completeMission(10);
 }
 
 /* ============================================================
@@ -1753,11 +1812,21 @@ wireQuestion('q1', 'b', {
 });
 
 wireQuestion('q2', 'b', {
-  a: 'Untracked is not an error -- Git read the path fine; it simply has no recorded history for it.',
-  b: 'Untracked means new-to-Git: the path exists but Git is not recording its changes, and nothing will happen to it on its own.',
-  c: '<code>git status</code> only reads and reports -- it never changes, moves, or removes files.'
+  a: 'Nothing was deleted -- <code>mv</code> never deletes. Look at the tree: there is a new file in the project root.',
+  b: 'No folder named <code>result</code> existed, so <code>mv</code> used the second argument as a new name. The file is still there, called <code>result</code>.',
+  c: '<code>mv</code> does not guess. It uses the exact path you typed, and <code>result</code> is not <code>results</code>.'
 }, function(){
-  completeMission(7);
+  completeMission(8);
+  document.getElementById('explainer-2').hidden = false;
+});
+
+wireQuestion('q3', 'b', {
+  a: 'The Trash belongs to Finder and Explorer. <code>rm</code> goes around it: the file is gone.',
+  b: '<code>rm</code> printed nothing because it succeeded. There is no Trash and no undo; only a copy made earlier can bring the file back.',
+  c: '<code>ls -a</code> shows hidden files, and <code>rm</code> hides nothing. Run <code>ls -a</code>: <code>result</code> is not there.'
+}, function(){
+  completeMission(9);
+  document.getElementById('explainer-3').hidden = false;
 });
 
 /* ============================================================
