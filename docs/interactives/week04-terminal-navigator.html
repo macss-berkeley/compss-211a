@@ -177,23 +177,37 @@ header h1{
 .hintchip code{ background:transparent; border:0; padding:0; }
 
 /* ---------- layout ---------- */
+/* The terminal, its file tree, and the mission checklist stay visible together:
+   from 1000px the checklist sits beside the terminal, and the terminal column
+   sticks while the checklist scrolls. */
 .layout{ display:grid; gap:18px; }
-@media (min-width:900px){
-  .layout{
-    grid-template-columns:minmax(0,1fr) 300px;
-    grid-template-areas:
-      "top side"
-      "missions side";
-    align-items:start;
-  }
-  .lay-top{ grid-area:top; }
-  .sidebar{ grid-area:side; }
-  .missions-card{ grid-area:missions; }
-  .sidebar-sticky{ position:sticky; top:14px; }
-}
 .lay-top{ display:grid; gap:14px; }
 .sidebar{ display:grid; gap:14px; align-content:start; }
 .sidebar-sticky{ display:grid; gap:14px; }
+@media (min-width:900px){
+  .fourq ol{ grid-template-columns:repeat(4, minmax(0,1fr)); gap:14px; padding-left:0; list-style-position:inside; }
+}
+@media (min-width:1000px){
+  .page{ max-width:1240px; }
+  .layout{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    grid-template-areas:"top missions";
+    align-items:start;
+  }
+  .lay-top{
+    grid-area:top;
+    position:sticky; top:12px;
+    max-height:calc(100vh - 24px);
+    overflow:auto;
+  }
+  .missions-card{ grid-area:missions; }
+  .term-body{ height:300px; }
+}
+@media (min-width:1000px) and (max-height:820px){
+  /* short laptop screens: keep the whole terminal column on screen without an inner scrollbar */
+  .term-body{ height:240px; }
+  .tree{ font-size:.78rem; }
+}
 
 /* ---------- mission strip ---------- */
 .strip{
@@ -556,6 +570,16 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     </div>
   </section>
 
+  <section class="card fourq reveal" style="--i:1" aria-labelledby="fourq-h">
+    <h2 id="fourq-h">The four questions</h2>
+    <ol>
+      <li><strong>Where am I?</strong> <span class="fq-how">Use <code>pwd</code>.</span></li>
+      <li><strong>What is here?</strong> <span class="fq-how">Use <code>ls</code> or <code>ls -lah</code>.</span></li>
+      <li><strong>What exact path will the command read or change?</strong> <span class="fq-how">Resolve relative paths from the current working directory.</span></li>
+      <li><strong>How will I check the result?</strong> <span class="fq-how">Read the output, then <code>ls</code> the exact path you changed.</span></li>
+    </ol>
+  </section>
+
   <!-- ============ main layout ============ -->
   <div class="layout">
 
@@ -585,9 +609,6 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
         <div class="term-hints">Tab completes names &middot; &uarr;/&darr; replay history &middot; type help for the full list &middot; reset restores the project</div>
       </section>
 
-    </div>
-
-    <!-- ============ sidebar ============ -->
     <aside class="sidebar" aria-label="Reference panel">
       <div class="sidebar-sticky">
 
@@ -598,18 +619,13 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
           <p class="tree-note">This picture updates as you type. The highlighted row is where you are standing right now.</p>
         </section>
 
-        <section class="card fourq reveal" style="--i:4" aria-labelledby="fourq-h">
-          <h2 id="fourq-h">The four questions</h2>
-          <ol>
-            <li><strong>Where am I?</strong> <span class="fq-how">Use <code>pwd</code>.</span></li>
-            <li><strong>What is here?</strong> <span class="fq-how">Use <code>ls</code> or <code>ls -lah</code>.</span></li>
-            <li><strong>What exact path will the command read or change?</strong> <span class="fq-how">Resolve relative paths from the current working directory.</span></li>
-            <li><strong>How will I check the result?</strong> <span class="fq-how">Read the output, then <code>ls</code> the exact path you changed.</span></li>
-          </ol>
-        </section>
+
 
       </div>
     </aside>
+
+    </div>
+
 
     <!-- ============ missions ============ -->
     <section class="card missions-card reveal" style="--i:5" aria-labelledby="missions-h">
