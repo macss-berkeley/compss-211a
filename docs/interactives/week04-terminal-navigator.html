@@ -624,7 +624,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
         <li class="mission" id="mission-1">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>List what is here.</strong> Run <code>ls</code>, then try <code>ls -lah</code> for the long view, including hidden entries.
+          <div class="mtext"><strong>List what is here.</strong> Run <code>ls</code>.
             <span class="mq">Question 2: what is here?</span>
           </div>
           <span class="sr-only mstat"></span>
@@ -638,7 +638,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
         <li class="mission" id="mission-3">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Peek at <code>sample.csv</code> without opening an editor.</strong> Run <code>head sample.csv</code> or <code>cat sample.csv</code>.
+          <div class="mtext"><strong>Peek at <code>sample.csv</code> without opening an editor.</strong> Run <code>head sample.csv</code>.
             <span class="mq">Small views first: inspect before changing.</span>
           </div>
           <span class="sr-only mstat"></span>
@@ -697,7 +697,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
         <li class="mission" id="mission-8">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Make the typo on purpose.</strong> Run the script again from the root so a fresh <code>summary.txt</code> appears, then run <code>mv summary.txt result</code> (no <code>s</code>, no <code>/</code>). Look at the tree, then answer below.</div>
+          <div class="mtext"><strong>Mistype the folder name.</strong> Run the script again from the root so a fresh <code>summary.txt</code> appears. Then run <code>mv summary.txt result</code>, with <code>result</code> where <code>results/</code> should be. Look at the tree, then answer below.</div>
           <span class="sr-only mstat"></span>
 
           <div class="qcard locked" id="qcard-2">
@@ -1674,14 +1674,14 @@ function renderTree(){
 /* Anything in <code> is typed exactly as shown, then Enter. */
 var MISSION_BRIEF = [
   'Find out where you are: type <code>pwd</code> and press Enter.',
-  'List what is here: type <code>ls</code>, then try <code>ls -lah</code>.',
+  'List what is here: type <code>ls</code>.',
   'Type <code>cd data</code>, then <code>pwd</code> to confirm the move.',
-  'Peek at the file: type <code>head sample.csv</code> or <code>cat sample.csv</code>.',
+  'Peek at the file: type <code>head sample.csv</code>.',
   'Return to the project root: type <code>cd ..</code>',
   'From the root, type <code>python3 scripts/summarize_csv.py</code>.',
   'Type <code>cd scripts</code>, then <code>python3 summarize_csv.py</code>, then answer the question in the checklist.',
   'From the root, type <code>mv summary.txt results/</code> (keep the trailing slash).',
-  'Run the script again, then type <code>mv summary.txt result</code> (no s, no slash), then answer the question in the checklist.',
+  'Run the script again from the root, then type <code>mv summary.txt result</code>, with <code>result</code> instead of <code>results/</code>. Then answer the question in the checklist.',
   'Type <code>pwd</code>, then <code>ls -l result</code>, then <code>rm result</code>, then answer the question in the checklist.',
   'Type <code>rm results</code> and read the refusal, then <code>rm -r results</code>, then <code>reset</code>.'
 ];
