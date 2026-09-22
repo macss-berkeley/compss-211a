@@ -660,7 +660,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
         <li class="mission" id="mission-5">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Make a folder, step into it, and create an empty file.</strong> Run <code>mkdir -p scratch</code>, then <code>cd scratch</code>, then <code>touch notes.txt</code>, then <code>ls</code>. The tree shows where you are and the new file.
+          <div class="mtext"><strong>Make a folder, step into it, and create an empty file.</strong> Run <code>mkdir scratch</code>, then <code>cd scratch</code>, then <code>touch notes.txt</code>, then <code>ls</code>. The tree shows where you are and the new file.
             <span class="mq">Question 4: how will I check the result? Run <code>ls</code>.</span>
           </div>
           <span class="sr-only mstat"></span>
@@ -798,7 +798,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
       <li><strong><code>..</code> is the parent directory and <code>~</code> is your home directory.</strong> <code>cd -</code> returns to the previous one.</li>
       <li><strong>Tab completion prevents typos.</strong> Use it whenever possible.</li>
       <li><strong>Run project scripts from the repository root,</strong> so the relative paths inside them resolve correctly.</li>
-      <li><strong><code>mkdir -p</code>, <code>touch</code>, and <code>cp</code> create; <code>mv</code> moves.</strong> Run <code>ls</code> on the destination afterwards to check.</li>
+      <li><strong><code>mkdir</code>, <code>touch</code>, and <code>cp</code> create; <code>mv</code> moves.</strong> Run <code>ls</code> on the destination afterwards to check. <code>mkdir -p</code> also creates missing parent folders and does not complain if the folder already exists.</li>
       <li><strong>End a destination folder with <code>/</code>.</strong> If the folder does not exist, <code>mv</code> refuses instead of renaming your file.</li>
       <li><strong><code>mv</code> and <code>cp</code> replace an existing destination file without asking.</strong> Check the destination with <code>ls</code> first.</li>
       <li><strong><code>rm</code> does not use the Trash.</strong> <code>pwd</code>, then <code>ls</code> the exact path, then <code>rm</code> that path. <code>-r</code> takes a whole folder.</li>
@@ -1706,7 +1706,7 @@ var MISSION_BRIEF = [
   'Type <code>cd data</code>, then <code>pwd</code> to confirm the move.',
   'Peek at the file: type <code>head sample.csv</code>.',
   'Return to the project root: type <code>cd ..</code>',
-  'Make a folder and step into it: type <code>mkdir -p scratch</code>, then <code>cd scratch</code>. Create an empty file there: type <code>touch notes.txt</code>, then <code>ls</code>.',
+  'Make a folder and step into it: type <code>mkdir scratch</code>, then <code>cd scratch</code>. Create an empty file there: type <code>touch notes.txt</code>, then <code>ls</code>.',
   'Type <code>cd ..</code> to go back to the root, then <code>cp notes.md scratch/notes_copy.md</code>, then <code>ls scratch</code>.',
   'From the root, type <code>python3 scripts/summarize_csv.py</code>.',
   'Type <code>cd scripts</code>, then <code>python3 summarize_csv.py</code>, then answer the question under the terminal.',
