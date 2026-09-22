@@ -397,6 +397,8 @@ ol.missions > .mission:last-child{ border-bottom:0; }
   background:var(--paper);
   padding:13px 15px;
 }
+.q-slot .qcard{ margin-top:0; }
+.qmoved{ grid-column:1 / -1; margin:6px 0 0; font-size:.8rem; color:#4A5A74; font-style:italic; }
 .qcard.locked{ border-left-color:var(--line); }
 .qcard.locked .qbody{ display:none; }
 .qcard .qlock{
@@ -588,6 +590,8 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
         </div>
         <div class="term-hints">Tab completes names &middot; &uarr;/&darr; replay history &middot; type help for the full list &middot; reset restores the project</div>
       </section>
+
+      <div class="q-slot" id="q-slot" hidden aria-live="polite"></div>
 
 
     </div>
@@ -1679,10 +1683,10 @@ var MISSION_BRIEF = [
   'Peek at the file: type <code>head sample.csv</code>.',
   'Return to the project root: type <code>cd ..</code>',
   'From the root, type <code>python3 scripts/summarize_csv.py</code>.',
-  'Type <code>cd scripts</code>, then <code>python3 summarize_csv.py</code>, then answer the question in the checklist.',
+  'Type <code>cd scripts</code>, then <code>python3 summarize_csv.py</code>, then answer the question under the terminal.',
   'From the root, type <code>mv summary.txt results/</code> (keep the trailing slash).',
-  'Run the script again from the root, then type <code>mv summary.txt result</code>, with <code>result</code> instead of <code>results/</code>. Then answer the question in the checklist.',
-  'Type <code>pwd</code>, then <code>ls -l result</code>, then <code>rm result</code>, then answer the question in the checklist.',
+  'Run the script again from the root, then type <code>mv summary.txt result</code>, with <code>result</code> instead of <code>results/</code>. Then answer the question under the terminal.',
+  'Type <code>pwd</code>, then <code>ls -l result</code>, then <code>rm result</code>, then answer the question under the terminal.',
   'Type <code>rm results</code> and read the refusal, then <code>rm -r results</code>, then <code>reset</code>.'
 ];
 var TOTAL = MISSION_BRIEF.length;
@@ -1735,14 +1739,41 @@ function completeMission(i){
   updateStrip();
 }
 
+var slotEl = document.getElementById('q-slot');
+var slotCard = null;
+
+function moveToSlot(card){
+  returnSlotCard(true);
+  var ph = document.createElement('p');
+  ph.className = 'qmoved';
+  ph.id = 'qmoved-' + card.id;
+  ph.textContent = 'Question shown under the terminal.';
+  card.parentNode.insertBefore(ph, card);
+  slotEl.appendChild(card);
+  slotEl.hidden = false;
+  slotCard = card;
+}
+
+function returnSlotCard(force){
+  if (!slotCard) return;
+  if (!force && !slotCard.dataset.answered) return;
+  var ph = document.getElementById('qmoved-' + slotCard.id);
+  if (ph){
+    ph.parentNode.insertBefore(slotCard, ph);
+    ph.parentNode.removeChild(ph);
+  }
+  slotCard = null;
+  slotEl.hidden = true;
+}
+
 function unlockQ(n, missionNo){
   if (qOpen[n]) return;
   qOpen[n] = true;
   var card = document.getElementById('qcard-' + n);
   card.classList.remove('locked');
   document.getElementById('q' + n + '-fs').disabled = false;
-  outNote('(A question just unlocked under mission ' + missionNo + ' in the checklist below.)');
-  if (motionOK) card.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  moveToSlot(card);
+  outNote('(A question appeared under the terminal. Answer it, then continue.)');
 }
 
 function baseOf(k){ return k.slice(k.lastIndexOf('/') + 1); }
@@ -1797,6 +1828,7 @@ function wireQuestion(qname, correct, feedbacks, onCorrect){
     }
     var opt = sel.closest('.qopt');
     if (sel.value === correct){
+      btn.closest('.qcard').dataset.answered = '1';
       opt.classList.add('picked-ok');
       fb.className = 'qfeedback fok';
       fb.innerHTML = 'Correct. <span class="fwhy">' + feedbacks[sel.value] + '</span>';
@@ -1917,6 +1949,7 @@ function tabComplete(){
 
 input.addEventListener('keydown', function(e){
   if (e.key === 'Enter'){
+    returnSlotCard(false);
     e.preventDefault();
     var raw = input.value;
     setInputValue('');
