@@ -193,7 +193,11 @@ header h1{
   .missions-card{ grid-area:missions; }
   .sidebar-sticky{ position:sticky; top:14px; }
 }
-.lay-top{ display:grid; gap:14px; }
+/* minmax(0,1fr) keeps the column at its track width even when a question card
+   with a wide fieldset sits in the slot; otherwise the column grows under the tree. */
+.lay-top{ display:grid; gap:14px; grid-template-columns:minmax(0,1fr); }
+.q-slot{ min-width:0; }
+.qcard fieldset{ min-width:0; min-inline-size:0; }
 .sidebar{ display:grid; gap:14px; align-content:start; }
 .sidebar-sticky{ display:grid; gap:14px; }
 
