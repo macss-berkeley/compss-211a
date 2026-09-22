@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Terminal Navigator · COMPSS 211A</title>
-<meta name="description" content="A safe, simulated terminal for practicing pwd, ls, cd, relative paths, running a Python script, and moving, renaming, and deleting files before Friday's quiz. COMPSS 211A, Week 4.">
+<meta name="description" content="A simulated terminal for practicing pwd, ls, cd, relative paths, running a Python script, and creating, moving, renaming, and deleting files.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Inter+Tight:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -544,7 +544,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
       <span class="chip chip-gold">Week 4 &middot; Command Line</span>
       <span class="chip chip-outline">&asymp; 14 minutes</span>
     </div>
-    <p class="promise">Practice moving around a file system in a shell that cannot touch your real computer, see why the working directory decides what every relative path means, then move, rename, and delete files where a mistake costs nothing.</p>
+    <p class="promise">Practice moving around a file system in a simulated shell. Find where you are, run a script from the right folder and the wrong one, then create, copy, move, and delete files.</p>
     <hr class="gold-rule">
   </header>
 
@@ -552,8 +552,8 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
   <!-- ============ intro ============ -->
   <section class="card intro reveal" style="--i:0" aria-labelledby="intro-h">
-    <h2 id="intro-h">A shell you cannot break</h2>
-    <p>The <strong>terminal</strong> is the window where you type and see output; the <strong>shell</strong> is the program that reads your command and decides how to run it. The one below is simulated: it runs entirely on this page, it starts inside a small practice project, and nothing you type here can reach your real files. The course references leave <code>rm</code> out on purpose. This shell includes it, because a file deleted here costs nothing and <code>reset</code> puts the project back. Every command follows the same anatomy from the primer:</p>
+    <h2 id="intro-h">The terminal and the shell</h2>
+    <p>The <strong>terminal</strong> is the window where you type and see output; the <strong>shell</strong> is the program that reads your command and decides how to run it. The one below is simulated: it runs entirely on this page, it starts inside a small practice project, and nothing you type here can reach your real files. This shell includes <code>rm</code>; a file deleted here comes back with <code>reset</code>. Every command has the same three parts:</p>
     <div class="anatomy" role="img" aria-label="Command anatomy. In the command 'ls -lah data': ls is the command, -lah is an option, and data is an argument.">
       <div class="apart"><code>ls</code><span>command</span></div>
       <div class="apart"><code>-lah</code><span>option</span></div>
@@ -647,7 +647,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
         <li class="mission" id="mission-3">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
           <div class="mtext"><strong>Peek at <code>sample.csv</code> without opening an editor.</strong> Run <code>head sample.csv</code>.
-            <span class="mq">Small views first: inspect before changing.</span>
+            <span class="mq">Inspect before changing.</span>
           </div>
           <span class="sr-only mstat"></span>
         </li>
@@ -669,7 +669,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
         <li class="mission" id="mission-6">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
           <div class="mtext"><strong>Copy a file into it.</strong> Run <code>cp notes.md scratch/notes_copy.md</code>, then <code>ls scratch</code>. The original <code>notes.md</code> stays where it was.
-            <span class="mq"><code>cp</code> copies; <code>mv</code>, later, moves.</span>
+            <span class="mq"><code>cp</code> leaves the original in place; <code>mv</code>, later, does not.</span>
           </div>
           <span class="sr-only mstat"></span>
         </li>
@@ -699,13 +699,13 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
                 <p class="qfeedback" id="q1-feedback" aria-live="polite"></p>
               </fieldset>
               <div class="explainer" id="explainer-1" hidden>
-                <h3>Why the working directory decided everything</h3>
+                <h3>Why the script failed from scripts/</h3>
                 <p>Python found and ran the script both times, because you gave a correct path to the script itself. The failure happened <em>inside</em> the script, at <code>open("data/sample.csv")</code>. A relative path starts from your current working directory, not from the folder that contains the script.</p>
                 <div class="pathmap" role="img" aria-label="From /Users/you/project, the relative path data/sample.csv resolves to /Users/you/project/data/sample.csv, which exists. From /Users/you/project/scripts, the same relative path resolves to /Users/you/project/scripts/data/sample.csv, which does not exist.">
 <div><span class="pm-dim">from</span> ~/project          <span class="pm-dim">data/sample.csv &rarr;</span> <span class="pm-ok">~/project/data/sample.csv          exists</span></div>
 <div><span class="pm-dim">from</span> ~/project/scripts  <span class="pm-dim">data/sample.csv &rarr;</span> <span class="pm-err">~/project/scripts/data/sample.csv  missing</span></div>
                 </div>
-                <p>That is why the habit is: <strong>run project scripts from the repository root.</strong> When a path error appears, check <code>pwd</code> first and read the missing path in the error before touching the code. Try <code>cd ..</code> and rerun it to see the fix.</p>
+                <p>So: <strong>run project scripts from the repository root.</strong> When a path error appears, run <code>pwd</code> first and read the missing path in the error before touching the code. Try <code>cd ..</code> and run the script again.</p>
               </div>
             </div>
           </div>
@@ -736,14 +736,14 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
                 <p class="qfeedback" id="q2-feedback" aria-live="polite"></p>
               </fieldset>
               <div class="explainer" id="explainer-2" hidden>
-                <h3>Why the second argument decides what mv does</h3>
+                <h3>What mv does with its second argument</h3>
                 <p><code>mv</code> looks at its second argument. If that path is an existing folder, the file moves inside it. If it is anything else, the file is renamed to that path. It never asks which one you meant, and it prints nothing when it succeeds.</p>
                 <div class="pathmap" role="img" aria-label="mv summary.txt results/ : results/ is an existing folder, so the file moves to results/summary.txt. mv summary.txt result : nothing named result exists, so the file is renamed to result. mv summary.txt result/ : nothing named result exists, so mv refuses with No such file or directory.">
 <div><span class="pm-dim">mv summary.txt</span> results/  <span class="pm-dim">results/ is an existing folder &rarr;</span> <span class="pm-ok">moved to results/summary.txt</span></div>
 <div><span class="pm-dim">mv summary.txt</span> result   <span class="pm-dim">nothing named result exists   &rarr;</span> <span class="pm-err">renamed to result</span></div>
 <div><span class="pm-dim">mv summary.txt</span> result/  <span class="pm-dim">nothing named result exists   &rarr;</span> <span class="pm-ok">refused: No such file or directory</span></div>
                 </div>
-                <p>That is why the habit is: <strong>end a destination folder with <code>/</code>.</strong> With it, a typo in the folder name fails loudly instead of renaming your file. One more thing <code>mv</code> and <code>cp</code> do without asking: if the destination is an existing file, they replace it, and the old contents are gone. A misnamed file is fixed with another <code>mv</code>, but leave <code>result</code> where it is: the next mission removes it.</p>
+                <p>So: <strong>end a destination folder with <code>/</code>.</strong> Then a typo in the folder name gives an error instead of renaming your file. Also, without asking, <code>mv</code> and <code>cp</code> if the destination is an existing file, they replace it, and the old contents are gone. A misnamed file is fixed with another <code>mv</code>, but leave <code>result</code> where it is: the next mission removes it.</p>
               </div>
             </div>
           </div>
@@ -751,8 +751,8 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
         <li class="mission" id="mission-11">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Delete the stray file, in the careful order.</strong> Run <code>pwd</code>, then <code>ls -l result</code> to see the exact file you are about to remove, then <code>rm result</code>. Then answer below.
-            <span class="mq">Inspect before changing: name the exact path, then act on that same path.</span>
+          <div class="mtext"><strong>Delete the stray file.</strong> Run <code>pwd</code>, then <code>ls -l result</code> to see the exact file you are about to remove, then <code>rm result</code>. Then answer below.
+            <span class="mq">Check the exact path first, then remove that same path.</span>
           </div>
           <span class="sr-only mstat"></span>
 
@@ -768,9 +768,9 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
                 <p class="qfeedback" id="q3-feedback" aria-live="polite"></p>
               </fieldset>
               <div class="explainer" id="explainer-3" hidden>
-                <h3>Why rm gets the careful order</h3>
-                <p><code>rm</code> prints nothing when it succeeds. Nothing goes to the Trash, nothing asks for confirmation, and nothing undoes it. <code>rm</code> takes whatever path you give it, resolved from the working directory, so the order matters: <code>pwd</code> to know where you stand, <code>ls</code> on the exact path to see what will go, then <code>rm</code> on that same path. Do not <code>rm</code> a path you have not just listed.</p>
-                <p>Two options make it more dangerous. <code>-r</code> removes a folder and everything inside it. <code>-f</code> silences the errors that would otherwise stop it. <code>rm -rf</code> with the wrong path is how people lose a project. The course references leave <code>rm</code> out for this reason: on your own machine, move practice files to the Trash instead, where they can come back.</p>
+                <h3>Why to check before rm</h3>
+                <p><code>rm</code> prints nothing when it succeeds. There is no Trash, no confirmation, and no undo. <code>rm</code> takes whatever path you give it, resolved from the working directory, so the order matters: <code>pwd</code> to know where you stand, <code>ls</code> on the exact path to see what will go, then <code>rm</code> on that same path. Do not <code>rm</code> a path you have not just listed.</p>
+                <p>Two options make it more dangerous. <code>-r</code> removes a folder and everything inside it. <code>-f</code> silences the errors that would otherwise stop it. <code>rm -rf</code> with the wrong path is how people lose a project.</p>
               </div>
             </div>
           </div>
@@ -778,7 +778,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
         <li class="mission" id="mission-12">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Remove a whole folder, then bring the project back.</strong> Run <code>rm results</code> and read the refusal. Then run <code>rm -r results</code> and watch the folder and everything in it leave the tree. Finally, type <code>reset</code>.
+          <div class="mtext"><strong>Remove a whole folder, then bring the project back.</strong> Run <code>rm results</code> and read the refusal. Then run <code>rm -r results</code> and the folder and everything in it disappears from the tree. Finally, type <code>reset</code>.
             <span class="mq">This sandbox has <code>reset</code>. Your computer does not.</span>
           </div>
           <span class="sr-only mstat"></span>
@@ -793,7 +793,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
   <section class="card recap reveal" style="--i:6" aria-labelledby="recap-h">
     <h2 id="recap-h">Remember</h2>
     <ul>
-      <li><strong><code>pwd</code>, <code>ls</code>, and <code>cd</code> are your compass:</strong> where am I, what is here, move.</li>
+      <li><strong><code>pwd</code>, <code>ls</code>, and <code>cd</code> answer three questions:</strong> where am I, what is here, how do I get there.</li>
       <li><strong>A relative path starts from the working directory;</strong> an absolute path starts from the file-system root.</li>
       <li><strong><code>..</code> is the parent directory and <code>~</code> is your home directory.</strong> <code>cd -</code> returns to the previous one.</li>
       <li><strong>Tab completion prevents typos.</strong> Use it whenever possible.</li>
@@ -1868,7 +1868,7 @@ function wireQuestion(qname, correct, feedbacks, onCorrect){
 }
 
 wireQuestion('q1', 'b', {
-  a: 'Python ran the script happily both times -- the failure came from a path the script itself tried to open.',
+  a: 'Python ran the script both times. The failure came from a path the script itself tried to open.',
   b: 'The script&rsquo;s <code>open("data/sample.csv")</code> resolves from the working directory, so from <code>scripts/</code> Python looked for <code>scripts/data/sample.csv</code>.',
   c: 'Nothing moved or disappeared -- check which directory the relative path <code>data/sample.csv</code> was resolved from.'
 }, function(){
