@@ -11,3 +11,8 @@ wandb/
 /generated/
 .agents/skills/bcourses-admin/
 /output/
+
+# Students' personal copies of course notebooks (keeps pulls conflict-free)
+*_mine.ipynb
+*-mine.ipynb
+* copy.ipynb

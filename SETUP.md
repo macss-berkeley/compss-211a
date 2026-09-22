@@ -105,12 +105,31 @@ Colab is a supported alternative for most notebooks:
 
 The command-line, Git, and local-environment exercises still require the local setup. Individual notebooks will say when that is the case.
 
+## Working on your own copies
+
+Don't edit the course notebooks directly. Before you start working in one,
+duplicate it and add `_mine` to the end of the name, before `.ipynb`:
+`week05_live_workspace.ipynb` becomes `week05_live_workspace_mine.ipynb`. Keep
+the copy in the same folder so its data paths keep working.
+
+Git ignores `_mine` copies, so they never appear in GitHub Desktop's
+**Changes** tab and never conflict with course updates. The original files stay
+untouched, so pulling always works, even when materials change mid-semester.
+
+If you already edited an original notebook:
+
+1. Rename it so it ends in `_mine.ipynb`. Do this first.
+2. In GitHub Desktop, right-click in the list of changed files and choose
+   **Discard All Changes** to restore the original course files. Discarded
+   changes go to your Trash/Recycle Bin.
+3. Click **Fetch origin**, then **Pull origin**.
+
 ## Updating later
 
-After pulling new course materials, refresh your environment with:
+Pull new course materials with **Fetch origin** and then **Pull origin** in
+GitHub Desktop, or `git pull` in a terminal. Then refresh your environment with:
 
 ```bash
-git pull
 uv sync --frozen
 ```
 
