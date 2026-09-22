@@ -705,7 +705,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
         <li class="mission" id="mission-8">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Mistype the folder name.</strong> Run the script again from the root so a fresh <code>summary.txt</code> appears. Then run <code>mv summary.txt result</code>, with <code>result</code> where <code>results/</code> should be. Look at the tree, then answer below.</div>
+          <div class="mtext"><strong>Mistype the folder name.</strong> What does <code>mv</code> do when the destination folder is spelled wrong? Type <code>python3 scripts/summarize_csv.py</code> to create a new <code>summary.txt</code>, then <code>mv summary.txt result</code>, missing the <code>s</code>. Look at the tree, then answer below.</div>
           <span class="sr-only mstat"></span>
 
           <div class="qcard locked" id="qcard-2">
@@ -1689,7 +1689,7 @@ var MISSION_BRIEF = [
   'From the root, type <code>python3 scripts/summarize_csv.py</code>.',
   'Type <code>cd scripts</code>, then <code>python3 summarize_csv.py</code>, then answer the question under the terminal.',
   'From the root, type <code>mv summary.txt results/</code> (keep the trailing slash).',
-  'Run the script again from the root, then type <code>mv summary.txt result</code>, with <code>result</code> instead of <code>results/</code>. Then answer the question under the terminal.',
+  'Make a new summary.txt: type <code>python3 scripts/summarize_csv.py</code>. Then move it with a typo in the folder name: type <code>mv summary.txt result</code>. Answer the question under the terminal.',
   'Type <code>pwd</code>, then <code>ls -l result</code>, then <code>rm result</code>, then answer the question under the terminal.',
   'Type <code>rm results</code> and read the refusal, then <code>rm -r results</code>, then <code>reset</code>.'
 ];
