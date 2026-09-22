@@ -713,7 +713,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
         <li class="mission" id="mission-9">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Move the summary into <code>results/</code>.</strong> From the root, run <code>mv summary.txt results/</code>. Keep the trailing <code>/</code>: it tells <code>mv</code> the destination must be an existing folder.
+          <div class="mtext"><strong>Move the summary into <code>results/</code>.</strong> From the root, run <code>mv summary.txt results/</code>, then <code>ls results</code>. Keep the trailing <code>/</code>: it tells <code>mv</code> the destination must be an existing folder.
             <span class="mq">Question 4: how will I check the result? Run <code>ls results</code>.</span>
           </div>
           <span class="sr-only mstat"></span>
@@ -1096,11 +1096,13 @@ function cmdLs(argv){
   var human = flags.has('h');
   var targets = operands.length ? operands : [''];
   var multiple = operands.length > 1;
+  LS_SEEN = [];
   var anyOk = false;
 
   targets.forEach(function(t, idx){
     var segs = t === '' ? cwd.slice() : resolvePath(t);
     var node = getNode(segs);
+    if (node && node.type === 'dir') LS_SEEN.push(key(segs));
     if (!node){ outErr('ls: ' + t + ': No such file or directory'); return; }
     anyOk = true;
     if (multiple && idx > 0) out('');
@@ -1273,6 +1275,7 @@ function cmdMv(argv){
   emit('fs-changed');
 }
 var MV_LAST = null;
+var LS_SEEN = [];   /* directories listed by the most recent ls */
 
 function cmdCp(argv){
   if (argv.length !== 3){ outErr('usage: cp source target'); return; }
@@ -1707,7 +1710,7 @@ var MISSION_BRIEF = [
   'Copy a file: type <code>cp notes.md scratch/notes_copy.md</code>, then <code>ls scratch</code>.',
   'From the root, type <code>python3 scripts/summarize_csv.py</code>.',
   'Type <code>cd scripts</code>, then <code>python3 summarize_csv.py</code>, then answer the question under the terminal.',
-  'From the root, type <code>mv summary.txt results/</code> (keep the trailing slash).',
+  'From the root, type <code>mv summary.txt results/</code> (keep the trailing slash), then <code>ls results</code>.',
   'Make a new summary.txt: type <code>python3 scripts/summarize_csv.py</code>. Then move it with a typo in the folder name: type <code>mv summary.txt result</code>. Answer the question under the terminal.',
   'Type <code>pwd</code>, then <code>ls -l result</code>, then <code>rm result</code>, then answer the question under the terminal.',
   'Type <code>rm results</code> and read the refusal, then <code>rm -r results</code>, then <code>reset</code>.'
@@ -1814,12 +1817,13 @@ function afterCommand(cwdBefore){
   }
   if (EVENTS.has('viewed-sample')) completeMission(3);
   if (EVENTS.has('cd-ok') && ck === PROJ_KEY && key(cwdBefore) !== PROJ_KEY) completeMission(4);
-  if (getNode(PROJ.concat(['scratch', 'notes.txt']))) completeMission(5);
-  if (getNode(PROJ.concat(['scratch', 'notes_copy.md']))) completeMission(6);
+  var listedScratch = EVENTS.has('ls-ok') && LS_SEEN.indexOf(PROJ_KEY + '/scratch') !== -1;
+  if (listedScratch && getNode(PROJ.concat(['scratch', 'notes.txt']))) completeMission(5);
+  if (listedScratch && getNode(PROJ.concat(['scratch', 'notes_copy.md']))) completeMission(6);
+  if (EVENTS.has('ls-ok') && LS_SEEN.indexOf(RESULTS_KEY) !== -1 && getNode(PROJ.concat(['results', 'summary.txt']))) completeMission(9);
   if (EVENTS.has('script-ok') && ck === PROJ_KEY) completeMission(7);
   if (EVENTS.has('script-fail') && ck === SCRIPTS_KEY) unlockQ(1, 9);
   if (EVENTS.has('mv-ok') && MV_LAST){
-    if (MV_LAST.to === RESULTS_KEY + '/summary.txt') completeMission(9);
     var typo = MV_LAST.to === PROJ_KEY + '/result' ||
                (MV_LAST.renamed && baseOf(MV_LAST.from) === 'summary.txt' && baseOf(MV_LAST.to) !== 'summary.txt');
     if (typo) unlockQ(2, 11);
