@@ -660,15 +660,15 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
         <li class="mission" id="mission-5">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Make a folder and an empty file.</strong> Run <code>mkdir -p scratch</code>, then <code>touch scratch/notes.txt</code>, then <code>ls scratch</code>. Both appear in the tree.
-            <span class="mq">Question 4: how will I check the result? Run <code>ls scratch</code>.</span>
+          <div class="mtext"><strong>Make a folder, step into it, and create an empty file.</strong> Run <code>mkdir -p scratch</code>, then <code>cd scratch</code>, then <code>touch notes.txt</code>, then <code>ls</code>. The tree shows where you are and the new file.
+            <span class="mq">Question 4: how will I check the result? Run <code>ls</code>.</span>
           </div>
           <span class="sr-only mstat"></span>
         </li>
 
         <li class="mission" id="mission-6">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Copy a file into it.</strong> Run <code>cp notes.md scratch/notes_copy.md</code>, then <code>ls scratch</code>. The original <code>notes.md</code> stays where it was.
+          <div class="mtext"><strong>Go back up and copy a file into the new folder.</strong> Run <code>cd ..</code>, then <code>cp notes.md scratch/notes_copy.md</code>, then <code>ls scratch</code>. The original <code>notes.md</code> stays where it was.
             <span class="mq"><code>cp</code> leaves the original in place; <code>mv</code>, later, does not.</span>
           </div>
           <span class="sr-only mstat"></span>
@@ -1706,8 +1706,8 @@ var MISSION_BRIEF = [
   'Type <code>cd data</code>, then <code>pwd</code> to confirm the move.',
   'Peek at the file: type <code>head sample.csv</code>.',
   'Return to the project root: type <code>cd ..</code>',
-  'Make a folder and a file: type <code>mkdir -p scratch</code>, then <code>touch scratch/notes.txt</code>, then <code>ls scratch</code>.',
-  'Copy a file: type <code>cp notes.md scratch/notes_copy.md</code>, then <code>ls scratch</code>.',
+  'Make a folder and step into it: type <code>mkdir -p scratch</code>, then <code>cd scratch</code>. Create an empty file there: type <code>touch notes.txt</code>, then <code>ls</code>.',
+  'Type <code>cd ..</code> to go back to the root, then <code>cp notes.md scratch/notes_copy.md</code>, then <code>ls scratch</code>.',
   'From the root, type <code>python3 scripts/summarize_csv.py</code>.',
   'Type <code>cd scripts</code>, then <code>python3 summarize_csv.py</code>, then answer the question under the terminal.',
   'From the root, type <code>mv summary.txt results/</code> (keep the trailing slash), then <code>ls results</code>.',
