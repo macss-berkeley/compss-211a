@@ -542,7 +542,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     <h1>Terminal Navigator</h1>
     <div class="chips">
       <span class="chip chip-gold">Week 4 &middot; Command Line</span>
-      <span class="chip chip-outline">&asymp; 12 minutes</span>
+      <span class="chip chip-outline">&asymp; 14 minutes</span>
     </div>
     <p class="promise">Practice moving around a file system in a shell that cannot touch your real computer, see why the working directory decides what every relative path means, then move, rename, and delete files where a mistake costs nothing.</p>
     <hr class="gold-rule">
@@ -572,7 +572,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     <div class="lay-top">
 
       <div class="strip reveal" style="--i:1" role="status" id="strip">
-        <span class="strip-badge" id="strip-badge">Current mission 1 of 11</span>
+        <span class="strip-badge" id="strip-badge">Current mission 1 of 13</span>
         <span id="strip-text">Find out where you are: type <code>pwd</code> and press Enter.</span>
       </div>
 
@@ -618,7 +618,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     <section class="card missions-card reveal" style="--i:5" aria-labelledby="missions-h">
       <div class="missions-head">
         <h2 id="missions-h">Missions</h2>
-        <span class="mcount" id="mcount">0 / 11 complete</span>
+        <span class="mcount" id="mcount">0 / 13 complete</span>
       </div>
       <ol class="missions" id="missions">
 
@@ -660,19 +660,35 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
         <li class="mission" id="mission-5">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Run the summarizer from the project root.</strong> Run <code>python3 scripts/summarize_csv.py</code> and watch <code>summary.txt</code> appear in the tree.
-            <span class="mq">Question 3: what exact path will this command read or change?</span>
+          <div class="mtext"><strong>Make a folder and an empty file.</strong> Run <code>mkdir -p scratch</code>, then <code>touch scratch/notes.txt</code>, then <code>ls scratch</code>. Both appear in the tree.
+            <span class="mq">Question 4: how will I check the result? Run <code>ls scratch</code>.</span>
           </div>
           <span class="sr-only mstat"></span>
         </li>
 
         <li class="mission" id="mission-6">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
+          <div class="mtext"><strong>Copy a file into it.</strong> Run <code>cp notes.md scratch/notes_copy.md</code>, then <code>ls scratch</code>. The original <code>notes.md</code> stays where it was.
+            <span class="mq"><code>cp</code> copies; <code>mv</code>, later, moves.</span>
+          </div>
+          <span class="sr-only mstat"></span>
+        </li>
+
+        <li class="mission" id="mission-7">
+          <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
+          <div class="mtext"><strong>Run the summarizer from the project root.</strong> Run <code>python3 scripts/summarize_csv.py</code> and watch <code>summary.txt</code> appear in the tree.
+            <span class="mq">Question 3: what exact path will this command read or change?</span>
+          </div>
+          <span class="sr-only mstat"></span>
+        </li>
+
+        <li class="mission" id="mission-8">
+          <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
           <div class="mtext"><strong>Run it from the wrong folder.</strong> Run <code>cd scripts</code>, then <code>python3 summarize_csv.py</code>. Read the error carefully, then answer below.</div>
           <span class="sr-only mstat"></span>
 
           <div class="qcard locked" id="qcard-1">
-            <p class="qlock">This question unlocks after you hit the error in mission 7.</p>
+            <p class="qlock">This question unlocks after you hit the error in mission 9.</p>
             <div class="qbody">
               <fieldset disabled id="q1-fs">
                 <legend>Predict, then check: the same script worked from <code>project/</code> a moment ago. Why did it fail from <code>scripts/</code>?</legend>
@@ -695,7 +711,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
           </div>
         </li>
 
-        <li class="mission" id="mission-7">
+        <li class="mission" id="mission-9">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
           <div class="mtext"><strong>Move the summary into <code>results/</code>.</strong> From the root, run <code>mv summary.txt results/</code>. Keep the trailing <code>/</code>: it tells <code>mv</code> the destination must be an existing folder.
             <span class="mq">Question 4: how will I check the result? Run <code>ls results</code>.</span>
@@ -703,13 +719,13 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
           <span class="sr-only mstat"></span>
         </li>
 
-        <li class="mission" id="mission-8">
+        <li class="mission" id="mission-10">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
           <div class="mtext"><strong>Mistype the folder name.</strong> What does <code>mv</code> do when the destination folder is spelled wrong? Type <code>python3 scripts/summarize_csv.py</code> to create a new <code>summary.txt</code>, then <code>mv summary.txt result</code>, missing the <code>s</code>. Look at the tree, then answer below.</div>
           <span class="sr-only mstat"></span>
 
           <div class="qcard locked" id="qcard-2">
-            <p class="qlock">This question unlocks after the mistyped <code>mv</code> in mission 9.</p>
+            <p class="qlock">This question unlocks after the mistyped <code>mv</code> in mission 11.</p>
             <div class="qbody">
               <fieldset disabled id="q2-fs">
                 <legend><code>mv</code> printed nothing, and <code>summary.txt</code> is no longer in the tree. Where did it go?</legend>
@@ -733,7 +749,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
           </div>
         </li>
 
-        <li class="mission" id="mission-9">
+        <li class="mission" id="mission-11">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
           <div class="mtext"><strong>Delete the stray file, in the careful order.</strong> Run <code>pwd</code>, then <code>ls -l result</code> to see the exact file you are about to remove, then <code>rm result</code>. Then answer below.
             <span class="mq">Inspect before changing: name the exact path, then act on that same path.</span>
@@ -741,7 +757,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
           <span class="sr-only mstat"></span>
 
           <div class="qcard locked" id="qcard-3">
-            <p class="qlock">This question unlocks after <code>rm</code> removes a file in mission 10.</p>
+            <p class="qlock">This question unlocks after <code>rm</code> removes a file in mission 12.</p>
             <div class="qbody">
               <fieldset disabled id="q3-fs">
                 <legend><code>rm result</code> printed nothing. Where is the file now?</legend>
@@ -760,7 +776,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
           </div>
         </li>
 
-        <li class="mission" id="mission-10">
+        <li class="mission" id="mission-12">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
           <div class="mtext"><strong>Remove a whole folder, then bring the project back.</strong> Run <code>rm results</code> and read the refusal. Then run <code>rm -r results</code> and watch the folder and everything in it leave the tree. Finally, type <code>reset</code>.
             <span class="mq">This sandbox has <code>reset</code>. Your computer does not.</span>
@@ -782,6 +798,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
       <li><strong><code>..</code> is the parent directory and <code>~</code> is your home directory.</strong> <code>cd -</code> returns to the previous one.</li>
       <li><strong>Tab completion prevents typos.</strong> Use it whenever possible.</li>
       <li><strong>Run project scripts from the repository root,</strong> so the relative paths inside them resolve correctly.</li>
+      <li><strong><code>mkdir -p</code>, <code>touch</code>, and <code>cp</code> create; <code>mv</code> moves.</strong> Run <code>ls</code> on the destination afterwards to check.</li>
       <li><strong>End a destination folder with <code>/</code>.</strong> If the folder does not exist, <code>mv</code> refuses instead of renaming your file.</li>
       <li><strong><code>mv</code> and <code>cp</code> replace an existing destination file without asking.</strong> Check the destination with <code>ls</code> first.</li>
       <li><strong><code>rm</code> does not use the Trash.</strong> <code>pwd</code>, then <code>ls</code> the exact path, then <code>rm</code> that path. <code>-r</code> takes a whole folder.</li>
@@ -1686,6 +1703,8 @@ var MISSION_BRIEF = [
   'Type <code>cd data</code>, then <code>pwd</code> to confirm the move.',
   'Peek at the file: type <code>head sample.csv</code>.',
   'Return to the project root: type <code>cd ..</code>',
+  'Make a folder and a file: type <code>mkdir -p scratch</code>, then <code>touch scratch/notes.txt</code>, then <code>ls scratch</code>.',
+  'Copy a file: type <code>cp notes.md scratch/notes_copy.md</code>, then <code>ls scratch</code>.',
   'From the root, type <code>python3 scripts/summarize_csv.py</code>.',
   'Type <code>cd scripts</code>, then <code>python3 summarize_csv.py</code>, then answer the question under the terminal.',
   'From the root, type <code>mv summary.txt results/</code> (keep the trailing slash).',
@@ -1714,7 +1733,7 @@ function updateStrip(){
     markCurrent(-1);
     stripEl.classList.add('all-done');
     stripBadge.textContent = 'All done';
-    stripText.textContent = 'All ' + TOTAL + ' missions complete. Read the recap card below -- you are set for Friday.';
+    stripText.textContent = 'All ' + TOTAL + ' missions complete. Read the recap card below.';
     return;
   }
   var next = missionDone.indexOf(false);
@@ -1795,15 +1814,17 @@ function afterCommand(cwdBefore){
   }
   if (EVENTS.has('viewed-sample')) completeMission(3);
   if (EVENTS.has('cd-ok') && ck === PROJ_KEY && key(cwdBefore) !== PROJ_KEY) completeMission(4);
-  if (EVENTS.has('script-ok') && ck === PROJ_KEY) completeMission(5);
-  if (EVENTS.has('script-fail') && ck === SCRIPTS_KEY) unlockQ(1, 7);
+  if (getNode(PROJ.concat(['scratch', 'notes.txt']))) completeMission(5);
+  if (getNode(PROJ.concat(['scratch', 'notes_copy.md']))) completeMission(6);
+  if (EVENTS.has('script-ok') && ck === PROJ_KEY) completeMission(7);
+  if (EVENTS.has('script-fail') && ck === SCRIPTS_KEY) unlockQ(1, 9);
   if (EVENTS.has('mv-ok') && MV_LAST){
-    if (MV_LAST.to === RESULTS_KEY + '/summary.txt') completeMission(7);
+    if (MV_LAST.to === RESULTS_KEY + '/summary.txt') completeMission(9);
     var typo = MV_LAST.to === PROJ_KEY + '/result' ||
                (MV_LAST.renamed && baseOf(MV_LAST.from) === 'summary.txt' && baseOf(MV_LAST.to) !== 'summary.txt');
-    if (typo) unlockQ(2, 9);
+    if (typo) unlockQ(2, 11);
   }
-  if (EVENTS.has('rm-file')) unlockQ(3, 10);
+  if (EVENTS.has('rm-file')) unlockQ(3, 12);
   if (EVENTS.has('rm-dir')){
     dirRemoved = true;
     if (!rmDirNoted){
@@ -1811,7 +1832,7 @@ function afterCommand(cwdBefore){
       outNote('(The folder and everything in it are gone. Type reset to bring the project back.)');
     }
   }
-  if (EVENTS.has('reset') && dirRemoved) completeMission(10);
+  if (EVENTS.has('reset') && dirRemoved) completeMission(12);
 }
 
 /* ============================================================
@@ -1851,7 +1872,7 @@ wireQuestion('q1', 'b', {
   b: 'The script&rsquo;s <code>open("data/sample.csv")</code> resolves from the working directory, so from <code>scripts/</code> Python looked for <code>scripts/data/sample.csv</code>.',
   c: 'Nothing moved or disappeared -- check which directory the relative path <code>data/sample.csv</code> was resolved from.'
 }, function(){
-  completeMission(6);
+  completeMission(8);
   var ex = document.getElementById('explainer-1');
   ex.hidden = false;
 });
@@ -1861,7 +1882,7 @@ wireQuestion('q2', 'b', {
   b: 'No folder named <code>result</code> existed, so <code>mv</code> used the second argument as a new name. The file is still there, called <code>result</code>.',
   c: '<code>mv</code> does not guess. It uses the exact path you typed, and <code>result</code> is not <code>results</code>.'
 }, function(){
-  completeMission(8);
+  completeMission(10);
   document.getElementById('explainer-2').hidden = false;
 });
 
@@ -1870,7 +1891,7 @@ wireQuestion('q3', 'b', {
   b: '<code>rm</code> printed nothing because it succeeded. There is no Trash and no undo; only a copy made earlier can bring the file back.',
   c: '<code>ls -a</code> shows hidden files, and <code>rm</code> hides nothing. Run <code>ls -a</code>: <code>result</code> is not there.'
 }, function(){
-  completeMission(9);
+  completeMission(11);
   document.getElementById('explainer-3').hidden = false;
 });
 
