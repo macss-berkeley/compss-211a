@@ -42,7 +42,7 @@ Before collecting more than one page, write down:
 
 Some APIs require a key; others allow small unauthenticated requests. Access rules can change. If a key is used:
 
-- store it in a local environment variable or Colab Secret named `OPENALEX_API_KEY`;
+- store it as `OPENALEX_API_KEY` in your gitignored `.env` file (see "API keys" in `SETUP.md`), or in a Colab Secret with that name;
 - never paste it into a notebook cell;
 - never commit `.env` or credential files;
 - never print it;

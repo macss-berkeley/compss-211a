@@ -58,7 +58,7 @@ For this course's local route, `pyproject.toml` states the direct requirements a
 
 ## Credentials and data boundaries
 
-- Locally, read the key from `GEMINI_API_KEY` in the process environment.
+- Locally, keep the key as `GEMINI_API_KEY` in the gitignored `.env` file; the course notebooks load it into the process environment with `python-dotenv`.
 - In Colab, use the Secrets panel and retrieve the value with `google.colab.userdata.get("GEMINI_API_KEY")`.
 - Display only whether the secret was found, never the secret itself.
 - Never commit keys to Git or paste them into a notebook cell.

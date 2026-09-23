@@ -124,6 +124,41 @@ If you already edited an original notebook:
    changes go to your Trash/Recycle Bin.
 3. Click **Fetch origin**, then **Pull origin**.
 
+## API keys
+
+Some weeks call an online service that needs an API key (a password for
+programs). Gemini, used from Week 10 and in HW5, is one of them. Keep keys in a
+file named `.env` in the top folder of the repository. Git ignores this file,
+so your keys never end up on GitHub.
+
+1. In VS Code's file list, find `.env.example` in the top folder. Right-click it,
+   choose **Copy**, then right-click the top folder and choose **Paste**.
+2. Rename the copy to exactly `.env`: no `.txt` at the end and nothing before the dot.
+3. Open `.env` and replace `paste-your-gemini-key-here` with your key. No quotes,
+   no spaces around the `=`:
+
+   ```text
+   GEMINI_API_KEY=AIzaSy...your-key...
+   ```
+
+4. Save the file. Then run `git status`: `.env` must **not** appear in the list.
+   If it does, stop and ask the instructional team before committing anything.
+
+The course notebooks read `.env` for you and only ever print whether a key was
+found, never the key itself. Don't paste a key into a notebook cell, and don't
+share your `.env` file.
+
+On macOS, Finder hides files whose names start with a dot. VS Code shows them,
+so create and edit `.env` there.
+
+**In Colab**, there is no `.env` file. Instead, click the key icon
+(**Secrets**) in the left sidebar, add a secret with the same name, for example
+`GEMINI_API_KEY`, and turn on **Notebook access**. The notebooks check there
+automatically.
+
+If a key ever ends up in a commit, a screenshot, or a message, delete it in
+[Google AI Studio](https://aistudio.google.com/apikey) and make a new one.
+
 ## Updating later
 
 Pull new course materials with **Fetch origin** and then **Pull origin** in
@@ -143,6 +178,7 @@ notebook kernel still points to the repository's `.venv` environment.
 - `.python-version` tells uv which Python version to use for this project.
 - `.venv/` is the local environment uv creates on your computer. Git ignores it.
 - `requirements-colab.txt` contains only the occasional additions needed in Colab.
+- `.env.example` is a template for your API keys. Your own copy, `.env`, holds the real keys and is ignored by Git.
 
 Students should not edit these files or run `uv add` for ordinary course work. If an assignment appears to need another package, ask the instructional team first.
 

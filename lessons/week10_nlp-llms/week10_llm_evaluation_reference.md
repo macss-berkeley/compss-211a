@@ -90,9 +90,9 @@ Examples of stopping conditions:
 
 ## Credentials and privacy
 
-- Keep API keys in an environment variable or Colab Secret. Never paste them into a notebook, output cell, screenshot, or repository.
+- Keep API keys in your gitignored `.env` file (see "API keys" in `SETUP.md`) or a Colab Secret. Never paste them into a notebook, output cell, screenshot, or repository.
 - Live mode should be off by default.
-- Use only the supplied synthetic teaching records for the course call unless a separate data-governance decision approves another dataset.
+- Send only approved data. Lab 10 uses synthetic teaching records; HW5 uses public r/AmItheAsshole posts from the course dataset, which contain no usernames. Don't send other text to the API without checking with the instructional team.
 - Free and paid services can have different data-use and retention conditions. Dollar cost and privacy cost are different questions.
 
 ## Official references
