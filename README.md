@@ -14,8 +14,6 @@ During the semester, you will:
 - test AI-generated code and evaluate LLM output against simpler methods;
 - move selected workflows between local VS Code, Google Colab, and cloud APIs.
 
-Some exercises use public snapshots; others use synthetic data written for class. 
-
 The course ends with a team project based on a text dataset. Your team will pose a social-science question, build a reproducible analysis, inspect errors and limitations, and present the result through a reproducible repository, a public-facing website, and a short website walkthrough.
 
 ## Local setup
@@ -44,7 +42,7 @@ causes a conflict. See [Working on your own copies](SETUP.md#working-on-your-own
 ## Course data
 
 The local fixtures required by homework and lab notebooks are committed under
-[`data/`](data/). Their sources, synthetic-data labels, and interpretation
+[`data/`](data/). Sources, labels, and interpretation
 limits are documented in [`data/README.md`](data/README.md).
 
 ## Google Colab
