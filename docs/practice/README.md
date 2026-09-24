@@ -54,3 +54,21 @@ path. The parent course repository is not pushed by the private Sites deployment
 The current Sites deployment is an instructor-only prototype. Make a deliberate
 audience decision before sharing it with students. A single stable student URL
 is important so saved progress remains available across weekly updates.
+
+## Python flashcards
+
+Open `#flashcards` from the navigation or use the Flashcards link beside a skill.
+The 32 cards in `flashcards.mjs` cover Python and pandas. Coverage defaults to the
+current course week; Entire course allows review ahead. Prompts require recall
+rather than choosing from multiple-choice answers. Students may type a temporary
+answer before revealing the answer; this scratch text is not saved after reload.
+
+Reviews are saved under `flashcards` in the existing progress record. Again returns
+a card in 1 minute; Hard in 10 minutes for new/learning cards; Good in 1 day; Easy
+in 4 days. For established cards, Hard increases the interval by 1.2x, Good by 2x,
+and Easy by 3x (rounded up, capped at 365 days). Again resets the interval.
+This is a simple interval schedule, not FSRS or an estimate of mastery. Due cards
+come before unseen cards. Review ahead is optional when no cards are due.
+Flashcard reviews do not set the checklist's self-ratings. Backups include review
+schedules, merge the most recent review per card, and accept older backups.
+Dates use the device clock; progress remains local to this browser and origin.

@@ -1,3 +1,4 @@
+import {validateCardReviews} from './flashcards.mjs';
 export const activities = [
   {id:'filter',title:'Filter rows',skill:'select-and-filter',minutes:2},
   {id:'function',title:'Write a function',skill:'writing-functions',minutes:4},
@@ -27,7 +28,7 @@ export const debugs = [
 ];
 export function checkDebug(index,cause,repair){const v=debugs[index];return {passed:cause===v.cause&&repair===v.repair,causeCorrect:cause===v.cause,repairCorrect:repair===v.repair};}
 export const ratingLabels={green:'I can do this',yellow:'I need some guidance',red:'I need help getting started'};
-export function freshProgress(){return {version:1,ratings:{},attempts:{},drafts:{},checks:{}};}
+export function freshProgress(){return {version:1,ratings:{},attempts:{},drafts:{},checks:{},flashcards:{}};}
 export function validateProgress(raw,validIds){
   if(!raw||raw.version!==1||typeof raw.ratings!=='object'||raw.ratings===null||Array.isArray(raw.ratings))throw new Error('Choose a progress backup exported from this site.');
   const out=freshProgress();
@@ -35,6 +36,7 @@ export function validateProgress(raw,validIds){
   for(const id of ['filter','function','debug']){const a=raw.attempts?.[id];if(a){if(!Array.isArray(a.tried)||!Array.isArray(a.passed)||!Number.isFinite(Date.parse(a.updatedAt)))throw new Error('This backup contains invalid practice results.');out.attempts[id]={tried:[...new Set(a.tried.filter(x=>Number.isInteger(x)&&x>=0&&x<3))],passed:[...new Set(a.passed.filter(x=>Number.isInteger(x)&&x>=0&&x<3))],updatedAt:a.updatedAt};}}
   for(let i=0;i<3;i++){const d=raw.drafts?.['function:'+i];if(d){if(typeof d.code!=='string'||d.code.length>20000||!Number.isFinite(Date.parse(d.updatedAt)))throw new Error('This backup contains an invalid code draft.');out.drafts['function:'+i]={code:d.code,updatedAt:d.updatedAt};}}
   for(const [id,c] of Object.entries(raw.checks||{})){if(!validIds.includes(id))continue;if(!c||typeof c.passed!=="boolean"||!Number.isFinite(Date.parse(c.updatedAt)))throw new Error("This backup contains an invalid skill check.");out.checks[id]={passed:c.passed,updatedAt:c.updatedAt};}
+  out.flashcards=validateCardReviews(raw.flashcards);
   return out;
 }
-export function mergeProgress(current,incoming){const merged=freshProgress();for(const group of ['ratings','drafts','checks']){merged[group]={...current[group]};for(const [id,value] of Object.entries(incoming[group]||{}))if(!merged[group][id]||Date.parse(value.updatedAt)>=Date.parse(merged[group][id].updatedAt))merged[group][id]=value;}for(const id of new Set([...Object.keys(current.attempts),...Object.keys(incoming.attempts)])){const a=current.attempts[id],b=incoming.attempts[id];merged.attempts[id]=!a?b:!b?a:{tried:[...new Set([...a.tried,...b.tried])],passed:[...new Set([...a.passed,...b.passed])],updatedAt:Date.parse(a.updatedAt)>Date.parse(b.updatedAt)?a.updatedAt:b.updatedAt};}return merged;}
+export function mergeProgress(current,incoming){const merged=freshProgress();for(const group of ['ratings','drafts','checks','flashcards']){merged[group]={...current[group]};for(const [id,value] of Object.entries(incoming[group]||{}))if(!merged[group][id]||Date.parse(value.updatedAt)>=Date.parse(merged[group][id].updatedAt))merged[group][id]=value;}for(const id of new Set([...Object.keys(current.attempts),...Object.keys(incoming.attempts)])){const a=current.attempts[id],b=incoming.attempts[id];merged.attempts[id]=!a?b:!b?a:{tried:[...new Set([...a.tried,...b.tried])],passed:[...new Set([...a.passed,...b.passed])],updatedAt:Date.parse(a.updatedAt)>Date.parse(b.updatedAt)?a.updatedAt:b.updatedAt};}return merged;}
