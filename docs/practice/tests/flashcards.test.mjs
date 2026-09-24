@@ -5,10 +5,11 @@ import {freshProgress,validateProgress,mergeProgress} from '../exercises.mjs';
 import {skills} from '../catalog.mjs';
 const now=new Date('2026-09-24T12:00:00Z');
 test('flashcard content has stable IDs, standalone questions, answers and real course skills',()=>{
- assert.equal(flashcards.length,32);assert.equal(new Set(flashcards.map(c=>c.id)).size,32);
+ assert.equal(flashcards.length,100);assert.equal(new Set(flashcards.map(c=>c.id)).size,100);
+ assert.deepEqual([...new Set(flashcards.map(c=>c.deck))].sort(),["Analysis","Python","SQL","pandas"]);
  for(const c of flashcards){assert.ok(skills.some(s=>s.id===c.skill));assert.ok(c.prompt);assert.ok(c.answer||c.answerCode);}
  assert.ok(availableCards({week:3}).every(c=>skills.find(s=>s.id===c.skill).releaseWeek<=3));
- assert.equal(availableCards({week:3,scope:'all'}).length,32);
+ assert.equal(availableCards({week:3,scope:'all'}).length,100);
  assert.ok(availableCards({week:13,deck:'pandas'}).every(c=>c.deck==='pandas'));
 });
 test('review intervals distinguish forgotten, difficult and recalled cards and cap growth',()=>{

@@ -55,10 +55,10 @@ The current Sites deployment is an instructor-only prototype. Make a deliberate
 audience decision before sharing it with students. A single stable student URL
 is important so saved progress remains available across weekly updates.
 
-## Python flashcards
+## Flashcards
 
 Open `#flashcards` from the navigation or use the Flashcards link beside a skill.
-The 32 cards in `flashcards.mjs` cover Python and pandas. Coverage defaults to the
+The 100 cards in `flashcards.mjs` cover Python, pandas, SQL, and analysis decisions. Coverage defaults to the
 current course week; Entire course allows review ahead. Prompts require recall
 rather than choosing from multiple-choice answers. Students may type a temporary
 answer before revealing the answer; this scratch text is not saved after reload.

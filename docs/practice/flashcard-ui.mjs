@@ -12,9 +12,9 @@ export function createFlashcards({getProgress,save,getWeek,skills,esc,title}){
     const card=cards.find(c=>c.id===state.card),skill=skills.find(s=>s.id===card?.skill);
     const pending=cards.filter(c=>reviews()[c.id]).sort((a,b)=>Date.parse(reviews()[a.id].dueAt)-Date.parse(reviews()[b.id].dueAt));
     const next=pending[0]&&reviews()[pending[0].id].dueAt;
-    return title('Python flashcards','Answer from memory, then reveal the answer.')+`
+    return title('Flashcards','Answer from memory, then reveal the answer.')+`
       ${state.skill?`<p><a href="#flashcards">All flashcards</a> · ${esc(skills.find(s=>s.id===state.skill).title)}</p>`:''}
-      <div class="filters flash-filters"><label>Deck<select id="flash-deck"><option value="all">Python + pandas</option>${['Python','pandas'].map(d=>`<option value="${d}" ${state.deck===d?'selected':''}>${d}</option>`).join('')}</select></label><label>Coverage<select id="flash-scope"><option value="covered" ${state.scope==='covered'?'selected':''}>Covered through Week ${getWeek()}</option><option value="all" ${state.scope==='all'?'selected':''}>Entire course</option></select></label></div>
+      <div class="filters flash-filters"><label>Deck<select id="flash-deck"><option value="all">All decks</option>${['Python','pandas','SQL','Analysis'].map(d=>`<option value="${d}" ${state.deck===d?'selected':''}>${d}</option>`).join('')}</select></label><label>Coverage<select id="flash-scope"><option value="covered" ${state.scope==='covered'?'selected':''}>Covered through Week ${getWeek()}</option><option value="all" ${state.scope==='all'?'selected':''}>Entire course</option></select></label></div>
       <p class="flash-stats">${due.filter(c=>reviews()[c.id]).length} due · ${due.filter(c=>!reviews()[c.id]).length} new · ${cards.length} cards</p>
       ${state.note?`<p class="micro" role="status">${esc(state.note)}</p>`:''}
       ${card?`<article class="flashcard" data-card-id="${card.id}">
