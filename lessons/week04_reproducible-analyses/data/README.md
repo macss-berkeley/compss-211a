@@ -1,35 +1,35 @@
-# SF311 request extract
+# SF311 request data
 
-`sf311_requests.csv` contains 16,876 requests opened August 3–9, 2026, downloaded from [311 Cases on DataSF](https://data.sf.gov/City-Infrastructure/311-Cases/vw6y-z8j6) on September 22, 2026. One row represents one request. Status and closure information reflect the download date, rather than the end of the opening week.
-
-The extract selects every source record with `requested_datetime` from August 3 at 00:00 up to, but not including, August 10 at 00:00, using the source's timestamp values. Keep this CSV unchanged when rerunning the report; a later download may contain different values.
+`sf311_requests.csv` contains 16,876 requests opened August 3–9, 2026. Each row is one request. The records were downloaded from [311 Cases on DataSF](https://data.sf.gov/City-Infrastructure/311-Cases/vw6y-z8j6) on September 22, 2026.
 
 ## Columns
 
 | Column | Source field | Meaning |
 | --- | --- | --- |
-| `request_id` | `service_request_id` | Request identifier; read as text |
-| `opened_at` | `requested_datetime` | Recorded opening timestamp |
-| `closed_at` | `closed_date` | Recorded closure timestamp; may be missing |
-| `status` | `status_description` | Open or Closed at extraction |
-| `category` | `service_name` | Request type, using the source label |
-| `channel` | `source` | Reporting channel, such as Phone or Web; may be missing |
+| `request_id` | `service_request_id` | Request ID; read as text |
+| `opened_at` | `requested_datetime` | Recorded opening time |
+| `closed_at` | `closed_date` | Recorded closure time; may be missing |
+| `status` | `status_description` | Open or Closed when downloaded |
+| `category` | `service_name` | Request type, with the city's label |
+| `channel` | `source` | How the request was reported, such as Phone or Web; may be missing |
 | `district` | `supervisor_district` | Supervisorial district; may be missing |
-| `hours_to_close` | Calculated | Elapsed hours between opening and closure when nonnegative; otherwise blank |
+| `hours_to_close` | Calculated | Hours from opening to closure; blank if closure is missing or recorded before opening |
 | `duration_note` | Calculated | `Recorded`, `No closure recorded`, or `Closure before opening` |
 
-## Preparation and reporting decisions
+## File preparation
 
-The seven source fields above were retained and renamed. District labels such as `5.0` were written as `5`; category and channel labels were preserved, including `Test`. Addresses, coordinates, photos and other fields are outside this extract. No request rows were filtered out after the opening-date selection.
+The file keeps the seven source columns listed above, with shorter names, and adds two calculated columns. District values such as `5.0` were changed to `5`. Category and channel labels are unchanged, including `Test`. Addresses, coordinates, photos and other source columns were left out. All requests from the selected opening dates were kept.
 
-`hours_to_close` is calculated from the original timestamps. A missing closure timestamp or a closure preceding opening leaves the duration blank. The request still counts in the report; its duration does not enter the median. Missing and negative durations are not replaced with zero. The original timestamps are retained so these decisions can be checked.
+`hours_to_close` comes from subtracting the opening time from the closure time. If closure is missing or recorded before opening, the duration is left blank. That request still counts in the report, but contributes no value to the median. A blank duration is never filled with zero. The original timestamps are in the file if you want to check the calculation.
 
-There are 72 missing channels and 110 missing districts. These groups can overlap with requests lacking usable durations. The summary function retains requests with missing district labels in a separate group, shown as `<NA>` in the notebook and a blank district in CSV output.
+There are 72 requests without a channel and 110 without a district. Some of these also lack a usable duration. The summary function keeps requests without a district together in one group. Its district label appears as `<NA>` in the notebook and is blank in the output CSV.
 
-## Interpretation
+## Reading the results
 
-Recorded closure is an administrative event; it does not establish whether or when the underlying problem was resolved. The extract covers requests made during one selected week, not all problems or needs across the city. Medians describe the requests with usable durations, so read them alongside the request and usable-duration counts. Consult the [city's dataset explanation](https://sfdigitalservices.gitbook.io/dataset-explainers/311-cases) for coverage, repeated reports and channel definitions.
+A closure timestamp records when a request was marked closed in the system. It does not indicate whether or when the problem was fixed. These records cover the requests people made during one week; they cannot tell us about problems that went unreported.
+
+The median uses only requests with usable closure times. Check `with_time` against `requests` to see how much of each group it describes. The [city's dataset explanation](https://sfdigitalservices.gitbook.io/dataset-explainers/311-cases) provides more information on what 311 covers, repeated reports of the same incident and reporting channels.
 
 ## License
 
-The source is licensed under the [Open Data Commons Public Domain Dedication and License](https://opendatacommons.org/licenses/pddl/1-0/).
+The source data are licensed under the [Open Data Commons Public Domain Dedication and License](https://opendatacommons.org/licenses/pddl/1-0/).
