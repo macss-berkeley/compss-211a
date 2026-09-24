@@ -72,3 +72,24 @@ h1,h2,h3{font-family:var(--heading)}h1{font-weight:800;letter-spacing:-.015em}
 .flash-known li{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 0;border-bottom:1px solid var(--line)}
 .flash-known li span{font-size:14px}.flash-known li button{flex-shrink:0;font-size:14px}
 @media(max-width:760px){.rating-options{grid-template-columns:1fr}.flash-known li{align-items:start;flex-direction:column;gap:10px}}
+
+/* One main link per skill; utility navigation stays secondary. */
+.layout{grid-template-columns:200px minmax(0,1fr)}
+.sidebar{padding:28px 14px}
+.sidebar nav a{font-size:15px;gap:8px}
+.sidebar nav a.nav-utility{margin-top:18px;border-top:1px solid var(--line);border-radius:0;padding-top:20px;font-size:14px}
+.sidebar nav a .count{font-size:12px!important;line-height:1.4;width:auto!important;text-align:center}
+.skill-row{padding:15px 20px;gap:14px}
+.skill-row h3 .skill-title{display:inline-block;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;padding:6px 0;line-height:1.4}
+.skill-row h3 .skill-title:hover{color:#123e94;text-decoration-thickness:2px}
+.skill-row p{margin-bottom:3px}
+.skill-row select{min-height:44px}
+.page-heading h1{margin-bottom:0}
+.page-heading .lede{margin-top:10px}
+@media(max-width:760px){
+ .layout{display:block}.sidebar{padding:8px 12px}
+ .sidebar nav{flex-wrap:wrap;overflow:visible;gap:4px;padding:0}
+ .sidebar nav a,.sidebar nav a:last-child{font-size:14px;min-height:44px;padding:10px}
+ .sidebar nav a.nav-utility{margin:0;border:0;font-size:14px;padding:10px}
+ .skill-row{padding:14px 16px}
+}
