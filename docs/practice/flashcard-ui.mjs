@@ -1,4 +1,4 @@
-import {availableCards,dueCards,reviewOptions,scheduleReview,setCardSuspended,intervalLabel} from './flashcards.mjs?v=20260924-review';
+import {availableCards,dueCards,reviewOptions,scheduleReview,setCardSuspended,intervalLabel} from './flashcards.mjs?v=20260924-wording';
 export function createFlashcards({getProgress,save,getWeek,skills,esc,title}){
   const state={deck:'all',scope:'covered',skill:null,card:null,revealed:false,note:'',draft:'',knownOpen:false};
   const reviews=()=>getProgress().flashcards||{};
