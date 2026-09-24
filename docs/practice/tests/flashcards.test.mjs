@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {flashcards,reviewOptions,scheduleReview,dueCards,availableCards,validateCardReviews} from '../flashcards.mjs';
+import {flashcards,reviewOptions,scheduleReview,dueCards,availableCards,validateCardReviews,setCardSuspended} from '../flashcards.mjs';
 import {freshProgress,validateProgress,mergeProgress} from '../exercises.mjs';
 import {skills} from '../catalog.mjs';
 const now=new Date('2026-09-24T12:00:00Z');
@@ -15,9 +15,9 @@ test('flashcard content has stable IDs, standalone questions, answers and real c
 test('review intervals distinguish forgotten, difficult and recalled cards and cap growth',()=>{
  const again=scheduleReview(undefined,'again',now),hard=scheduleReview(undefined,'hard',now),good=scheduleReview(undefined,'good',now),easy=scheduleReview(undefined,'easy',now);
  assert.equal(Date.parse(again.dueAt)-now,60000);assert.equal(again.intervalDays,0);
- assert.equal(Date.parse(hard.dueAt)-now,600000);assert.equal(Date.parse(good.dueAt)-now,86400000);assert.equal(Date.parse(easy.dueAt)-now,4*86400000);
+ assert.equal(Date.parse(hard.dueAt)-now,600000);assert.equal(Date.parse(good.dueAt)-now,86400000);assert.equal(Date.parse(easy.dueAt)-now,14*86400000);
  assert.equal(scheduleReview(good,'good',now).intervalDays,2);
- assert.equal(scheduleReview(easy,'easy',now).intervalDays,12);
+ assert.equal(scheduleReview(easy,'easy',now).intervalDays,42);
  assert.equal(scheduleReview(easy,'again',now).intervalDays,0);
  assert.ok(reviewOptions({intervalDays:360}).every(o=>o.days<=365));
  assert.throws(()=>scheduleReview(undefined,'invalid',now));
@@ -38,4 +38,25 @@ test('flashcard schedules survive restore, merge by recency and preserve old bac
  assert.throws(()=>validateCardReviews({[id]:{...b.flashcards[id],dueAt:'bad date'}}));
  assert.throws(()=>validateCardReviews({[id]:{...b.flashcards[id],intervalDays:Infinity}}));
  assert.deepEqual(validateCardReviews({unknown:{}}),{});
+});
+
+test('already-known cards stay out of review; restoring makes them due without counting a review',()=>{
+ const c=flashcards[0],known=setCardSuspended(undefined,true,now);
+ assert.equal(known.reviews,0);
+ assert.deepEqual(dueCards([c],{[c.id]:known},new Date('2030-01-01')),[]);
+ const restored=setCardSuspended(known,false,new Date(now.getTime()+1000));
+ assert.equal(restored.reviews,0);
+ assert.equal(dueCards([c],{[c.id]:restored},new Date(now.getTime()+1000)).length,1);
+ const reviewed=scheduleReview(restored,'easy',now);
+ assert.equal(reviewed.reviews,1);assert.equal(reviewed.suspended,undefined);
+ assert.equal(scheduleReview({intervalDays:1},'easy',now).intervalDays,14);
+});
+test('known and restored cards survive JSON backups and merge by the latest change',()=>{
+ const id=flashcards[0].id,a=freshProgress(),b=freshProgress();
+ a.flashcards[id]=setCardSuspended(undefined,true,now);
+ b.flashcards[id]=setCardSuspended(a.flashcards[id],false,new Date(now.getTime()+1000));
+ for(const p of [a,b])assert.deepEqual(validateProgress(JSON.parse(JSON.stringify(p)),skills.map(s=>s.id)).flashcards,p.flashcards);
+ assert.deepEqual(mergeProgress(a,b).flashcards,b.flashcards);
+ assert.deepEqual(mergeProgress(b,a).flashcards,b.flashcards);
+ assert.throws(()=>validateCardReviews({[id]:{...a.flashcards[id],suspended:'yes'}}));
 });

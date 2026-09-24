@@ -56,3 +56,19 @@ h1,h2,h3{font-family:var(--heading)}h1{font-weight:800;letter-spacing:-.015em}
 @media(max-width:760px){.skill-overview{padding:16px}.rating-totals{display:grid;grid-template-columns:1fr 1fr;gap:12px}.skill-squares{grid-template-columns:repeat(auto-fill,44px);gap:6px}}
 
 .filters label{min-width:0;flex:1 1 190px}.filters input,.filters select{width:100%;min-width:0}
+
+.workspace .rating-bar{margin-top:24px;padding:22px 0 0}
+.rating-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.rating-options button{text-align:left;align-content:start;padding:12px}
+.rating-options strong{display:block;font-size:14px}
+.rating-guidance{display:block;font-size:14px;line-height:1.5;margin-top:8px}
+.rating-options .rating-clear{grid-column:1 / -1;justify-self:start;padding:7px 11px}
+.rating-bar .rating-saved{margin:12px 0 0;min-height:1.5em;color:var(--ink)}
+.flash-known-action{margin-top:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.flash-known-action span{font-size:14px;color:var(--muted)}
+.flash-known{max-width:850px;margin-top:24px;border-top:1px solid var(--line);padding-top:18px}
+.flash-known summary{cursor:pointer;font-weight:600}
+.flash-known ul{list-style:none;padding:0;margin:14px 0}
+.flash-known li{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 0;border-bottom:1px solid var(--line)}
+.flash-known li span{font-size:14px}.flash-known li button{flex-shrink:0;font-size:14px}
+@media(max-width:760px){.rating-options{grid-template-columns:1fr}.flash-known li{align-items:start;flex-direction:column;gap:10px}}

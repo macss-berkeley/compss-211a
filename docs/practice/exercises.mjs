@@ -1,4 +1,4 @@
-import {validateCardReviews} from './flashcards.mjs';
+import {validateCardReviews} from './flashcards.mjs?v=20260924-review';
 export const activities = [
   {id:'filter',title:'Filter rows',skill:'select-and-filter',minutes:2},
   {id:'function',title:'Write a function',skill:'writing-functions',minutes:4},
