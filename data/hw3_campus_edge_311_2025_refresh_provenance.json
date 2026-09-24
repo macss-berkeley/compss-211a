@@ -1,0 +1,9 @@
+{
+  "source": "City of Berkeley 311 Cases",
+  "endpoint": "https://data.cityofberkeley.info/resource/p88g-6gs2.csv",
+  "retrieved_on": "2026-09-23",
+  "selection": "Same query as hw3_campus_edge_311_2025 (cases opened during 2025 within latitude 37.862 to 37.884 and longitude -122.274 to -122.244, ordered by case_id), re-run one month later. 1,093 records.",
+  "purpose": "HW3 join task: compare the 2026-08-23 snapshot with this refresh to see how a live open-data portal changes over time.",
+  "fields": ["case_id", "date_opened", "case_status", "last_action_date", "date_closed", "case_request", "city", "state", "latitude", "longitude"],
+  "format": "csv"
+}
