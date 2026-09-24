@@ -101,3 +101,8 @@ h1,h2,h3{font-family:var(--heading)}h1{font-weight:800;letter-spacing:-.015em}
 .outline-group ul{padding-left:22px;margin:0}
 .outline-group li{padding-left:3px;margin:0 0 12px;line-height:1.65;overflow-wrap:anywhere}
 .outline-link{font-weight:600;text-underline-offset:3px}
+
+.square-tooltip{position:fixed;z-index:20;width:max-content;max-width:min(280px,calc(100vw - 24px));padding:12px 15px;border-radius:4px;background:var(--blue);color:white;box-shadow:0 3px 12px #0003;text-align:left;white-space:normal;overflow-wrap:anywhere;font-size:14px;line-height:1.5;font-weight:400}
+.square-tooltip[hidden]{display:none}
+.square-tooltip strong{display:block;font-size:16px;margin-bottom:3px}
+.square-tooltip>span{display:block;color:#e3ebfa}
