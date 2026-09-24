@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>One Dataset, Four Formats · COMPSS 211A</title>
-<meta name="description" content="The same records as CSV, TSV, JSON, and XML: what each format preserves, loses, and quietly changes.">
+<title>One dataset, four formats · COMPSS 211A</title>
+<meta name="description" content="The same records saved as CSV, TSV, JSON, and XML, and what each format keeps or loses.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Inter+Tight:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -167,6 +167,7 @@ html,body{overflow-x:clip}
 h2 .step{color:var(--berkeley)}
 footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(50% - 50vw) 0;padding:20px calc(50vw - 50%) 26px;border-top:0}
 </style>
+<link rel="stylesheet" href="sandbox/sandbox.css">
 </head>
 <body>
 <div class="wrap">
@@ -174,24 +175,24 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
 <header>
   <p class="eyebrow rise d1">COMPSS 211A · Computing I</p>
-  <h1 class="rise d1">One Dataset, Four Formats</h1>
+  <h1 class="rise d1">One dataset, four formats</h1>
   <div class="chips rise d2">
     <span class="chip chip-gold">Week 5 · Structured Data</span>
     <span class="chip chip-line">≈ 7 minutes</span>
   </div>
   <p class="lede rise d2">
-    CSV, TSV, JSON, and XML are four ways of writing down the same records. Each
-    format preserves some things and loses others. This page shows you which.
+    CSV, TSV, JSON, and XML are four ways to save the same records in a file. They
+    don't all keep the same information. Here you can see what each one keeps and what it loses.
   </p>
 </header>
 <hr class="rule rise d2">
 
 <!-- ══════════════ 1 · the records ══════════════ -->
 <section class="rise d3" aria-labelledby="s1">
-  <h2 id="s1"><span class="step">1·</span>What you mean</h2>
+  <h2 id="s1"><span class="step">1·</span>The records</h2>
   <p class="section-note">
-    Four service requests as a tidy table: one row per case, one type per column.
-    <strong>Click any cell</strong>, then find that value in each format below.
+    Here are four service requests in a table: one row per request, one type of value per column.
+    <strong>Click any cell</strong>, then look for the same value in each format below.
   </p>
   <div class="card">
     <span class="tag-synth">Synthetic example, not real 311 records</span>
@@ -209,15 +210,15 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
       <tbody></tbody>
     </table>
     </div>
-    <p class="hint">The interesting cells: the quoted description, the two kinds of missing value, and every <code>case_id</code>.</p>
+    <p class="hint">Try these cells first: the description with quotes in it, the two empty cells, and any <code>case_id</code>.</p>
     <div class="misscap" id="missCap" aria-live="polite">Click a cell to trace it through the formats below.</div>
   </div>
 </section>
 
 <!-- ══════════════ 2 · four costumes ══════════════ -->
 <section class="rise d3" aria-labelledby="s2">
-  <h2 id="s2"><span class="step">2·</span>How it gets written down</h2>
-  <p class="section-note">The same four records in each format. Your selection stays highlighted when you switch tabs.</p>
+  <h2 id="s2"><span class="step">2·</span>The same records in four formats</h2>
+  <p class="section-note">Switch between the tabs. The cell you clicked stays highlighted in each one.</p>
   <div style="margin-bottom:34px">
     <div class="tabs" role="tablist" aria-label="Data formats">
       <button role="tab" id="tab-csv"  aria-selected="true"  aria-controls="panel-fmt">CSV</button>
@@ -231,15 +232,15 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
 <!-- ══════════════ 3 · hazard drills ══════════════ -->
 <section class="rise d4" aria-labelledby="s3">
-  <h2 id="s3"><span class="step">3·</span>Three traps, three drills</h2>
+  <h2 id="s3"><span class="step">3·</span>Three common mistakes</h2>
   <p class="section-note">Pick an answer before you check.</p>
 
   <div class="qcard" id="q1">
-    <h3>Drill 1 · The comma trap</h3>
+    <h3>Question 1 · A comma inside a value</h3>
     <p style="font-size:.93rem">Case 0042’s description is
       <code style="font-family:var(--mono);font-size:.8rem">Broken light, near the "north path" entrance</code>.
-      A classmate skips the parser and writes <code style="font-family:var(--mono);font-size:.8rem">line.split(",")</code>
-      on its CSV row. The row has 7 columns. How many pieces does the split produce?</p>
+      Instead of using pandas, a classmate splits its CSV line with <code style="font-family:var(--mono);font-size:.8rem">line.split(",")</code>.
+      The row has 7 columns. How many pieces does the split produce?</p>
     <div class="opts" role="radiogroup" aria-labelledby="q1">
       <label><input type="radio" name="q1" value="a"> 7, one per column</label>
       <label><input type="radio" name="q1" value="b"> 8, because the comma inside the description also splits</label>
@@ -251,7 +252,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
   </div>
 
   <div class="qcard" id="q2">
-    <h3>Drill 2 · The leading-zero trap</h3>
+    <h3>Question 2 · An ID that starts with zero</h3>
     <p style="font-size:.93rem">You load the CSV with a default <code style="font-family:var(--mono);font-size:.8rem">pd.read_csv("cases.csv")</code>
       and print the first <code style="font-family:var(--mono);font-size:.8rem">case_id</code>. What do you see?</p>
     <div class="opts" role="radiogroup" aria-labelledby="q2">
@@ -264,11 +265,11 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
   </div>
 
   <div class="qcard" id="q3">
-    <h3>Drill 3 · The nesting question</h3>
+    <h3>Question 3 · Values inside values</h3>
     <p style="font-size:.93rem">Suppose you want <code style="font-family:var(--mono);font-size:.8rem">lat</code> and
       <code style="font-family:var(--mono);font-size:.8rem">lon</code> grouped together under a single
       <code style="font-family:var(--mono);font-size:.8rem">location</code>, the way a Python dictionary would hold them.
-      Which formats can express that grouping directly?</p>
+      Which formats can store them that way?</p>
     <div class="opts" role="radiogroup" aria-labelledby="q3">
       <label><input type="radio" name="q3" value="a"> All four, since grouping is just a naming convention</label>
       <label><input type="radio" name="q3" value="b"> JSON and XML, which nest; CSV and TSV must flatten into extra columns</label>
@@ -281,10 +282,10 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
 <!-- ══════════════ 4 · reconciliation ══════════════ -->
 <section class="rise d4" aria-labelledby="s4">
-  <h2 id="s4"><span class="step">4·</span>Same data? Prove it.</h2>
+  <h2 id="s4"><span class="step">4·</span>Do the four files really match?</h2>
   <p class="section-note">
-    HW3 asks you to load one snapshot in all four formats and show they agree.
-    Run the three checks.
+    In HW3 you load the same data from all four formats and check that they match.
+    Run the three checks below to see how.
   </p>
   <div class="card recon">
     <div class="checkrow">
@@ -300,7 +301,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
       <button class="btn btn-ghost" id="chkMiss">Run</button>
       <div style="flex:1">
         <h3>Check 2 · Missingness</h3>
-        <p>Count missing values per column, and notice that the kinds of missing do not survive every format.</p>
+        <p>Count the missing values in each column. Notice that some formats can't tell two kinds of missing apart.</p>
         <div id="outMiss"></div>
       </div>
       <span class="status" id="stMiss" hidden></span>
@@ -308,8 +309,8 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     <div class="checkrow">
       <button class="btn btn-ghost" id="chkTypes">Run</button>
       <div style="flex:1">
-        <h3>Check 3 · Dtypes</h3>
-        <p>Compare column types after loading with defaults.</p>
+        <h3>Check 3 · Column types</h3>
+        <p>Compare the type pandas gives each column when you load the file without any options.</p>
         <div id="outTypes"></div>
         <button class="btn" id="fixTypes" style="display:none;margin-top:10px">Re-read with <span style="font-family:var(--mono);font-weight:500">dtype={"case_id": str}</span></button>
       </div>
@@ -318,17 +319,36 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
   </div>
 </section>
 
+<!-- ══════════════ try it in Python ══════════════ -->
+<section class="rise d4" aria-labelledby="s4b">
+  <h2 id="s4b"><span class="step">5·</span>Try it in real Python</h2>
+  <p class="section-note">
+    The same four records are saved below as <code>cases.csv</code>, <code>cases.tsv</code>, <code>cases.json</code>, and <code>cases.xml</code>.
+    This is real Python with pandas, running in your browser. The first run takes a few seconds while Python loads,
+    and it needs an internet connection.
+  </p>
+  <div class="card">
+    <ol style="margin:0 0 6px 18px;padding:0;font-size:.95rem">
+      <li>Press <strong>Run</strong>. What happened to the <code>case_id</code> <code>0042</code>?</li>
+      <li>Fix it: change the first line to <code>pd.read_csv("cases.csv", dtype={"case_id": str})</code> and run it again.</li>
+      <li>Load the JSON file too: <code>json_rows = pd.read_json("cases.json", dtype={"case_id": str})</code>. Compare <code>csv_rows.isna().sum()</code> with <code>json_rows.isna().sum()</code>. Do both files agree on what's missing?</li>
+      <li>Look at a raw file: <code>print(open("cases.csv").read())</code>. Find the quotes around the description with a comma in it.</li>
+    </ol>
+    <div id="formats-python"></div>
+  </div>
+</section>
+
 <!-- ══════════════ recap ══════════════ -->
 <section class="rise d4" aria-labelledby="s5">
   <h2 id="s5"><span class="step">✓</span>Remember</h2>
   <div class="card recap">
     <ul>
-      <li>Every format has parsing rules (quoting, escaping, nesting), and those rules are part of the data.</li>
-      <li><strong>CSV and TSV carry no type information.</strong> Check dtypes after reading, and force string dtypes for identifier columns like <code style="font-family:var(--mono);font-size:.8rem">case_id</code>.</li>
-      <li><strong>JSON</strong> distinguishes <code style="font-family:var(--mono);font-size:.8rem">"0042"</code> from <code style="font-family:var(--mono);font-size:.8rem">42</code>, nests like Python lists and dictionaries, and has an explicit <code style="font-family:var(--mono);font-size:.8rem">null</code>.</li>
-      <li><strong>XML</strong> nests with elements and attributes; absence can be an empty element or no element at all.</li>
-      <li>Missing values come in several forms (empty string, <code style="font-family:var(--mono);font-size:.8rem">null</code>, absent key), and flat formats collapse them into one.</li>
-      <li><strong>Reconciliation means comparing row counts, missingness, and dtypes</strong> in the notebook, not eyeballing the files.</li>
+      <li>Every format has its own rules for quotes, commas, and nesting. Use a real reader such as <code style="font-family:var(--mono);font-size:.8rem">pd.read_csv</code>, not your own splitting code.</li>
+      <li><strong>CSV and TSV don't store types.</strong> After loading, check <code style="font-family:var(--mono);font-size:.8rem">.dtypes</code>, and load ID columns such as <code style="font-family:var(--mono);font-size:.8rem">case_id</code> as text.</li>
+      <li><strong>JSON</strong> can tell <code style="font-family:var(--mono);font-size:.8rem">"0042"</code> (text) from <code style="font-family:var(--mono);font-size:.8rem">42</code> (a number), can put values inside other values like a Python dictionary, and has <code style="font-family:var(--mono);font-size:.8rem">null</code> for missing values.</li>
+      <li><strong>XML</strong> can also put values inside other values. A missing value can be an empty tag or no tag at all.</li>
+      <li>"Missing" can mean different things: an empty string, <code style="font-family:var(--mono);font-size:.8rem">null</code>, or a key that isn't there. CSV and TSV turn all of these into the same empty cell.</li>
+      <li><strong>To check that files match, compare row counts, missing values, and column types</strong> in your notebook. Looking at the files isn't enough.</li>
     </ul>
   </div>
 </section>
@@ -441,9 +461,9 @@ const CAPS={
   "lon-2":"In the table this is <b>None</b>: the value was looked up and recorded as unknown. CSV and TSV write it as an empty field. JSON keeps an explicit <b>null</b>. XML uses an empty element <b>&lt;lon/&gt;</b>.",
   "description-2":"This value was <b>never recorded</b>. JSON has no “description” key and XML has no element, but CSV and TSV still need an empty slot. So “never recorded” and “recorded as unknown” end up looking the same.",
   "description-0":"A comma and quotes inside one value. CSV handles this with quoting rules; note the doubled <b>\"\"</b>. Use a real parser, not <code>split(\",\")</code>.",
-  "case_id":"Looks like a number, works as an identifier. JSON can mark it as a string with quotes. CSV and TSV cannot record types at all, so the reader has to already know.",
-  "minutes_open":"A true integer. JSON writes it bare (no quotes); in CSV/TSV it is indistinguishable from text until a parser guesses.",
-  "default":"Follow the highlight in each tab to see how each format writes this value."
+  "case_id":"It looks like a number, but it's an ID. JSON can mark it as text with quotes. CSV and TSV can't store types at all, so whoever reads the file has to know.",
+  "minutes_open":"A real number, one you could add or average. JSON writes it without quotes. In CSV and TSV it looks like any other text until a reader guesses its type.",
+  "default":"Follow the highlight in each tab to see how each format saves this value."
 };
 const missCap=document.getElementById("missCap");
 function caption(rec,field){
@@ -484,14 +504,14 @@ renderPanel();
 /* ---------- drills ---------- */
 const ANSWERS={
   q1:{correct:"b",
-      good:"Right: 8 pieces. split(\",\") ignores quoting, so the comma inside the description breaks the row. Use pd.read_csv. TSV avoids commas, but every format still has parsing rules you have to respect.",
-      bad:"It makes 8 pieces. split(\",\") knows nothing about quoting, so the comma inside the description also splits. A real parser like pd.read_csv reads the quotes correctly."},
+      good:"Right: 8 pieces. split(\",\") doesn't understand quotes, so the comma inside the description splits the row. Use pd.read_csv instead. TSV avoids this problem, but every format has its own rules.",
+      bad:"It makes 8 pieces. split(\",\") doesn't understand quotes, so the comma inside the description splits the row too. pd.read_csv reads the quotes correctly."},
   q2:{correct:"b",
       good:"Right: pandas sees digits, guesses integer, and 0042 becomes 42 with no warning. Use dtype={\"case_id\": str} and check .dtypes after loading.",
       bad:"It prints 42. CSV cannot mark a column as text, so pandas guesses integer from the digits and drops the leading zero without a warning. Fix: dtype={\"case_id\": str}, then check .dtypes."},
   q3:{correct:"b",
-      good:"Right: JSON and XML nest the way lists and dictionaries do. CSV and TSV are flat, so the grouping has to be faked with column names like location_lat.",
-      bad:"JSON and XML can nest values the way Python dictionaries do. CSV and TSV are flat, so grouping has to be faked with column names like location_lat and location_lon."}
+      good:"Right: JSON and XML can put values inside values, like a Python dictionary. CSV and TSV are flat, so you need extra columns with names like location_lat.",
+      bad:"JSON and XML can put values inside values, like a Python dictionary. CSV and TSV are flat, so you need extra columns with names like location_lat and location_lon."}
 };
 document.querySelectorAll("[data-check]").forEach(btn=>{
   btn.addEventListener("click",()=>{
@@ -527,8 +547,8 @@ document.getElementById("chkMiss").addEventListener("click",function(){
       <tr><th>CSV/TSV</th><td>1 empty</td><td>1 empty</td></tr>
       <tr><th>JSON</th><td>1 null</td><td>1 absent key</td></tr>
       <tr><th>XML</th><td>1 empty element</td><td>1 absent element</td></tr></table>
-     <p style="margin-top:8px">Counts agree, but only JSON and XML remember which kind of missing each one was. Note the difference before you convert between formats.</p>`;
-  stMiss.hidden=false; stMiss.className="status warn"; stMiss.textContent="MATCH, WITH A CATCH";
+     <p style="margin-top:8px">The counts match, but only JSON and XML remember which kind of missing value each one was. Keep that in mind when you convert between formats.</p>`;
+  stMiss.hidden=false; stMiss.className="status warn"; stMiss.textContent="MATCH, BUT CHECK";
   this.disabled=true;
 });
 const chkTypes=document.getElementById("chkTypes"), fixTypes=document.getElementById("fixTypes");
@@ -548,10 +568,36 @@ fixTypes.addEventListener("click",function(){
       <tr><td>case_id</td><td style="color:var(--ok)">string → "0042"</td><td>string → "0042"</td></tr>
       <tr><td>minutes_open</td><td>int64</td><td>int</td></tr>
       <tr><td>lat / lon</td><td>float64</td><td>float / null</td></tr></table>
-     <p style="margin-top:8px">Now the four loads agree, and you can show it.</p>`;
-  stTypes.className="status ok"; stTypes.textContent="RECONCILED";
+     <p style="margin-top:8px">Now all four files load with the same types.</p>`;
+  stTypes.className="status ok"; stTypes.textContent="MATCH";
   this.style.display="none";
 });
+</script>
+<script src="sandbox/sandbox.js"></script>
+<script>
+(function () {
+  // Save the page's four records in each format, exactly as the tabs above show them.
+  const csvValue = v => {
+    if (v === null || v === undefined) return "";
+    const s = String(v);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  const row = (r, sep, fmt) => FIELDS.map(f => fmt(r[f])).join(sep);
+  const csv = [FIELDS.join(","), ...RECORDS.map(r => row(r, ",", csvValue))].join("\n") + "\n";
+  const tsv = [FIELDS.join("\t"), ...RECORDS.map(r => row(r, "\t", v => v === null || v === undefined ? "" : String(v)))].join("\n") + "\n";
+  const json = JSON.stringify(RECORDS, null, 2) + "\n";
+  const xmlEsc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const xml = "<?xml version='1.0' encoding='utf-8'?>\n<cases>\n" + RECORDS.map(r =>
+    "  <case>\n" + FIELDS.filter(f => f in r).map(f => r[f] === null ? `    <${f}/>` : `    <${f}>${xmlEsc(r[f])}</${f}>`).join("\n") + "\n  </case>"
+  ).join("\n") + "\n</cases>\n";
+  Sandbox.python(document.getElementById("formats-python"), {
+    packages: ["pandas"],
+    root: "/home/you/formats",
+    setup: 'import pandas as pd\npd.set_option("display.width", 200)\npd.set_option("display.max_columns", 20)',
+    files: {"cases.csv": csv, "cases.tsv": tsv, "cases.json": json, "cases.xml": xml},
+    code: 'import pandas as pd\n\ncsv_rows = pd.read_csv("cases.csv")\nprint(csv_rows.dtypes)\ncsv_rows\n'
+  });
+})();
 </script>
 </body>
 </html>

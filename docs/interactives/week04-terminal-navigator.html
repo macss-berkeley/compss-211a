@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Terminal Navigator · COMPSS 211A</title>
+<title>Terminal navigator · COMPSS 211A</title>
 <meta name="description" content="A simulated terminal for practicing pwd, ls, cd, relative paths, running a Python script, and creating, moving, renaming, and deleting files.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -532,6 +532,7 @@ html,body{overflow-x:clip}
 h2 .step{color:var(--berkeley)}
 footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(50% - 50vw) 0;padding:20px calc(50vw - 50%) 26px;border-top:0}
 </style>
+<link rel="stylesheet" href="sandbox/sandbox.css">
 </head>
 <body>
 <div class="page">
@@ -540,12 +541,12 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
   <header>
     <p class="eyebrow">COMPSS 211A &middot; COMPUTING I</p>
-    <h1>Terminal Navigator</h1>
+    <h1>Terminal navigator</h1>
     <div class="chips">
-      <span class="chip chip-gold">Week 4 &middot; Command Line</span>
+      <span class="chip chip-gold">Week 4 &middot; Command line</span>
       <span class="chip chip-outline">&asymp; 14 minutes</span>
     </div>
-    <p class="promise">Practice moving around a file system in a simulated shell. Find where you are, run a script from the right folder and the wrong one, then create, copy, move, and delete files.</p>
+    <p class="promise">Practice moving around a file system in a simulated terminal. Find out where you are, run a script from the right folder and the wrong one, then create, copy, move, and delete files.</p>
     <hr class="gold-rule">
   </header>
 
@@ -554,8 +555,8 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
   <!-- ============ intro ============ -->
   <section class="card intro reveal" style="--i:0" aria-labelledby="intro-h">
     <h2 id="intro-h">The terminal and the shell</h2>
-    <p>The <strong>terminal</strong> is the window where you type and see output; the <strong>shell</strong> is the program that reads your command and decides how to run it. The one below is simulated: it runs entirely on this page, it starts inside a small practice project, and nothing you type here can reach your real files. This shell includes <code>rm</code>; a file deleted here comes back with <code>reset</code>. Every command has the same three parts:</p>
-    <div class="anatomy" role="img" aria-label="Command anatomy. In the command 'ls -lah data': ls is the command, -lah is an option, and data is an argument.">
+    <p>The <strong>terminal</strong> is the window where you type commands and see the output. The <strong>shell</strong> is the program inside it that reads each command and runs it. The terminal below is simulated. It runs only on this page, starts inside a small practice project, and cannot reach your real files. You can delete files here with <code>rm</code>, and <code>reset</code> brings them back. Every command has the same three parts:</p>
+    <div class="anatomy" role="img" aria-label="Parts of a command. In the command 'ls -lah data': ls is the command, -lah is an option, and data is an argument.">
       <div class="apart"><code>ls</code><span>command</span></div>
       <div class="apart"><code>-lah</code><span>option</span></div>
       <div class="apart"><code>data</code><span>argument</span></div>
@@ -588,12 +589,12 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
         <div class="term-input-row" id="term-input-row">
           <span class="t-prompt" id="prompt-label" aria-hidden="true">you@laptop project %</span>
           <div class="input-wrap">
-            <label class="sr-only" for="term-in">Terminal input. Type a command and press Enter. Tab completes names; the up and down arrow keys replay history.</label>
+            <label class="sr-only" for="term-in">Terminal input. Type a command and press Enter. Tab completes names. The up and down arrow keys bring back earlier commands.</label>
             <input id="term-in" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send">
             <span class="block-cursor idle" id="block-cursor" aria-hidden="true"></span>
           </div>
         </div>
-        <div class="term-hints">Tab completes names &middot; &uarr;/&darr; replay history &middot; type help for the full list &middot; reset restores the project</div>
+        <div class="term-hints">Tab completes names &middot; &uarr;/&darr; bring back earlier commands &middot; type help for the full list &middot; reset restores the project</div>
       </section>
 
       <div class="q-slot" id="q-slot" hidden aria-live="polite"></div>
@@ -609,7 +610,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
           <h2 id="tree-h">File tree</h2>
           <p class="tree-cwd">working directory: <code id="tree-cwd">/Users/you/project</code></p>
           <div class="tree" id="tree"></div>
-          <p class="tree-note">Updates as you type. The highlighted row is where you are standing right now.</p>
+          <p class="tree-note">The tree updates after each command. The highlighted row is the folder you are in now.</p>
         </section>
 
       </div>
@@ -641,21 +642,21 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
         <li class="mission" id="mission-2">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Step into <code>data/</code> and confirm the move.</strong> Run <code>cd data</code>, then <code>pwd</code>. The prompt changes, but confirm with <code>pwd</code> rather than trusting how the prompt looks.</div>
+          <div class="mtext"><strong>Step into <code>data/</code> and confirm the move.</strong> Run <code>cd data</code>, then <code>pwd</code>. The prompt also changes, but check with <code>pwd</code> instead of relying on the prompt.</div>
           <span class="sr-only mstat"></span>
         </li>
 
         <li class="mission" id="mission-3">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Peek at <code>sample.csv</code> without opening an editor.</strong> Run <code>head sample.csv</code>.
-            <span class="mq">Inspect before changing.</span>
+          <div class="mtext"><strong>Look at the start of <code>sample.csv</code> without opening it in an editor.</strong> Run <code>head sample.csv</code>.
+            <span class="mq">Look at a file before you change it.</span>
           </div>
           <span class="sr-only mstat"></span>
         </li>
 
         <li class="mission" id="mission-4">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Return to the project root.</strong> Run <code>cd ..</code>. Two dots mean the parent directory.</div>
+          <div class="mtext"><strong>Go back to the project root, the top folder of the project.</strong> Run <code>cd ..</code>. Two dots mean the parent directory, the folder one level up.</div>
           <span class="sr-only mstat"></span>
         </li>
 
@@ -670,14 +671,14 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
         <li class="mission" id="mission-6">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
           <div class="mtext"><strong>Go back up and copy a file into the new folder.</strong> Run <code>cd ..</code>, then <code>cp notes.md scratch/notes_copy.md</code>, then <code>ls scratch</code>. The original <code>notes.md</code> stays where it was.
-            <span class="mq"><code>cp</code> leaves the original in place; <code>mv</code>, later, does not.</span>
+            <span class="mq"><code>cp</code> keeps the original. <code>mv</code>, which you use later, does not.</span>
           </div>
           <span class="sr-only mstat"></span>
         </li>
 
         <li class="mission" id="mission-7">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Run the summarizer from the project root.</strong> Run <code>python3 scripts/summarize_csv.py</code> and watch <code>summary.txt</code> appear in the tree.
+          <div class="mtext"><strong>Run the summary script from the project root.</strong> Run <code>python3 scripts/summarize_csv.py</code> and watch <code>summary.txt</code> appear in the tree.
             <span class="mq">Question 3: what exact path will this command read or change?</span>
           </div>
           <span class="sr-only mstat"></span>
@@ -685,7 +686,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
         <li class="mission" id="mission-8">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Run it from the wrong folder.</strong> Run <code>cd scripts</code>, then <code>python3 summarize_csv.py</code>. Read the error carefully, then answer below.</div>
+          <div class="mtext"><strong>Run it from the wrong folder.</strong> Run <code>cd scripts</code>, then <code>python3 summarize_csv.py</code>. Read the error, then answer below.</div>
           <span class="sr-only mstat"></span>
 
           <div class="qcard locked" id="qcard-1">
@@ -694,7 +695,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
               <fieldset disabled id="q1-fs">
                 <legend>Predict, then check: the same script worked from <code>project/</code> a moment ago. Why did it fail from <code>scripts/</code>?</legend>
                 <label class="qopt"><input type="radio" name="q1" value="a"><span>Python can only run a script from inside the folder that contains it.</span></label>
-                <label class="qopt"><input type="radio" name="q1" value="b"><span>The script opens the relative path <code>data/sample.csv</code>, and relative paths resolve from the current working directory. From <code>scripts/</code> that means <code>scripts/data/sample.csv</code>, which does not exist.</span></label>
+                <label class="qopt"><input type="radio" name="q1" value="b"><span>The script opens the relative path <code>data/sample.csv</code>, and a relative path starts from the current working directory. From <code>scripts/</code> that means <code>scripts/data/sample.csv</code>, which does not exist.</span></label>
                 <label class="qopt"><input type="radio" name="q1" value="c"><span>Changing into <code>scripts/</code> moved the <code>data/</code> folder, so the file is gone.</span></label>
                 <button type="button" class="qcheck" id="q1-check">Check my prediction</button>
                 <p class="qfeedback" id="q1-feedback" aria-live="polite"></p>
@@ -706,7 +707,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 <div><span class="pm-dim">from</span> ~/project          <span class="pm-dim">data/sample.csv &rarr;</span> <span class="pm-ok">~/project/data/sample.csv          exists</span></div>
 <div><span class="pm-dim">from</span> ~/project/scripts  <span class="pm-dim">data/sample.csv &rarr;</span> <span class="pm-err">~/project/scripts/data/sample.csv  missing</span></div>
                 </div>
-                <p>So: <strong>run project scripts from the repository root.</strong> When a path error appears, run <code>pwd</code> first and read the missing path in the error before touching the code. Try <code>cd ..</code> and run the script again.</p>
+                <p><strong>Run project scripts from the project root.</strong> When you get a path error, first run <code>pwd</code>, then read the missing path in the error. Only then change the code. Try <code>cd ..</code> and run the script again.</p>
               </div>
             </div>
           </div>
@@ -714,7 +715,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
         <li class="mission" id="mission-9">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Move the summary into <code>results/</code>.</strong> From the root, run <code>mv summary.txt results/</code>, then <code>ls results</code>. Keep the trailing <code>/</code>: it tells <code>mv</code> the destination must be an existing folder.
+          <div class="mtext"><strong>Move the summary into <code>results/</code>.</strong> From the root, run <code>mv summary.txt results/</code>, then <code>ls results</code>. Keep the <code>/</code> at the end. It tells <code>mv</code> that the destination must be a folder that already exists.
             <span class="mq">Question 4: how will I check the result? Run <code>ls results</code>.</span>
           </div>
           <span class="sr-only mstat"></span>
@@ -722,7 +723,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
         <li class="mission" id="mission-10">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Mistype the folder name.</strong> What does <code>mv</code> do when the destination folder is spelled wrong? Type <code>python3 scripts/summarize_csv.py</code> to create a new <code>summary.txt</code>, then <code>mv summary.txt result</code>, missing the <code>s</code>. Look at the tree, then answer below.</div>
+          <div class="mtext"><strong>Mistype the folder name.</strong> What does <code>mv</code> do when the destination folder is spelled wrong? Type <code>python3 scripts/summarize_csv.py</code> to create a new <code>summary.txt</code>, then <code>mv summary.txt result</code>, leaving out the <code>s</code>. Look at the tree, then answer below.</div>
           <span class="sr-only mstat"></span>
 
           <div class="qcard locked" id="qcard-2">
@@ -744,7 +745,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 <div><span class="pm-dim">mv summary.txt</span> result   <span class="pm-dim">nothing named result exists   &rarr;</span> <span class="pm-err">renamed to result</span></div>
 <div><span class="pm-dim">mv summary.txt</span> result/  <span class="pm-dim">nothing named result exists   &rarr;</span> <span class="pm-ok">refused: No such file or directory</span></div>
                 </div>
-                <p>So: <strong>end a destination folder with <code>/</code>.</strong> Then a typo in the folder name gives an error instead of renaming your file. Also, without asking, <code>mv</code> and <code>cp</code> if the destination is an existing file, they replace it, and the old contents are gone. A misnamed file is fixed with another <code>mv</code>, but leave <code>result</code> where it is: the next mission removes it.</p>
+                <p><strong>End a destination folder with <code>/</code>.</strong> Then a typo in the folder name gives an error instead of renaming your file. Also, if the destination is a file that already exists, <code>mv</code> and <code>cp</code> replace it without asking, and the old contents are gone. You can fix a misnamed file with another <code>mv</code>, but leave <code>result</code> where it is. The next mission removes it.</p>
               </div>
             </div>
           </div>
@@ -770,8 +771,8 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
               </fieldset>
               <div class="explainer" id="explainer-3" hidden>
                 <h3>Why to check before rm</h3>
-                <p><code>rm</code> prints nothing when it succeeds. There is no Trash, no confirmation, and no undo. <code>rm</code> takes whatever path you give it, resolved from the working directory, so the order matters: <code>pwd</code> to know where you stand, <code>ls</code> on the exact path to see what will go, then <code>rm</code> on that same path. Do not <code>rm</code> a path you have not just listed.</p>
-                <p>Two options make it more dangerous. <code>-r</code> removes a folder and everything inside it. <code>-f</code> silences the errors that would otherwise stop it. <code>rm -rf</code> with the wrong path is how people lose a project.</p>
+                <p><code>rm</code> prints nothing when it succeeds. There is no Trash, no confirmation, and no undo. <code>rm</code> removes whatever path you give it, starting from the working directory. So work in this order: <code>pwd</code> to see where you are, <code>ls</code> on the exact path to see what will be removed, then <code>rm</code> on that same path. Do not <code>rm</code> a path you have not just listed.</p>
+                <p>Two options make it more dangerous. <code>-r</code> removes a folder and everything inside it. <code>-f</code> hides the errors that would otherwise stop it. <code>rm -rf</code> with the wrong path can delete a whole project.</p>
               </div>
             </div>
           </div>
@@ -779,8 +780,8 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
         <li class="mission" id="mission-12">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24"><circle class="ring" cx="12" cy="12" r="10"/><path class="tick" d="M7.5 12.6l3 3L16.6 9.4"/></svg></span>
-          <div class="mtext"><strong>Remove a whole folder, then bring the project back.</strong> Run <code>rm results</code> and read the refusal. Then run <code>rm -r results</code> and the folder and everything in it disappears from the tree. Finally, type <code>reset</code>.
-            <span class="mq">This sandbox has <code>reset</code>. Your computer does not.</span>
+          <div class="mtext"><strong>Remove a whole folder, then bring the project back.</strong> Run <code>rm results</code> and read the error. Then run <code>rm -r results</code> and watch the folder and everything in it disappear from the tree. Finally, type <code>reset</code>.
+            <span class="mq">This practice terminal has <code>reset</code>. Your computer does not.</span>
           </div>
           <span class="sr-only mstat"></span>
         </li>
@@ -797,14 +798,29 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
       <li><strong><code>pwd</code>, <code>ls</code>, and <code>cd</code> answer three questions:</strong> where am I, what is here, how do I get there.</li>
       <li><strong>A relative path starts from the working directory;</strong> an absolute path starts from the file-system root.</li>
       <li><strong><code>..</code> is the parent directory and <code>~</code> is your home directory.</strong> <code>cd -</code> returns to the previous one.</li>
-      <li><strong>Tab completion prevents typos.</strong> Use it whenever possible.</li>
-      <li><strong>Run project scripts from the repository root,</strong> so the relative paths inside them resolve correctly.</li>
-      <li><strong><code>mkdir</code>, <code>touch</code>, and <code>cp</code> create; <code>mv</code> moves.</strong> Run <code>ls</code> on the destination afterwards to check. <code>mkdir -p</code> also creates missing parent folders and does not complain if the folder already exists.</li>
+      <li><strong>Tab completion helps you avoid typos.</strong> Use it often.</li>
+      <li><strong>Run project scripts from the project root,</strong> so the relative paths inside them point to the right files.</li>
+      <li><strong><code>mkdir</code>, <code>touch</code>, and <code>cp</code> create; <code>mv</code> moves.</strong> Run <code>ls</code> on the destination afterwards to check. <code>mkdir -p</code> also creates missing parent folders and gives no error if the folder already exists.</li>
       <li><strong>End a destination folder with <code>/</code>.</strong> If the folder does not exist, <code>mv</code> refuses instead of renaming your file.</li>
       <li><strong><code>mv</code> and <code>cp</code> replace an existing destination file without asking.</strong> Check the destination with <code>ls</code> first.</li>
-      <li><strong><code>rm</code> does not use the Trash.</strong> <code>pwd</code>, then <code>ls</code> the exact path, then <code>rm</code> that path. <code>-r</code> takes a whole folder.</li>
-      <li><strong>This sandbox has <code>reset</code>. Your computer does not.</strong> On your own machine, practice in a disposable copy and use the Finder or Explorer trash.</li>
+      <li><strong><code>rm</code> does not use the Trash.</strong> First <code>pwd</code>, then <code>ls</code> on the exact path, then <code>rm</code> on that path. <code>-r</code> takes a whole folder.</li>
+      <li><strong>This practice terminal has <code>reset</code>. Your computer does not.</strong> On your own computer, practice on a copy you don't mind losing, and delete files through the Trash in Finder or Explorer.</li>
     </ul>
+  </section>
+
+  <!-- ============ real terminal ============ -->
+  <section class="card" aria-labelledby="real-h" style="margin-top:28px">
+    <h2 id="real-h">Now try a real terminal</h2>
+    <p>The terminal above is simulated. This one has real files and runs real Python inside your browser. It holds a small copy of Monday's project: <code>case_summary.py</code>, <code>run_report.py</code>, and 400 of the 16,876 San Francisco 311 requests. Nothing here can reach the files on your computer, and <code>reset</code> puts everything back.</p>
+    <p><strong>Try this, in order:</strong></p>
+    <ol>
+      <li>Find your way around: <code>pwd</code>, <code>ls</code>, <code>ls data</code>, <code>head -n 3 data/sf311_requests.csv</code>.</li>
+      <li>Run the report: <code>python run_report.py</code>. Then check the saved file: <code>ls outputs</code> and <code>cat outputs/request_summary.csv</code>.</li>
+      <li>Make the same mistake as in class: <code>cd data</code>, then <code>python ../run_report.py</code>. Read the error. Which folder was Python looking in?</li>
+      <li>Go back with <code>cd ..</code>. Make the manager's change: <code>edit run_report.py</code>, change <code>group_by="channel"</code> to <code>group_by="district"</code>, press <strong>Save</strong>, and run the report again. Did the saved CSV change too?</li>
+    </ol>
+    <p class="small" style="font-size:.88rem">The first command loads Python into your browser (about 25 MB with pandas, only once), so it takes a few seconds. This part needs an internet connection.</p>
+    <div id="real-terminal"></div>
   </section>
 
   <footer>
@@ -841,7 +857,7 @@ var SURVEY_CSV = [
 var NOTES_MD = [
   '# Project notes',
   '',
-  'Week 4 practice sandbox. Use it to rehearse navigation',
+  'Week 4 practice project. Use it to practice moving around',
   'before opening a real terminal. Nothing in this folder',
   'is connected to your real computer.'
 ].join('\n');
@@ -1148,7 +1164,7 @@ function readFileLines(t, cmdName){
 
 function cmdCat(argv){
   if (argv.length < 2){
-    outNote('cat: this sandbox cannot read from the keyboard -- pass a file path, like cat notes.md');
+    outNote('cat: this practice terminal cannot read from the keyboard. Give it a file path, like cat notes.md');
     return;
   }
   for (var i = 1; i < argv.length; i++){
@@ -1171,7 +1187,7 @@ function parseHeadTail(argv, cmdName){
     else files.push(t);
   }
   if (!files.length){
-    outNote(cmdName + ': pass a file path, like ' + cmdName + ' data/sample.csv');
+    outNote(cmdName + ': give it a file path, like ' + cmdName + ' data/sample.csv');
     return null;
   }
   return { n:n, files:files };
@@ -1321,7 +1337,7 @@ function cmdTouch(argv){
 /* ---------- python3 (simulated) ---------- */
 function cmdPython(argv, rawTarget){
   if (argv.length < 2){
-    outNote('An interactive Python prompt is not simulated here -- this sandbox runs scripts only.');
+    outNote('This practice terminal can only run scripts. It cannot open an interactive Python prompt.');
     outNote('Try: python3 scripts/summarize_csv.py');
     return;
   }
@@ -1333,7 +1349,7 @@ function cmdPython(argv, rawTarget){
     return;
   }
   if (node.content !== SCRIPT_PY){
-    outNote('sandbox: only scripts/summarize_csv.py is simulated here.');
+    outNote('sandbox: the only script this practice terminal can run is scripts/summarize_csv.py.');
     return;
   }
   var dataPathTyped = argv.length > 2 ? argv[2] : 'data/sample.csv';
@@ -1410,8 +1426,8 @@ function cmdClear(){
 function cmdHelp(){
   var rows = [
     ['pwd',                 'print the working directory'],
-    ['ls [-lah] [path]',    'list a directory (-a shows hidden entries)'],
-    ['cd [path]',           'change directory: a path, .., ~, or - for previous'],
+    ['ls [-lah] [path]',    'list a directory (-a also shows hidden files)'],
+    ['cd [path]',           'change directory: a path, .., ~, or - for the previous one'],
     ['cat <file>',          'print a whole file'],
     ['head [-n N] <file>',  'first lines of a file (default 3)'],
     ['tail [-n N] <file>',  'last lines of a file (default 3)'],
@@ -1426,14 +1442,14 @@ function cmdHelp(){
     ['echo <text>',         'print text'],
     ['history',             'show the commands you have run'],
     ['clear',               'clear the screen'],
-    ['help',                'this list']
+    ['help',                'show this list']
   ];
   rows.forEach(function(r){
     addLine([{text:'  ' + r[0].padEnd(22), cls:'t-ok'}, {text:r[1], cls:'t-out'}]);
   });
-  outNote('Tab completes names; the up and down arrows replay history.');
-  outNote('rm is real here and has no trash, as on your own machine. reset exists only in this sandbox.');
-  outNote('Pipes and redirection are in the primer, not this sandbox.');
+  outNote('Tab completes names. The up and down arrows bring back earlier commands.');
+  outNote('rm works here as it does on your own computer: there is no Trash. reset exists only in this practice terminal.');
+  outNote('Pipes and redirection (| and >) are covered in the primer but do not work here.');
 }
 
 function insideCwd(segs){
@@ -1500,7 +1516,7 @@ function cmdReset(){
   cwd = PROJ.slice();
   prevDir = null;
   outOk('Practice project restored to its starting state.');
-  outNote('On a real machine, reset only fixes a garbled terminal display. It does not bring files back.');
+  outNote('On a real computer, reset only cleans up a messed-up terminal screen. It does not bring files back.');
   emit('reset');
   emit('fs-changed');
 }
@@ -1511,9 +1527,9 @@ var NOT_INCLUDED = {
   'find':'searches for files by name or type', 'less':'pages through a long file',
   'more':'pages through a long file', 'man':'opens a manual page',
   'nano':'opens a terminal text editor', 'vim':'opens a terminal text editor',
-  'vi':'opens a terminal text editor', 'open':'opens a file in a GUI app',
+  'vi':'opens a terminal text editor', 'open':'opens a file in a regular app',
   'code':'opens VS Code', 'curl':'downloads from a URL', 'wget':'downloads from a URL',
-  'ssh':'connects to a remote computer', 'chmod':'changes permissions',
+  'ssh':'connects to a remote computer', 'chmod':'changes file permissions',
   'sudo':'runs a command as an administrator', 'ps':'lists processes',
   'which':'locates a program', 'pip':'installs Python packages',
   'jupyter':'starts a notebook server', 'exit':'closes a real shell session',
@@ -1570,7 +1586,7 @@ function execute(raw){
   if (trimmed !== ''){
     var tk = tokenize(raw);
     if (tk.err === 'redir' || tk.err === 'chain'){
-      outNote('sandbox: pipes, redirection, and command chaining (|, >, >>, &&) are introduced in the primer but disabled here.');
+      outNote('sandbox: pipes, redirection, and chaining commands (|, >, >>, &&) are covered in the primer but do not work here.');
     } else if (tk.err === 'quote'){
       outNote('sandbox: that quote never closed. Close it on the same line and try again.');
     } else if (tk.toks.length){
@@ -1579,7 +1595,7 @@ function execute(raw){
       if (argv[0] === 'uv' && argv[1] === 'run' && (argv[2] === 'python' || argv[2] === 'python3')){
         argv = ['python3'].concat(argv.slice(3));
       } else if (argv[0] === 'uv'){
-        outNote('uv: environment syncing is covered in the setup guide -- here, run python3 directly.');
+        outNote('uv: setting up environments with uv is covered in the setup guide. Here, run python3 directly.');
         argv = null;
       } else if (argv[0] === 'python'){
         argv = ['python3'].concat(argv.slice(1));
@@ -1705,7 +1721,7 @@ var MISSION_BRIEF = [
   'Find out where you are: type <code>pwd</code> and press Enter.',
   'List what is here: type <code>ls</code>.',
   'Type <code>cd data</code>, then <code>pwd</code> to confirm the move.',
-  'Peek at the file: type <code>head sample.csv</code>.',
+  'Look at the start of the file: type <code>head sample.csv</code>.',
   'Return to the project root: type <code>cd ..</code>',
   'Make a folder and step into it: type <code>mkdir scratch</code>, then <code>cd scratch</code>. Create an empty file there: type <code>touch notes.txt</code>, then <code>ls</code>.',
   'Type <code>cd ..</code> to go back to the root, then <code>cp notes.md scratch/notes_copy.md</code>, then <code>ls scratch</code>.',
@@ -1714,7 +1730,7 @@ var MISSION_BRIEF = [
   'From the root, type <code>mv summary.txt results/</code> (keep the trailing slash), then <code>ls results</code>.',
   'Make a new summary.txt: type <code>python3 scripts/summarize_csv.py</code>. Then move it with a typo in the folder name: type <code>mv summary.txt result</code>. Answer the question under the terminal.',
   'Type <code>pwd</code>, then <code>ls -l result</code>, then <code>rm result</code>, then answer the question under the terminal.',
-  'Type <code>rm results</code> and read the refusal, then <code>rm -r results</code>, then <code>reset</code>.'
+  'Type <code>rm results</code> and read the error, then <code>rm -r results</code>, then <code>reset</code>.'
 ];
 var TOTAL = MISSION_BRIEF.length;
 var missionDone = MISSION_BRIEF.map(function(){ return false; });
@@ -1737,7 +1753,7 @@ function updateStrip(){
     markCurrent(-1);
     stripEl.classList.add('all-done');
     stripBadge.textContent = 'All done';
-    stripText.textContent = 'All ' + TOTAL + ' missions complete. Read the recap card below.';
+    stripText.textContent = 'All ' + TOTAL + ' missions done. Read the Remember section below.';
     return;
   }
   var next = missionDone.indexOf(false);
@@ -1774,7 +1790,7 @@ function moveToSlot(card){
   var ph = document.createElement('p');
   ph.className = 'qmoved';
   ph.id = 'qmoved-' + card.id;
-  ph.textContent = 'Question shown under the terminal.';
+  ph.textContent = 'This question is now under the terminal.';
   card.parentNode.insertBefore(ph, card);
   slotEl.appendChild(card);
   slotEl.hidden = false;
@@ -1874,8 +1890,8 @@ function wireQuestion(qname, correct, feedbacks, onCorrect){
 
 wireQuestion('q1', 'b', {
   a: 'Python ran the script both times. The failure came from a path the script itself tried to open.',
-  b: 'The script&rsquo;s <code>open("data/sample.csv")</code> resolves from the working directory, so from <code>scripts/</code> Python looked for <code>scripts/data/sample.csv</code>.',
-  c: 'Nothing moved or disappeared -- check which directory the relative path <code>data/sample.csv</code> was resolved from.'
+  b: 'The script&rsquo;s <code>open("data/sample.csv")</code> starts from the working directory, so from <code>scripts/</code> Python looked for <code>scripts/data/sample.csv</code>.',
+  c: 'Nothing moved or disappeared. Check which directory the relative path <code>data/sample.csv</code> started from.'
 }, function(){
   completeMission(8);
   var ex = document.getElementById('explainer-1');
@@ -1883,7 +1899,7 @@ wireQuestion('q1', 'b', {
 });
 
 wireQuestion('q2', 'b', {
-  a: 'Nothing was deleted -- <code>mv</code> never deletes. Look at the tree: there is a new file in the project root.',
+  a: 'Nothing was deleted. <code>mv</code> never deletes. Look at the tree: there is a new file in the project root.',
   b: 'No folder named <code>result</code> existed, so <code>mv</code> used the second argument as a new name. The file is still there, called <code>result</code>.',
   c: '<code>mv</code> does not guess. It uses the exact path you typed, and <code>result</code> is not <code>results</code>.'
 }, function(){
@@ -1892,7 +1908,7 @@ wireQuestion('q2', 'b', {
 });
 
 wireQuestion('q3', 'b', {
-  a: 'The Trash belongs to Finder and Explorer. <code>rm</code> goes around it: the file is gone.',
+  a: 'The Trash belongs to Finder and Explorer. <code>rm</code> does not use it, so the file is gone.',
   b: '<code>rm</code> printed nothing because it succeeded. There is no Trash and no undo; only a copy made earlier can bring the file back.',
   c: '<code>ls -a</code> shows hidden files, and <code>rm</code> hides nothing. Run <code>ls -a</code>: <code>result</code> is not there.'
 }, function(){
@@ -2050,8 +2066,8 @@ document.getElementById('term-input-row').addEventListener('click', focusTerm);
 /* ============================================================
    Boot
    ============================================================ */
-addLine([{text:'COMPSS 211A sandbox shell. ', cls:'t-out'}, {text:'Type ', cls:'t-out'}, {text:'help', cls:'t-ok'}, {text:' to see every supported command.', cls:'t-out'}]);
-outNote('This terminal is simulated -- nothing you type here can touch your real computer.');
+addLine([{text:'COMPSS 211A practice shell. ', cls:'t-out'}, {text:'Type ', cls:'t-out'}, {text:'help', cls:'t-ok'}, {text:' to see every command you can use here.', cls:'t-out'}]);
+outNote('This terminal is simulated. Nothing you type here can change your real computer.');
 out('');
 promptLabel.textContent = promptText();
 renderTree();
@@ -2059,6 +2075,16 @@ updateStrip();
 updateCursor();
 
 })();
+</script>
+<script src="sandbox/sandbox.js"></script>
+<script src="sandbox/week04-project.js"></script>
+<script>
+Sandbox.terminal(document.getElementById("real-terminal"), {
+  files: window.SANDBOX_WEEK04_PROJECT,
+  packages: ["pandas"],
+  root: "/Users/you/monday-practice",
+  welcome: "Type help to see the commands. Start with pwd and ls."
+});
 </script>
 </body>
 </html>

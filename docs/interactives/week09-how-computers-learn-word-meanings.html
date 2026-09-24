@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>How Computers Learn Word Meanings · COMPSS 211A</title>
-<meta name="description" content="Place a word on a map, compare directions, average words into documents, and run a small KMeans. A hands-on introduction to embeddings and clustering.">
+<title>How computers learn word meanings · COMPSS 211A</title>
+<meta name="description" content="Place a word on a map, compare words by direction, average words into documents, and run a small KMeans. An introduction to embeddings and clustering.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Inter+Tight:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -152,55 +152,56 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
 <header>
   <p class="eyebrow rise d1">COMPSS 211A · Computing I</p>
-  <h1 class="rise d1">How Computers Learn Word Meanings</h1>
+  <h1 class="rise d1">How computers learn word meanings</h1>
   <div class="chips rise d2">
-    <span class="chip chip-gold">Week 9 · Embeddings &amp; Clustering</span>
+    <span class="chip chip-gold">Week 9 · Embeddings &amp; clustering</span>
     <span class="chip chip-line">≈ 8 minutes</span>
-    <span class="chip chip-line">Hand-made miniature</span>
+    <span class="chip chip-line">Small hand-made example</span>
   </div>
   <p class="lede rise d2">
-    An embedding turns meaning into <em>position</em>: words that appear in similar contexts
-    end up pointing in similar directions. Everything below is a hand-placed two-dimensional
-    miniature. Real embeddings have hundreds of dimensions and are learned from co-occurrence,
-    but the geometry works the same way.
+    An embedding gives each word a <em>position</em>, stored as a list of numbers called a vector.
+    Words that appear in similar contexts (the words around them) end up pointing in similar
+    directions. The map below is a small example we placed by hand. It has two dimensions, so
+    each word has two numbers. Real embeddings have hundreds of dimensions and are learned from
+    which words appear near each other in lots of text. The math works the same way.
   </p>
 </header>
 <hr class="rule rise d2">
 
 <!-- ══════════════ 1 · you place a word ══════════════ -->
 <section class="rise d3" aria-labelledby="s1">
-  <h2 id="s1"><span class="step">1·</span>First, you be the computer</h2>
+  <h2 id="s1"><span class="step">1·</span>Place a word yourself</h2>
   <p class="section-note">
-    Twenty campus words are placed on the map, and direction encodes topic. One word is
-    missing: <strong>“deadline.”</strong> Click where you think it belongs. Which words
-    would appear in sentences around it?
+    The map shows 22 campus words. Words about the same topic point in the same direction
+    from the gray dot at the bottom. One word is missing: <strong>“deadline.”</strong> Click
+    where you think it belongs. Think about which words show up in sentences with it.
   </p>
   <div class="card">
     <div class="maparea">
-      <svg id="map" viewBox="0 0 720 470" role="img" aria-label="Two-dimensional word map. Words fan out from an origin point; direction encodes topic."></svg>
+      <svg id="map" viewBox="0 0 720 470" role="img" aria-label="Word map with two dimensions. Words spread out from a starting point at the bottom. Words about the same topic point in the same direction."></svg>
     </div>
-    <p class="axiscap">The axes have no built-in meaning; only distances and directions do. Cosine similarity ignores arrow length.</p>
+    <p class="axiscap">The two axes don’t mean anything on their own. What matters is how far apart words are and which way they point. Cosine similarity compares only the direction of the arrows, not their length.</p>
     <div class="status" id="placeStatus" aria-live="polite">Waiting for your guess. Click anywhere on the map.</div>
     <div class="mapbtns">
       <button class="btn btn-ghost" id="clearSel" disabled>Clear selection</button>
-      <span class="axiscap" id="selHint" style="margin-top:0">After placing “deadline”: click any word for its nearest neighbors, then a second word to compare the pair.</span>
+      <span class="axiscap" id="selHint" style="margin-top:0">After you place “deadline,” click any word to see its nearest neighbors (the words that point in the closest direction). Then click a second word to compare the two.</span>
     </div>
     <div class="readout">
       <div class="readbox">
         <h3>Pair similarity</h3>
-        <div id="pairOut"><span class="gloss">Select two words to compare their directions.</span></div>
+        <div id="pairOut"><span class="gloss">Click two words to compare their directions.</span></div>
       </div>
       <div class="readbox">
         <h3>Nearest neighbors</h3>
-        <div id="nnOut"><span class="gloss">Select one word to list the three that point most nearly the same way.</span></div>
+        <div id="nnOut"><span class="gloss">Click one word to see the three words that point in the most similar direction.</span></div>
       </div>
     </div>
 
     <div class="qcard">
       <h3>Predict before you click</h3>
-      <p style="font-size:.93rem">Which pair is more similar in this space: <strong>(library, book)</strong> or <strong>(library, bus)</strong>?</p>
+      <p style="font-size:.93rem">Which pair is more similar on this map: <strong>(library, book)</strong> or <strong>(library, bus)</strong>?</p>
       <div class="opts" role="radiogroup">
-        <label><input type="radio" name="p1" value="a"> (library, book): they share study contexts</label>
+        <label><input type="radio" name="p1" value="a"> (library, book): both show up in sentences about studying</label>
         <label><input type="radio" name="p1" value="b"> (library, bus): both are campus places you go</label>
       </div>
       <button class="btn" id="checkP1">Check</button>
@@ -211,36 +212,37 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
 <!-- ══════════════ 2 · documents ══════════════ -->
 <section class="rise d3" aria-labelledby="s2">
-  <h2 id="s2"><span class="step">2·</span>A document is a combination</h2>
+  <h2 id="s2"><span class="step">2·</span>A document as an average of its words</h2>
   <p class="section-note">
-    Average the vectors of a document’s words and the <em>document</em> gets a position too,
-    shown on the map above as a star. Friday’s lab does the same thing with TF-IDF vectors
-    compressed by TruncatedSVD (LSA): <strong>a document becomes a position.</strong>
+    If you average the vectors of all the words in a document, the <em>document</em> gets a
+    position too. It shows up on the map above as a star. Friday’s lab uses the same idea: you
+    start with TF-IDF vectors and shrink them to fewer dimensions with TruncatedSVD (also called
+    LSA). <strong>Each document ends up with a position.</strong>
   </p>
   <div class="card">
     <div class="docs">
       <div class="docpanel a">
         <h3>★ Doc A</h3>
         <div class="docwords" id="docA" aria-live="polite"></div>
-        <button class="btn btn-ghost" id="fillA">Use suggestion: library · exam · study · notes</button>
+        <button class="btn btn-ghost" id="fillA">Fill in: library · exam · study · notes</button>
         <div class="chipbank" id="bankA" aria-label="Add words to Doc A"></div>
       </div>
       <div class="docpanel b">
         <h3>★ Doc B</h3>
         <div class="docwords" id="docB" aria-live="polite"></div>
-        <button class="btn btn-ghost" id="fillB">Use suggestion: coffee · snack · lunch</button>
+        <button class="btn btn-ghost" id="fillB">Fill in: coffee · snack · lunch</button>
         <div class="chipbank" id="bankB" aria-label="Add words to Doc B"></div>
       </div>
     </div>
-    <div class="docsim" id="docSim" aria-live="polite"><span class="gloss" style="color:#51607A;font-size:.9rem">Give both documents at least one word to compare them.</span></div>
+    <div class="docsim" id="docSim" aria-live="polite"><span class="gloss" style="color:#51607A;font-size:.9rem">Add at least one word to each document to compare them.</span></div>
 
     <div class="qcard">
-      <h3>Predict, then try it</h3>
-      <p style="font-size:.93rem">Doc A is <em>library · exam · study · notes</em>. If you add <strong>“pizza”</strong>, its star moves toward which neighborhood?</p>
+      <h3>Guess, then try it</h3>
+      <p style="font-size:.93rem">Doc A is <em>library · exam · study · notes</em>. If you add <strong>“pizza”</strong>, its star moves toward which group of words?</p>
       <div class="opts" role="radiogroup">
-        <label><input type="radio" name="p2" value="a"> The food words, because the average is pulled by every member</label>
-        <label><input type="radio" name="p2" value="b"> Nowhere, because one word cannot move a document</label>
-        <label><input type="radio" name="p2" value="c"> The transit words</label>
+        <label><input type="radio" name="p2" value="a"> Toward the food words, because every word counts toward the average</label>
+        <label><input type="radio" name="p2" value="b"> It doesn’t move, because one word can’t change a document’s position</label>
+        <label><input type="radio" name="p2" value="c"> Toward the transit words</label>
       </div>
       <button class="btn" id="checkP2">Check</button>
       <button class="btn btn-ghost" id="tryPizza" style="margin-left:8px">Add “pizza” to Doc A</button>
@@ -251,11 +253,11 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
 <!-- ══════════════ 3 · kmeans ══════════════ -->
 <section class="rise d4" aria-labelledby="s3">
-  <h2 id="s3"><span class="step">3·</span>Cluster, then inspect before you name</h2>
+  <h2 id="s3"><span class="step">3·</span>Group words with KMeans, then check the groups</h2>
   <p class="section-note">
-    KMeans always returns <em>k</em> clusters, whether or not the data contain <em>k</em>
-    groups. Run it, then do what the lab requires: <strong>read the members before naming
-    the group.</strong>
+    KMeans sorts points into <em>k</em> groups, called clusters. It always returns <em>k</em>
+    clusters, even when the data don’t really have <em>k</em> groups. Run it below. Then, as in
+    the lab, <strong>read the words in a cluster before you name it.</strong>
   </p>
   <div class="card">
     <div class="kbtns">
@@ -272,12 +274,12 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     </div>
 
     <div class="qcard" id="nameCard" style="display:none">
-      <h3>Name that cluster</h3>
+      <h3>Name the cluster</h3>
       <p style="font-size:.93rem" id="nameMembers"></p>
       <div class="opts" role="radiogroup">
         <label><input type="radio" name="p3" value="a"> “Transit”</label>
         <label><input type="radio" name="p3" value="b"> “Campus logistics”</label>
-        <label><input type="radio" name="p3" value="c"> Only something that fits the full member list, which includes feeling words as well as transit words</label>
+        <label><input type="radio" name="p3" value="c"> A name that fits every word in the list, including the feeling words as well as the transit words</label>
       </div>
       <button class="btn" id="checkP3">Check</button>
       <div class="verdict" id="v-p3" aria-live="polite"></div>
@@ -287,35 +289,36 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
 <!-- ══════════════ 4 · bias ══════════════ -->
 <section class="rise d4" aria-labelledby="s4">
-  <h2 id="s4"><span class="step">4·</span>Whose contexts?</h2>
+  <h2 id="s4"><span class="step">4·</span>Embeddings reflect their training text</h2>
   <div class="card bias">
     <p style="font-size:.95rem;max-width:720px">
-      On this map, “morning” sits between the food and study words because <em>we drew it
-      there</em>. Real embeddings get their positions from the texts they are trained on, and
-      they pick up social associations the same way. That is how this week’s reading
-      (Caliskan et al., <em>Science</em> 2017) measured stereotypes inside word vectors.
-      Treat similarity as evidence about the <strong>training text</strong>, not as a fact
-      about people, and say so when you interpret results.
+      On this map, “morning” sits between the food and study words because <em>we put it
+      there</em>. Real embeddings get their positions from the text they are trained on. So
+      they also pick up the social associations in that text, including stereotypes. This
+      week’s reading (Caliskan et al., <em>Science</em> 2017) used this to measure stereotypes
+      in word vectors. When two words are similar, that tells you something about the
+      <strong>training text</strong>. It is not a fact about people. Say this when you
+      interpret your results.
     </p>
   </div>
 </section>
 
 <!-- ══════════════ recap ══════════════ -->
 <section class="rise d4" aria-labelledby="s5">
-  <h2 id="s5"><span class="step">✓</span>Remember</h2>
+  <h2 id="s5"><span class="step">✓</span>Summary</h2>
   <div class="card recap">
     <ul>
-      <li>A word’s position is <strong>learned from its contexts</strong>: similar contexts, similar directions.</li>
-      <li><strong>Cosine similarity compares directions</strong> (1 same, 0 unrelated, −1 opposite); vector length doesn’t matter.</li>
-      <li>A document can be summarized as a position too. The lab’s route is <strong>TF-IDF, then TruncatedSVD (LSA)</strong>.</li>
-      <li>KMeans always returns k clusters. A fixed <code class="inl">random_state</code> makes runs <strong>repeatable</strong>, nothing more.</li>
-      <li><strong>Read cluster members before naming clusters.</strong> A label is a claim you check against the documents.</li>
-      <li>Similarity reflects the training text. State that limitation when you make social claims.</li>
+      <li>A word’s position is <strong>learned from its contexts</strong>, the words around it. Words with similar contexts point in similar directions.</li>
+      <li><strong>Cosine similarity compares directions.</strong> 1 means the same direction, 0 means unrelated, and −1 means opposite. The length of the vector doesn’t matter.</li>
+      <li>A document can have a position too. In the lab you get it with <strong>TF-IDF, then TruncatedSVD (LSA)</strong>.</li>
+      <li>KMeans always returns k clusters. Setting <code class="inl">random_state</code> to a fixed number makes every run give the <strong>same result</strong>. It does not make the clusters more correct.</li>
+      <li><strong>Read the members of a cluster before you name it.</strong> A name is a claim, so check it against the documents.</li>
+      <li>Similarity reflects the training text. Say so when you use it to make claims about society.</li>
     </ul>
   </div>
 </section>
 
-<footer>COMPSS 211A · UC Berkeley · CC BY 4.0 · A hand-made miniature. Runs in your browser.</footer>
+<footer>COMPSS 211A · UC Berkeley · CC BY 4.0 · A small hand-made example. Runs in your browser.</footer>
 </div>
 
 <script>
@@ -403,10 +406,10 @@ map.addEventListener("click",e=>{
   const cosg=(gx*d.ux+gy*d.uy)/gn;
   const angDiff=Math.round(Math.acos(Math.max(-1,Math.min(1,cosg)))*180/Math.PI);
   let msg;
-  if(angDiff<=25) msg=`Right neighborhood: your direction was only ${angDiff}° off. “deadline” sits between the study and feeling words because sentences about deadlines mention both.`;
-  else if(angDiff<=60) msg=`Close: ${angDiff}° off. The computed spot is between the study and feeling words, since sentences about deadlines mention exams and stress.`;
-  else msg=`${angDiff}° away. Look at where it landed: between the study and feeling words, because those are the words “deadline” shares sentences with.`;
-  placeStatus.innerHTML=`<strong>You just did an embedding by hand.</strong> ${msg} A model does the same thing from millions of contexts instead of intuition.`;
+  if(angDiff<=25) msg=`Good guess. Your direction was only ${angDiff}° off. “deadline” sits between the study words and the feeling words, because sentences about deadlines mention both.`;
+  else if(angDiff<=60) msg=`Fairly close: ${angDiff}° off. The real spot is between the study words and the feeling words, because sentences about deadlines mention exams and stress.`;
+  else msg=`${angDiff}° off. Look where it landed: between the study words and the feeling words. Those are the words that show up in sentences with “deadline.”`;
+  placeStatus.innerHTML=`<strong>You just placed a word by hand.</strong> ${msg} An embedding model does this using millions of example sentences instead of intuition.`;
 });
 
 /* ---------------- selection: pair + neighbors ---------------- */
@@ -449,25 +452,25 @@ function onWordClick(w){
     const ns=neighbors(w);
     nnOut.innerHTML=`<strong style="font-family:var(--mono)">${w}</strong><ol>`+
       ns.map(n=>`<li>${n.w} <span style="color:#6B7890">(${fmt(n.c)})</span></li>`).join("")+`</ol>`;
-    pairOut.innerHTML=`<span class="gloss">Now click a second word to compare the pair.</span>`;
+    pairOut.innerHTML=`<span class="gloss">Now click a second word to compare the two.</span>`;
     drawArrow(byName[w],"#2D6AA3");
   }else{
     const [a,b]=sel.map(x=>byName[x]);
     drawArrow(a,"#2D6AA3");drawArrow(b,"#C4820E");drawArc(a.a,b.a);
     const c=cosine(a,b);
     let gloss;
-    if(c>0.85) gloss="pointing almost the same way; these words appear in similar contexts.";
-    else if(c>0.4) gloss="related directions, some shared contexts.";
-    else if(c>-0.2) gloss="nearly perpendicular: little shared context in this miniature.";
-    else gloss="pointing in different directions: in this miniature they rarely share contexts.";
+    if(c>0.85) gloss="pointing almost the same way. These words appear in similar contexts.";
+    else if(c>0.4) gloss="similar directions. These words share some contexts.";
+    else if(c>-0.2) gloss="almost at a right angle. These words share little context on this map.";
+    else gloss="pointing in different directions. On this map these words rarely share contexts.";
     pairOut.innerHTML=`<strong style="font-family:var(--mono)">${sel[0]} · ${sel[1]}</strong><br><span class="big">cos = ${fmt(c)}</span><br><span class="gloss">${gloss}</span>`;
   }
 }
 clearSelBtn.addEventListener("click",()=>{
   sel=[];clearArrows();
   Object.values(dotEls).forEach(g=>g.classList.remove("sel","seltext"));
-  pairOut.innerHTML=`<span class="gloss">Select two words to compare their directions.</span>`;
-  nnOut.innerHTML=`<span class="gloss">Select one word to list the three that point most nearly the same way.</span>`;
+  pairOut.innerHTML=`<span class="gloss">Click two words to compare their directions.</span>`;
+  nnOut.innerHTML=`<span class="gloss">Click one word to see the three words that point in the most similar direction.</span>`;
   clearSelBtn.disabled=true;
 });
 
@@ -475,12 +478,12 @@ clearSelBtn.addEventListener("click",()=>{
 document.getElementById("checkP1").addEventListener("click",()=>{
   const pick=document.querySelector("input[name=p1]:checked");
   const v=document.getElementById("v-p1");
-  if(!pick){v.className="verdict show bad";v.textContent="Commit to an answer first.";return;}
+  if(!pick){v.className="verdict show bad";v.textContent="Pick an answer first.";return;}
   const c1=cosine(byName.library,byName.book), c2=cosine(byName.library,byName.bus);
   const good=pick.value==="a";
   v.className="verdict show "+(good?"good":"bad");
-  v.textContent=(good?"✓ Right: ":"✗ Check the geometry: ")+
-    `cos(library, book) = ${fmt(c1)} versus cos(library, bus) = ${fmt(c2)}. Similarity here is about shared sentence contexts, not shared category of “place.” Click both pairs on the map to see the angles.`;
+  v.textContent=(good?"✓ Right. ":"✗ Not quite. ")+
+    `cos(library, book) = ${fmt(c1)} and cos(library, bus) = ${fmt(c2)}. Here, similarity means the words show up in the same kinds of sentences. Being the same kind of thing, like a “place,” doesn’t count. Click both pairs on the map to see the angles.`;
 });
 
 /* ---------------- documents ---------------- */
@@ -504,7 +507,7 @@ function renderDoc(which){
   });
   if(!docState[which].length){
     const em=document.createElement("span");em.style.cssText="font-size:.85rem;color:#98A2B5";
-    em.textContent="empty, add words below";wordsDiv.appendChild(em);
+    em.textContent="Empty. Add words below.";wordsDiv.appendChild(em);
   }
   document.querySelectorAll(`#bank${which} button`).forEach(b=>{b.disabled=docState[which].includes(b.textContent)});
   if(starEls[which]){starEls[which].remove();delete starEls[which];}
@@ -526,11 +529,11 @@ function centroid(which){
 function renderDocSim(){
   const out=document.getElementById("docSim");
   if(!docState.A.length||!docState.B.length){
-    out.innerHTML=`<span style="color:#51607A;font-size:.9rem">Give both documents at least one word to compare them.</span>`;return;
+    out.innerHTML=`<span style="color:#51607A;font-size:.9rem">Add at least one word to each document to compare them.</span>`;return;
   }
   const a=centroid("A"), b=centroid("B");
   const c=cosXY(a.x,a.y,b.x,b.y);
-  out.innerHTML=`Document similarity: <span class="big">cos(★A, ★B) = ${fmt(c)}</span>, computed between the directions of the two stars, the same way you will compare LSA document vectors in the lab.`;
+  out.innerHTML=`Document similarity: <span class="big">cos(★A, ★B) = ${fmt(c)}</span>. This compares the directions of the two stars. You will compare LSA document vectors the same way in the lab.`;
 }
 const BANK=["library","book","exam","study","notes","lecture","coffee","tea","snack","pizza","lunch","bus","shuttle","commute","happy","tired","deadline","morning"];
 ["A","B"].forEach(which=>{
@@ -556,12 +559,12 @@ document.getElementById("tryPizza").addEventListener("click",()=>{
 document.getElementById("checkP2").addEventListener("click",()=>{
   const pick=document.querySelector("input[name=p2]:checked");
   const v=document.getElementById("v-p2");
-  if(!pick){v.className="verdict show bad";v.textContent="Commit to an answer first.";return;}
+  if(!pick){v.className="verdict show bad";v.textContent="Pick an answer first.";return;}
   const good=pick.value==="a";
   v.className="verdict show "+(good?"good":"bad");
   v.textContent=good
-    ? "✓ Right. An average is pulled by every member, so one food word moves the star toward the food words. Try the button."
-    : "✗ An average is pulled by every member, so adding “pizza” moves the star toward the food words. In a four-word document, one word matters. Try the button.";
+    ? "✓ Right. Every word counts toward the average, so one food word moves the star toward the food words. Click the button to see it."
+    : "✗ Not quite. Every word counts toward the average, so adding “pizza” moves the star toward the food words. In a document of only four words, one extra word makes a difference. Click the button to see it.";
 });
 
 /* ---------------- kmeans (seeded, on unit vectors) ---------------- */
@@ -608,11 +611,11 @@ function applyClusters(k){
   document.getElementById("leg4").hidden=(k<4);
   const transitCluster=assign[pts.findIndex(p=>p.w==="bus")];
   const members=pts.filter((p,i)=>assign[i]===transitCluster).map(p=>p.w);
-  document.getElementById("kStatus").textContent=`k=${k}, random_state=211. Run it again: the same seed gives the same clusters.`;
+  document.getElementById("kStatus").textContent=`k=${k}, random_state=211. Run it again and you get the same clusters, because random_state (the seed) stays the same.`;
   const card=document.getElementById("nameCard");
   card.style.display="block";
   document.getElementById("nameMembers").innerHTML=
-    `One cluster contains: <strong style="font-family:var(--mono)">${members.join(" · ")}</strong>. What do you call it?`;
+    `One cluster contains: <strong style="font-family:var(--mono)">${members.join(" · ")}</strong>. What would you name it?`;
   return members;
 }
 function clearClusters(){
@@ -635,12 +638,12 @@ document.getElementById("kOff").addEventListener("click",clearClusters);
 document.getElementById("checkP3").addEventListener("click",()=>{
   const pick=document.querySelector("input[name=p3]:checked");
   const v=document.getElementById("v-p3");
-  if(!pick){v.className="verdict show bad";v.textContent="Commit to an answer first.";return;}
+  if(!pick){v.className="verdict show bad";v.textContent="Pick an answer first.";return;}
   const good=pick.value==="c";
   v.className="verdict show "+(good?"good":"bad");
   v.textContent=good
-    ? "✓ Right. A cluster name is a claim about its members, so read them first. Try k=4 and watch the boundary words (morning, deadline) switch clusters. A label chosen before inspection can quietly become wrong."
-    : "✗ Check the full list first: this cluster also contains feeling words, so a transit label ignores half its members. Try k=4 and watch the boundary words (morning, deadline) switch clusters.";
+    ? "✓ Right. A cluster name is a claim about the words in it, so read them first. Try k=4 and watch the words near the edges (morning, deadline) move to a different cluster. A name you pick before looking can turn out wrong."
+    : "✗ Not quite. Read the full list first. This cluster also contains feeling words, so the name “transit” ignores half of them. Try k=4 and watch the words near the edges (morning, deadline) move to a different cluster.";
 });
 </script>
 </body>

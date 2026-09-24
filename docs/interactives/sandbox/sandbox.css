@@ -1,0 +1,28 @@
+/* Shared styles for the COMPSS 211A Python and terminal sandboxes. */
+.sbx{border:1px solid #CBD4E1;border-radius:6px;overflow:hidden;margin:14px 0;background:#fff;font-size:15px}
+.sbx-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 12px;background:#EEF3FA;border-bottom:1px solid #CBD4E1}
+.sbx-label{font-size:.82rem;font-weight:600;color:#002676;letter-spacing:.02em}
+.sbx-actions{display:flex;gap:6px}
+.sbx-actions button{font:600 .85rem/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;border:1px solid #002676;border-radius:4px;padding:7px 12px;background:#fff;color:#002676;cursor:pointer}
+.sbx-actions button.sbx-run{background:#002676;color:#fff}
+.sbx-actions button:disabled{opacity:.55;cursor:default}
+.sbx-actions button:focus-visible,.sbx-code:focus-visible,.sbx-input:focus-visible{outline:3px solid #FDBA12;outline-offset:2px}
+.sbx-code{display:block;width:100%;min-height:150px;border:0;border-bottom:1px solid #CBD4E1;padding:12px 14px;font:13.5px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#FBFCFE;color:#1A1A1A;resize:vertical;box-sizing:border-box}
+.sbx-out{margin:0;padding:12px 14px;min-height:44px;max-height:360px;overflow:auto;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#fff;color:#1A1A1A;white-space:pre}
+.sbx-status{font-size:.85rem;color:#465973;padding:0 14px}
+.sbx-status:not(:empty){padding:8px 14px;background:#FFF1CC}
+.sbx-err{color:#9B1C1C}
+.sbx-dim{color:#6B7A90}
+.sbx-term .sbx-screen{background:#101F48;color:#F0F4FF;padding:12px 14px;height:340px;overflow:auto;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;cursor:text}
+.sbx-term .sbx-log{margin:0;white-space:pre-wrap;word-break:break-word;font:inherit;color:inherit}
+.sbx-term .sbx-err{color:#FF9B9B}
+.sbx-term .sbx-dim{color:#9FB0D6}
+.sbx-term .sbx-echo{color:#F0F4FF}
+.sbx-term .sbx-dir{color:#FDBA12;font-weight:600}
+.sbx-term .sbx-line{display:flex;align-items:baseline}
+.sbx-term .sbx-prompt{white-space:pre;color:#9FE0B0}
+.sbx-term .sbx-input{flex:1;min-width:0;background:transparent;border:0;color:#F0F4FF;font:inherit;padding:0;outline:none}
+.sbx-term .sbx-input:disabled{opacity:.5}
+@media(max-width:720px){.sbx-term .sbx-screen{height:300px;font-size:12px}.sbx-code{font-size:12.5px}}
+.sbx-editor{border-top:1px solid #CBD4E1}
+.sbx-editor .sbx-code{min-height:220px;border-bottom:0}

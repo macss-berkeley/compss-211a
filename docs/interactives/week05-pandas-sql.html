@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Do these queries answer the same question? · COMPSS 211A</title>
+<meta name="description" content="Follow six requests through pandas and SQL to see how missing values, group counts, and joins can change your results.">
+<style>
+:root{--navy:#002676;--gold:#FDBA12;--ink:#1A1A1A;--muted:#465973;--line:#CBD4E1;--pale:#EEF3FA;--paper:#fff;--mark:#FFF1CC;--good:#17643C;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}a{color:var(--navy)}button,input{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.55}button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--gold);outline-offset:3px}button{border:1px solid var(--navy);border-radius:4px;padding:9px 16px;color:var(--navy);background:white;font-weight:600}button:hover:not(:disabled){background:var(--pale)}.primary{background:var(--navy);color:white}.primary:hover:not(:disabled){background:#173F91}.wrap{max-width:1100px;margin:auto;padding:0 24px}.mast{background:var(--navy);color:white}.mast .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:13px;padding-bottom:13px;font-size:.88rem}.mast a{color:white}.brand{font:700 1.05rem Georgia,serif;color:var(--gold);margin-right:12px}header{background:var(--navy);color:white;border-bottom:5px solid var(--gold);padding:28px 0 32px}h1{font-size:clamp(1.9rem,4.5vw,2.85rem);line-height:1.15;letter-spacing:-.025em;max-width:850px;margin:0 0 16px}header p{max-width:690px;margin:0 0 12px}.meta{font-size:.9rem;color:#DFE8FF}main{padding-top:28px!important}h2{color:var(--navy);font-size:1.4rem;line-height:1.3;margin:0 0 10px}h3{margin:0;color:var(--navy);font-size:1.05rem}p{max-width:75ch;margin:10px 0 16px}.small{font-size:.88rem;color:var(--muted)}.table-wrap{overflow:auto;margin:12px 0}table{border-collapse:collapse;width:100%;font-size:.91rem;text-align:left}caption{text-align:left;color:var(--muted);font-size:.88rem;margin-bottom:8px}th{background:var(--pale);font-weight:600;color:var(--navy);white-space:nowrap}th,td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}tbody tr.highlight{background:var(--mark)}.source td:not(:first-child){font-family:var(--mono);font-size:.85rem}.row-id{padding:2px 7px;font-family:var(--mono);font-size:.85rem}.row-id[aria-pressed=true]{background:var(--gold)}.missing{color:var(--muted);font-style:italic}.source-section{margin-bottom:30px}.step-nav{display:flex;gap:8px;flex-wrap:wrap;padding:20px 0;border-top:1px solid var(--line)}.step-nav button[aria-current=step]{background:var(--navy);color:white}.step-nav .done::after{content:" ✓"}.exercise{scroll-margin-top:16px}.question{font-size:1.07rem;max-width:75ch}.panels{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}.panel{min-width:0;border:1px solid var(--line);border-radius:4px;overflow:hidden}.panel h3{padding:12px 16px;background:var(--pale)}pre{background:#101F48;color:#F0F4FF;font:13px/1.65 var(--mono);padding:16px;margin:0;overflow:auto;min-height:155px}code{font-family:var(--mono);font-size:.88em}pre code{font-size:inherit}.result{padding:12px 15px}.placeholder{color:var(--muted);font-size:.93rem}.metric{font-weight:650;color:var(--navy);margin:0 0 12px}.trace{color:#674B00;background:var(--mark);padding:10px 14px;font-size:.9rem;min-height:44px}.members{font-family:var(--mono);white-space:nowrap}.prediction{margin:20px 0;border:1px solid var(--line);border-radius:4px;padding:14px 18px}.prediction legend{padding:0 6px;color:var(--navy);font-weight:600}.choices{display:flex;flex-wrap:wrap;gap:12px 24px}.choices label{cursor:pointer;display:flex;align-items:center;gap:7px}.choices input{accent-color:var(--navy)}.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.feedback{border-left:4px solid var(--gold);background:var(--pale);padding:15px 18px;margin:20px 0}.feedback p{margin:0 0 10px}.feedback p:last-child{margin-bottom:0}.feedback strong{color:var(--navy)}.join-controls{padding:12px 16px;background:var(--pale);margin:16px 0}.join-controls label{display:flex;align-items:flex-start;gap:9px;cursor:pointer}.join-controls input{margin-top:6px;accent-color:var(--navy)}.lookup{max-width:460px}.counts{border-top:1px solid var(--line);padding-top:16px;margin-top:16px}.counts ul{padding-left:22px}.bottom{border-top:1px solid var(--line);margin-top:28px;padding-top:22px}details{margin:20px 0}summary{cursor:pointer;color:var(--navy);font-weight:600}footer{background:var(--navy);color:#E1E9FC;padding:22px 0;margin-top:40px;font-size:.85rem}footer a{color:white}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}[hidden]{display:none!important}#step-title:focus{outline:none}.status{font-size:.9rem;color:var(--muted)}
+@media(max-width:720px){.wrap{padding-left:16px;padding-right:16px}.panels{grid-template-columns:1fr}pre{min-height:0;font-size:12px}th,td{padding:7px 9px}.choices{flex-direction:column;gap:9px}.step-nav button{flex:1;padding:9px 8px;font-size:.9rem}h1{font-size:2rem}.source{min-width:460px}}
+</style>
+</head>
+<body>
+<div class="mast"><div class="wrap"><span><span class="brand">UC Berkeley</span>COMPSS 211A · Computing I</span><a href="../index.html">All interactives</a></div></div>
+<header><div class="wrap"><h1>Do these queries answer the same question?</h1><p>Pandas and SQL can give different answers from the same data. In this activity, you follow the requests that go missing from one result. Then you fix the code so it says clearly which rows to keep.</p><div class="meta">Week 5 · Structured data · About 8–10 minutes</div></div></header>
+<main class="wrap">
+<section class="source-section" aria-labelledby="source-title">
+<h2 id="source-title">The six requests</h2>
+<p>We made up these six rows for teaching. They do not come from the real SF311 data. Every exercise starts from this full table. Click an ID to highlight that request in both results.</p>
+<div class="table-wrap" role="region" aria-label="Source requests, scroll horizontally if needed" tabindex="0"><table class="source"><caption>Each row is one request. “Missing” means no value was recorded. 0 hours is a real, recorded value.</caption><thead><tr><th scope="col">request_id</th><th scope="col">channel</th><th scope="col">district</th><th scope="col">hours_to_close</th></tr></thead><tbody id="source-body"></tbody></table></div>
+<p class="small">In the pandas examples, channel is a text column (dtype <code>object</code>) that uses <code>NaN</code> for missing values, just like in the course notebook. SQLite stores missing values as <code>NULL</code>.</p>
+</section>
+<nav class="step-nav" aria-label="Exercise steps"><button data-step="filter" aria-current="step">1. Filter rows</button><button data-step="group">2. Count groups</button><button data-step="join">3. Join a lookup table</button></nav>
+<section class="exercise" aria-labelledby="step-title">
+<h2 id="step-title" tabindex="-1"></h2><p class="question" id="question"></p>
+<div id="lookup-box" hidden><div class="table-wrap lookup"><table><caption>Lookup table: one label per district (until you add a second row for district 2).</caption><thead><tr><th scope="col">district</th><th scope="col">label</th></tr></thead><tbody id="lookup-body"></tbody></table></div></div>
+<div class="panels">
+<article class="panel"><h3>Pandas</h3><pre><code id="pandas-code"></code></pre><div class="result" id="pandas-result"><p class="placeholder">Make a prediction, then show the results.</p></div></article>
+<article class="panel"><h3>SQL</h3><pre><code id="sql-code"></code></pre><div class="result" id="sql-result"><p class="placeholder">Make a prediction, then show the results.</p></div></article>
+</div>
+<fieldset class="prediction" id="prediction"><legend>Read the code above. Which result will have more rows?</legend><div class="choices"><label><input type="radio" name="prediction" value="pandas">Pandas</label><label><input type="radio" name="prediction" value="same">Same number</label><label><input type="radio" name="prediction" value="sql">SQL</label></div></fieldset>
+<div class="actions"><button class="primary" id="reveal">Show results</button><button id="repair" hidden></button><button id="reset">Reset this exercise</button></div>
+<p id="notice" role="status" class="status"></p>
+<div class="feedback" id="feedback" hidden><p id="verdict"></p><p id="explanation"></p></div>
+<div id="trace" class="trace" hidden></div>
+<div id="counts" class="counts" hidden><h3>Counting rows vs. counting recorded values</h3><p>For all six requests:</p><ul><li><code>COUNT(*)</code> / <code>len(requests)</code>: <strong>6 rows</strong>.</li><li><code>COUNT(hours_to_close)</code> / <code>requests["hours_to_close"].count()</code>: <strong>4 recorded durations</strong>.</li></ul><p>B’s 0 is a recorded value, so it counts. C and F have no duration. A median would use only the four recorded values, so it would not describe all six requests.</p></div>
+<div id="duplicate-controls" class="join-controls" hidden><label><input type="checkbox" id="duplicate">Add a second lookup row for district 2</label><p class="small">Both queries now use a left join. If both results have the same number of rows, does that still mean one row per request? Make a guess, then check the box.</p><p id="duplicate-note"></p></div>
+<div class="bottom"><button id="next" class="primary">Next: count groups</button><p id="progress" class="small"></p></div>
+</section>
+<details><summary>Using this in the notebook</summary><p>When you compare two results, check every group and every request ID. One row that looks right is not enough. Decide how missing values should be handled, and write that into your code. Before a join, check that each key appears only once in the lookup table. For any number you report, look at which rows went into it.</p><p>In pandas, add <code>validate="many_to_one"</code> to the merge. It raises an error if a lookup key appears more than once. In SQL, you have to check for repeated keys yourself, for example:</p><pre><code>SELECT district, COUNT(*) AS rows_per_key
+FROM districts
+GROUP BY district
+HAVING COUNT(*) &gt; 1;</code></pre><p>This page only shows results for the examples above. To write and run your own queries, use the Week 5 notebook. Two more things to know. If you change how pandas stores missing values (the column’s dtype), comparisons like <code>!=</code> can behave differently. And pandas will match a missing join key to another missing key, but SQL never treats two NULLs as equal. Our lookup table has no missing keys, so that does not come up here.</p></details>
+<noscript><p>This activity needs JavaScript. If it is turned off, use the Week 5 notebook, which covers the same ideas.</p></noscript>
+</main>
+<footer><div class="wrap">COMPSS 211A · UC Berkeley · CC BY 4.0. Runs in your browser. It loads nothing from other sites and does not save your progress.<br>More reading from Exponent on <a href="https://www.tryexponent.com/courses/sql-interviews/sql-null-values">missing values</a>, <a href="https://www.tryexponent.com/courses/sql-interviews/sql-group-by-having">counts</a>, and <a href="https://www.tryexponent.com/courses/sql-interviews/sql-joins-and-duplicate-control">joins</a>. The examples and exercises were written for this course.</div></footer>
+<script>
+'use strict';
+// MODEL START: fixed demonstrations, verified against pandas 2.2.3 and SQLite.
+const records = [
+ {id:'A',channel:'Phone',district:1,hours:4},
+ {id:'B',channel:null,district:1,hours:0},
+ {id:'C',channel:'Web',district:null,hours:null},
+ {id:'D',channel:'Test',district:2,hours:2},
+ {id:'E',channel:'Phone',district:2,hours:8},
+ {id:'F',channel:'Phone',district:null,hours:null}
+];
+function lookupRows(duplicate=false){return [{district:1,label:'North'},{district:2,label:'South'},...(duplicate?[{district:2,label:'Second label'}]:[])];}
+function resultsFor(step,fixed=false,duplicate=false){
+ if(step==='filter')return {
+  pandas:records.filter(r=>r.channel!=='Test').map(r=>({id:r.id,channel:r.channel,members:[r.id]})),
+  sql:records.filter(r=>(r.channel!==null&&r.channel!=='Test')||(fixed&&r.channel===null)).map(r=>({id:r.id,channel:r.channel,members:[r.id]}))
+ };
+ if(step==='group'){
+  const group=keepMissing=>[1,2,...(keepMissing?[null]:[])].map(d=>{const members=records.filter(r=>r.district===d).map(r=>r.id);return {district:d,requests:members.length,members};});
+  return {pandas:group(fixed),sql:group(true)};
+ }
+ const join=left=>records.flatMap(r=>{const matches=lookupRows(duplicate).filter(k=>k.district===r.district);return matches.length?matches.map(k=>({id:r.id,label:k.label,members:[r.id]})):left?[{id:r.id,label:null,members:[r.id]}]:[];});
+ return {pandas:join(true),sql:join(fixed)};
+}
+// MODEL END
+const steps=['filter','group','join'];
+const state={step:'filter',selected:null,filter:{revealed:false,fixed:false,answer:null},group:{revealed:false,fixed:false,answer:null},join:{revealed:false,fixed:false,answer:null,duplicate:false}};
+const content={
+ filter:{title:'Keep every request except Test, including missing channels',question:'We want to keep B, whose channel is missing. Does each version of the code do that?',repair:'Fix SQL to keep missing channels',expected:'pandas',
+ pandas:'result = requests.loc[\n    requests["channel"] != "Test",\n    ["request_id", "channel"]\n]',
+ sql:'SELECT request_id, channel\nFROM requests\nWHERE channel != \'Test\'\nORDER BY request_id;',
+ sqlFixed:'SELECT request_id, channel\nFROM requests\nWHERE channel != \'Test\'\n   OR channel IS NULL\nORDER BY request_id;',
+ explanation:'Pandas keeps B. In this object column, NaN != "Test" counts as true. In SQL, comparing NULL with anything gives “unknown” instead of true, so WHERE drops B. Both drop D. The SQL code has to say what to do with missing channels.',
+ repaired:'Both now keep A, B, C, E, and F. The fixed SQL says directly that NULL channels should stay. In pandas, you can write (channel != "Test") | channel.isna() to say the same thing. That version works however pandas stores the missing values.'},
+ group:{title:'Count requests in each district, including unknown districts',question:'Both versions group all six rows by district. Will the two requests with a missing district be counted in any group?',repair:'Fix pandas to keep the missing-district group',expected:'sql',
+ pandas:'result = (\n    requests.groupby("district")\n    .size().rename("requests")\n    .reset_index()\n)',
+ pandasFixed:'result = (\n    requests.groupby("district", dropna=False)\n    .size().rename("requests")\n    .reset_index()\n)',
+ sql:'SELECT district, COUNT(*) AS requests\nFROM requests\nGROUP BY district\nORDER BY district IS NULL, district;',
+ explanation:'SQL returns three group rows, and their counts add up to all six requests. By default, pandas drops the group for missing districts. C and F disappear, and the counts add up to only four. Note that each row in these results is a group of requests.',
+ repaired:'Both now return three group rows, and the counts add up to six. C and F are in the missing-district group. The “Request IDs” column only shows you which rows went into each group. The code above does not return that column.'},
+ join:{title:'Add a district label and keep every request',question:'Both use the lookup table below. We want to keep C and F, even though they have no district to match. Look at which kind of join each version uses.',repair:'Use LEFT JOIN in SQL',expected:'pandas',
+ pandas:'result = requests.merge(\n    districts, on="district", how="left"\n)[["request_id", "label"]]',
+ sql:'SELECT r.request_id, d.label\nFROM requests AS r\nINNER JOIN districts AS d\n    ON r.district = d.district\nORDER BY r.request_id;',
+ sqlFixed:'SELECT r.request_id, d.label\nFROM requests AS r\nLEFT JOIN districts AS d\n    ON r.district = d.district\nORDER BY r.request_id;',
+ explanation:'The pandas left join keeps all six requests. The SQL inner join keeps only rows that find a match, so it returns just A, B, D, and E. C and F have no district, so no lookup row matches them.',
+ repaired:'Both left joins now keep all six requests. C and F have missing labels. Next, try adding a second lookup row for district 2. Even when pandas and SQL agree, you may not get one row per request.'}
+};
+const $=id=>document.getElementById(id);
+const escapeText=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const valueCell=value=>value===null?'<span class="missing">Missing</span>':escapeText(value);
+function tableHTML(rows,step){
+ const keys=step==='filter'?['id','channel']:step==='group'?['district','requests']:['id','label'];
+ const labels={id:'request_id',channel:'channel',district:'district',requests:'requests',label:'label'};
+ return '<div class="table-wrap"><table><thead><tr>'+keys.map(k=>'<th scope="col">'+labels[k]+'</th>').join('')+(step==='group'?'<th scope="col">Request IDs¹</th>':'')+'</tr></thead><tbody>'+rows.map(r=>'<tr'+(state.selected&&r.members.includes(state.selected)?' class="highlight"':'')+'>'+keys.map(k=>'<td>'+valueCell(r[k])+'</td>').join('')+(step==='group'?'<td class="members">'+r.members.join(', ')+'</td>':'')+'</tr>').join('')+'</tbody></table></div>';
+}
+function sourceHTML(){return records.map(r=>'<tr'+(state.selected===r.id?' class="highlight"':'')+'><td><button class="row-id" data-id="'+r.id+'" aria-label="Trace request '+r.id+'" aria-pressed="'+(state.selected===r.id)+'">'+r.id+'</button></td><td>'+valueCell(r.channel)+'</td><td>'+valueCell(r.district)+'</td><td>'+valueCell(r.hours)+'</td></tr>').join('');}
+function render(){
+ const s=state[state.step],c=content[state.step];
+ // Keep source controls in place after initialization so keyboard focus survives tracing.
+ if(!$('source-body').children.length)$('source-body').innerHTML=sourceHTML();
+ document.querySelectorAll('[data-id]').forEach(b=>{b.setAttribute('aria-pressed',String(state.selected===b.dataset.id));b.closest('tr').classList.toggle('highlight',state.selected===b.dataset.id);});
+ document.querySelectorAll('[data-step]').forEach(b=>{b.classList.toggle('done',state[b.dataset.step].fixed);if(b.dataset.step===state.step)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
+ $('step-title').textContent=c.title;$('question').textContent=c.question;
+ $('pandas-code').textContent=s.fixed&&c.pandasFixed?c.pandasFixed:c.pandas;
+ $('sql-code').textContent=s.fixed&&c.sqlFixed?c.sqlFixed:c.sql;
+ $('lookup-box').hidden=state.step!=='join';
+ $('lookup-body').innerHTML=lookupRows(s.duplicate).map(r=>'<tr><td>'+r.district+'</td><td>'+r.label+'</td></tr>').join('');
+ $('prediction').hidden=s.revealed;$('reveal').hidden=s.revealed;
+ document.querySelectorAll('input[name=prediction]').forEach(r=>r.checked=s.answer===r.value);
+ $('repair').hidden=!s.revealed||s.fixed;$('repair').textContent=c.repair;
+ $('feedback').hidden=!s.revealed;$('trace').hidden=!s.revealed;
+ $('counts').hidden=state.step!=='group'||!s.revealed;
+ $('duplicate-controls').hidden=state.step!=='join'||!s.fixed;
+ $('duplicate').checked=Boolean(s.duplicate);
+ if(s.revealed){
+  const out=resultsFor(state.step,s.fixed,s.duplicate);
+  for(const tool of ['pandas','sql']){
+   const rows=out[tool],ids=new Set(rows.flatMap(r=>r.members));
+   const count=state.step==='group'?rows.reduce((a,r)=>a+r.requests,0):rows.length;
+   const metric=state.step==='group'?`${rows.length} group rows · ${count} requests counted`:`${rows.length} output rows · ${ids.size} different requests`;
+   $(tool+'-result').innerHTML='<p class="metric">'+metric+'</p>'+tableHTML(rows,state.step)+(state.step==='group'?'<p class="small">¹ Not part of the query result. Shows which requests went into each group.</p>':'');
+  }
+  $('verdict').textContent=s.fixed?'The code now says clearly which rows to keep.':s.answer===c.expected?'Your prediction was right.':'Not quite. Look at which rows made it into each result.';
+  $('explanation').textContent=s.fixed?c.repaired:c.explanation;
+  if(state.selected){
+   const describe=tool=>{const n=out[tool].filter(r=>r.members.includes(state.selected)).length;return n?state.step==='group'?`is counted in ${n} group`:`appears ${n} ${n===1?'time':'times'}`:'is dropped';};
+   $('trace').textContent=`Request ${state.selected}: pandas ${describe('pandas')}; SQL ${describe('sql')}.`;
+  }else $('trace').textContent='Click a request ID in the table at the top to follow it into both results.';
+ }else{
+  $('pandas-result').innerHTML=$('sql-result').innerHTML='<p class="placeholder">Make a prediction, then show the results.</p>';
+ }
+ $('duplicate-note').textContent=s.duplicate?'Now there are eight rows but only six different requests. D and E each match two lookup rows, so each appears twice. If you counted the joined rows, you would overcount the requests. In pandas, validate="many_to_one" would raise an error for this lookup table.':'Each district appears once in the lookup table, so both left joins return six rows for six requests. The labels themselves can still be wrong or out of date, so check them too.';
+ const n=steps.indexOf(state.step);$('next').hidden=n===2;$('next').textContent=n===0?'Next: count groups':'Next: join a lookup table';
+ $('progress').textContent=steps.filter(k=>state[k].fixed).length+' of 3 exercises fixed. You can go back to any step.';
+}
+function changeStep(step){state.step=step;$('notice').textContent='';render();$('step-title').focus();}
+document.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>changeStep(b.dataset.step)));
+$('source-body').addEventListener('click',e=>{const b=e.target.closest('[data-id]');if(!b)return;state.selected=state.selected===b.dataset.id?null:b.dataset.id;render();});
+$('reveal').addEventListener('click',()=>{const picked=document.querySelector('input[name=prediction]:checked');if(!picked){$('notice').textContent='Pick a prediction first.';document.querySelector('input[name=prediction]').focus();return;}Object.assign(state[state.step],{revealed:true,answer:picked.value});$('notice').textContent='Results shown. Compare the row counts, and click a request ID to follow it.';render();$('repair').focus();});
+$('repair').addEventListener('click',()=>{state[state.step].fixed=true;render();$('notice').textContent='The fixed code now keeps the rows we wanted.';(state.step==='join'?$('duplicate'):$('next')).focus();});
+$('reset').addEventListener('click',()=>{state[state.step]={revealed:false,fixed:false,answer:null,duplicate:false};$('notice').textContent='Exercise reset. Make a new prediction.';render();document.querySelector('input[name=prediction]').focus();});
+$('duplicate').addEventListener('change',e=>{state.join.duplicate=e.target.checked;render();$('notice').textContent=state.join.duplicate?'District 2 now appears twice in the lookup table. Both results have eight rows for six requests.':'The second district 2 row is gone. Both results have six rows.';});
+$('next').addEventListener('click',()=>changeStep(steps[steps.indexOf(state.step)+1]));
+render();
+</script>
+</body>
+</html>

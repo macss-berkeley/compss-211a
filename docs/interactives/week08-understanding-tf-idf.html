@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
-<meta name="description" content="Interactive pre-quiz warmup for COMPSS 211A Week 8: watch four campus comments move through the full pipeline (raw text, tokens, counts, TF-IDF, top terms) and see how preprocessing choices change interpretation.">
+<meta name="description" content="A warm-up before the COMPSS 211A Week 8 quiz. Follow four campus comments from raw text to tokens, word counts, TF-IDF scores, and top terms, and see how your text-cleaning choices change what you conclude.">
 <title>Understanding TF-IDF · COMPSS 211A</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -604,6 +604,7 @@ html,body{overflow-x:clip}
 h2 .step{color:var(--berkeley)}
 footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(50% - 50vw) 0;padding:20px calc(50vw - 50%) 26px;border-top:0}
 </style>
+<link rel="stylesheet" href="sandbox/sandbox.css">
 </head>
 <body>
 <div class="wrap">
@@ -614,10 +615,10 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     <p class="eyebrow">COMPSS 211A &middot; COMPUTING I</p>
     <h1>Understanding TF-IDF</h1>
     <div class="chip-row">
-      <span class="meta-chip gold">Week 8 &middot; NLP Fundamentals</span>
+      <span class="meta-chip gold">Week 8 &middot; NLP basics</span>
       <span class="meta-chip outline">&approx; 8 minutes</span>
     </div>
-    <p class="promise">Four campus comments move through the whole pipeline (raw text, tokens, counts, TF-IDF, top terms) as you type and toggle. Each preprocessing choice changes what you would conclude.</p>
+    <p class="promise">Follow four campus comments step by step: raw text, tokens, word counts, TF-IDF scores, and top terms. Everything updates as you type or flip a switch. Each text-cleaning (preprocessing) choice changes what you would conclude.</p>
     <hr class="gold-rule">
   </header>
 
@@ -630,9 +631,9 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
           <p class="stage-eyebrow">The corpus</p>
           <h2 id="corpus-h">Four campus comments</h2>
         </div>
-        <button type="button" class="plain" id="reset-btn">Reset corpus</button>
+        <button type="button" class="plain" id="reset-btn">Reset comments</button>
       </div>
-      <p class="sub">A small synthetic corpus, similar to your homework&rsquo;s campus comments. Each line is one <strong>document</strong>. Edit any line and every stage below recomputes.</p>
+      <p class="sub">These four made-up campus comments are your corpus (a collection of texts). Each line is one <strong>document</strong>. Edit any line and everything below updates.</p>
 
       <div class="doc-row">
         <label class="doc-badge" for="doc0">D1<span class="sr-only">, document 1 text</span></label>
@@ -655,8 +656,8 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     <!-- ================= Toggles ================= -->
     <section class="card fade" id="controls" style="--d:0.06s" aria-labelledby="controls-h">
       <p class="stage-eyebrow">Preprocessing choices</p>
-      <h2 id="controls-h">The pipeline, four switches</h2>
-      <p class="sub">Every switch is a decision someone makes before any model runs. Flip them and watch the stages below.</p>
+      <h2 id="controls-h">Four ways to clean the text</h2>
+      <p class="sub">Before any analysis runs, someone has to decide how to clean the text. Each switch is one of those decisions. Turn them on and off and watch what changes below.</p>
 
       <div class="switch-grid">
         <label class="switch">
@@ -664,7 +665,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
           <span class="track" aria-hidden="true"></span>
           <span class="switch-text">
             <strong>lowercase</strong>
-            <small>merge case variants: <code>The</code> &rarr; <code>the</code> (sklearn: <code>lowercase=True</code>)</small>
+            <small>change capital letters to small ones, so <code>The</code> &rarr; <code>the</code> (in scikit-learn: <code>lowercase=True</code>)</small>
           </span>
         </label>
 
@@ -682,7 +683,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
           <span class="track" aria-hidden="true"></span>
           <span class="switch-text">
             <strong>remove stopwords</strong>
-            <small>drop very common words from a fixed list (matched case-insensitively); see the list below</small>
+            <small>drop very common words (stopwords) from a fixed list, whether or not they are capitalized. You can see the list below.</small>
           </span>
         </label>
 
@@ -691,7 +692,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
           <span class="track" aria-hidden="true"></span>
           <span class="switch-text">
             <strong>include bigrams</strong>
-            <small>n-grams: also count adjacent token pairs, e.g. <code>library wifi</code> (sklearn: <code>ngram_range=(1,&nbsp;2)</code>)</small>
+            <small>also count pairs of words that sit next to each other, like <code>library wifi</code>. A pair like this is a bigram, one kind of n-gram (in scikit-learn: <code>ngram_range=(1,&nbsp;2)</code>)</small>
           </span>
         </label>
       </div>
@@ -702,7 +703,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
           <span class="track" aria-hidden="true"></span>
           <span class="switch-text">
             <strong>keep negations</strong>
-            <small>curated stopword list: keep <code>not</code>, <code>no</code>, <code>never</code>, <code>nor</code> (only applies while stopword removal is on)</small>
+            <small>use an edited stopword list that keeps <code>not</code>, <code>no</code>, <code>never</code>, and <code>nor</code> (works only when stopword removal is on)</small>
           </span>
         </label>
       </div>
@@ -710,28 +711,28 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
       <details>
         <summary>See this page&rsquo;s stopword list</summary>
         <p class="stoplist" id="stoplist"></p>
-        <p class="smallnote">Gold entries are negations; they are struck through while <em>keep negations</em> is on. This curated list is a <strong>choice</strong>. scikit-learn&rsquo;s <code>stop_words="english"</code> list is much longer, and it also contains <code>not</code>.</p>
+        <p class="smallnote">The gold words are negations. They are crossed out while <em>keep negations</em> is on, because they are no longer removed. Someone chose the words on this list, and you could choose differently. scikit-learn&rsquo;s <code>stop_words="english"</code> list is much longer, and it also contains <code>not</code>.</p>
       </details>
 
-      <p class="pipe-note">Order of operations: lowercase &rarr; strip punctuation &rarr; split into tokens (tokenization) &rarr; remove stopwords &rarr; build bigrams. Bigrams are built <em>after</em> stopword removal, exactly as a standard vectorizer does it.</p>
+      <p class="pipe-note">The steps run in this order: lowercase &rarr; strip punctuation &rarr; split into tokens (tokenization) &rarr; remove stopwords &rarr; build bigrams. Bigrams are built <em>after</em> stopwords are removed. scikit-learn&rsquo;s vectorizer (the tool that turns text into counts) works the same way.</p>
     </section>
 
     <!-- ================= Stage A ================= -->
     <section class="card fade" style="--d:0.09s" aria-labelledby="stagea-h">
       <p class="stage-eyebrow">Stage A &middot; Tokenization</p>
-      <h2 id="stagea-h">Token strips</h2>
-      <p class="sub">Tokenization decides what counts as a word. These chips are exactly the tokens the matrices below will count. When you switch stopword removal on, the removed chips ghost out first so you can see what vanished.</p>
+      <h2 id="stagea-h">The tokens in each comment</h2>
+      <p class="sub">Tokenization splits text into pieces called tokens, usually words. It decides what counts as a word. Each chip below is one token, and these are exactly the tokens the tables below count. When you turn on stopword removal, the removed chips fade out first so you can see what was dropped.</p>
 
       <div id="strips"></div>
 
-      <p class="strip-legend"><span class="chip">token</span> unigram &nbsp;&middot;&nbsp; <span class="chip bigram">two words</span> bigram &nbsp;&middot;&nbsp; <span class="chip negkept">not</span> negation kept by the curated list &nbsp;&middot;&nbsp; <span class="chip ghost">ghosted</span> about to be removed</p>
+      <p class="strip-legend"><span class="chip">token</span> single word (unigram) &nbsp;&middot;&nbsp; <span class="chip bigram">two words</span> bigram &nbsp;&middot;&nbsp; <span class="chip negkept">not</span> negation kept by the edited list &nbsp;&middot;&nbsp; <span class="chip ghost">fading</span> about to be removed</p>
     </section>
 
     <!-- ================= Stage B ================= -->
     <section class="card fade" style="--d:0.12s" aria-labelledby="stageb-h">
       <p class="stage-eyebrow">Stage B &middot; Counts</p>
-      <h2 id="stageb-h">Document-term matrix <span class="tag">bag of words: order is gone</span></h2>
-      <p class="sub">Rows are documents, columns are vocabulary terms, cells are counts. At this point word order no longer exists: <code>wifi not working</code> and <code>not wifi working</code> would produce the same row.</p>
+      <h2 id="stageb-h">Document-term matrix <span class="tag">bag of words: word order is lost</span></h2>
+      <p class="sub">Each row is a document. Each column is a term from the vocabulary (the list of all distinct terms). Each cell shows how many times that term appears in that document. Word order is gone at this point: <code>wifi not working</code> and <code>not wifi working</code> would give the same row. That is why this is called a bag of words.</p>
 
       <div class="table-wrap">
         <table id="count-table">
@@ -743,10 +744,10 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
     <!-- ================= Predict 1 ================= -->
     <section class="card predict fade" style="--d:0.15s" aria-labelledby="p1-h">
-      <p class="stage-eyebrow">Predict, then check &middot; 1 of 3</p>
-      <h2 id="p1-h">Raw frequency</h2>
+      <p class="stage-eyebrow">Guess, then check &middot; 1 of 3</p>
+      <h2 id="p1-h">Which word is most common?</h2>
       <fieldset>
-        <legend>With all four switches <strong>off</strong>, which word has the highest raw count across the whole corpus?</legend>
+        <legend>With all four switches <strong>off</strong>, which word appears most often across all four comments?</legend>
         <label class="opt"><input type="radio" name="p1" value="the"><span><code>the</code></span></label>
         <label class="opt"><input type="radio" name="p1" value="wifi"><span><code>wifi</code></span></label>
         <label class="opt"><input type="radio" name="p1" value="library"><span><code>library</code></span></label>
@@ -758,8 +759,8 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
     <!-- ================= Predict 2 ================= -->
     <section class="card predict fade" style="--d:0.18s" aria-labelledby="p2-h">
-      <p class="stage-eyebrow">Predict, then check &middot; 2 of 3</p>
-      <h2 id="p2-h">The negation trap</h2>
+      <p class="stage-eyebrow">Guess, then check &middot; 2 of 3</p>
+      <h2 id="p2-h">What happens to &ldquo;not&rdquo;?</h2>
       <fieldset>
         <legend>Turn <strong>remove stopwords</strong> on (leave <em>keep negations</em> off). What happens to <code>not working</code> in D1?</legend>
         <label class="opt"><input type="radio" name="p2" value="both-stay"><span>Both words stay, since stopword lists only remove small grammar words like <code>the</code> and <code>is</code>.</span></label>
@@ -775,16 +776,16 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
       <p class="stage-eyebrow">Stage C &middot; Weighting</p>
       <h2 id="stagec-h">TF-IDF matrix</h2>
 
-      <p class="idea-callout">A term scores high when it is frequent <em>in</em> this document but rare <em>across</em> documents.</p>
+      <p class="idea-callout">A term gets a high score when it appears often <em>in</em> this document but in few of the other documents.</p>
 
       <p class="legend-row">
-        <span><b>TF</b> = count of the term in the document</span>
-        <span><b>DF</b> = number of documents containing the term</span>
-        <span><b>IDF</b> = ln(N &divide; DF), which grows as DF shrinks</span>
+        <span><b>TF</b> (term frequency) = how many times the term appears in the document</span>
+        <span><b>DF</b> (document frequency) = how many documents contain the term</span>
+        <span><b>IDF</b> (inverse document frequency) = ln(N &divide; DF), which gets bigger as DF gets smaller</span>
         <span><b>N</b> = 4 documents</span>
         <span><b>weight</b> = TF &times; IDF</span>
       </p>
-      <p class="sub">A term in all 4 documents gets IDF = ln(4/4) = 0: weight zero, no matter how frequent. Darker gold = higher weight; the outlined cell is the strongest term shown for that document.</p>
+      <p class="sub">A term that appears in all 4 documents gets IDF = ln(4/4) = 0, so its weight is zero no matter how often it appears. Darker gold means a higher weight. The outlined cell in each row is that document&rsquo;s highest-scoring term in the table.</p>
 
       <div class="table-wrap">
         <table id="tfidf-table">
@@ -792,18 +793,18 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
         </table>
       </div>
       <p class="matrix-note" id="tfidf-note"></p>
-      <p class="footnote">scikit-learn&rsquo;s default <code>TfidfVectorizer</code> differs in details (smoothing, normalization); the ranking logic is the same.</p>
+      <p class="footnote">By default, scikit-learn&rsquo;s <code>TfidfVectorizer</code> adjusts the numbers a little (smoothing and normalization), but it ranks terms the same way.</p>
     </section>
 
     <!-- ================= Predict 3 ================= -->
     <section class="card predict fade" style="--d:0.24s" aria-labelledby="p3-h">
-      <p class="stage-eyebrow">Predict, then check &middot; 3 of 3</p>
-      <h2 id="p3-h">Shared vs. distinctive</h2>
+      <p class="stage-eyebrow">Guess, then check &middot; 3 of 3</p>
+      <h2 id="p3-h">A word two comments share</h2>
       <fieldset>
-        <legend>Set <strong>lowercase</strong> and <strong>remove stopwords</strong> on. Under TF-IDF, which document does <code>shuttle</code> point to most strongly?</legend>
+        <legend>Set <strong>lowercase</strong> and <strong>remove stopwords</strong> on. Looking at the TF-IDF weights, which document does <code>shuttle</code> point to most strongly?</legend>
         <label class="opt"><input type="radio" name="p3" value="d3"><span>D3, the shuttle-schedule comment.</span></label>
         <label class="opt"><input type="radio" name="p3" value="d4"><span>D4, the coffee comment.</span></label>
-        <label class="opt"><input type="radio" name="p3" value="tie"><span>Neither: it ties between D3 and D4, so it cannot separate them.</span></label>
+        <label class="opt"><input type="radio" name="p3" value="tie"><span>Neither. It has the same weight in D3 and D4, so it cannot tell them apart.</span></label>
         <label class="opt"><input type="radio" name="p3" value="d1"><span>D1, the wifi complaint.</span></label>
       </fieldset>
       <button type="button" class="check" data-predict="p3">Check</button>
@@ -812,23 +813,38 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
     <!-- ================= Stage D ================= -->
     <section class="card fade" style="--d:0.27s" aria-labelledby="staged-h">
-      <p class="stage-eyebrow">Stage D &middot; Inspection</p>
-      <h2 id="staged-h">Top 3 distinctive terms per document</h2>
-      <p class="sub">Ranked by TF-IDF over the full current vocabulary (not just the columns shown above); ties break alphabetically. This is the view you will read in the homework, and it changes every time you flip a switch.</p>
+      <p class="stage-eyebrow">Stage D &middot; Top terms</p>
+      <h2 id="staged-h">The 3 most distinctive terms in each document</h2>
+      <p class="sub">Terms are ranked by TF-IDF weight across the whole vocabulary, including terms not shown in the columns above. Ties are sorted alphabetically. You will read lists like this in the homework. The list changes every time you flip a switch.</p>
       <div class="tops-grid" id="tops"></div>
+    </section>
+
+    <!-- ================= Real Python ================= -->
+    <section class="card fade" id="real-python" style="--d:0.28s" aria-labelledby="real-python-h">
+      <p class="stage-eyebrow">Try it in Python</p>
+      <h2 id="real-python-h">The same comments in scikit-learn</h2>
+      <p class="sub">This cell runs real Python with scikit-learn's <code>TfidfVectorizer</code>, the tool from class and HW4. The first time you run it, it downloads Python and scikit-learn (about 40 MB, only once). That takes a little while and needs an internet connection.</p>
+      <ol style="margin:0 0 6px 18px;padding:0;font-size:.95rem">
+        <li>Press <strong>Run</strong>. Is <code>not</code> in the vocabulary? Why not?</li>
+        <li>Add <code>ngram_range=(1, 2)</code> to the vectorizer. Do you get <code>not working</code>? What would you need to change to keep it?</li>
+        <li>To keep <code>not</code>, use <code>stop_words=list(ENGLISH_STOP_WORDS - {"not"})</code> together with <code>ngram_range=(1, 2)</code>. Now look for <code>not working</code>.</li>
+        <li>Print the top three words for each comment: <code>scores.loc["D1"].nlargest(3)</code>.</li>
+      </ol>
+      <p class="sub">The numbers won't exactly match the matrix above. scikit-learn adjusts the IDF slightly (smoothing) and rescales each row to a length of 1, so the scores differ, but the ranking is usually similar. If you edited the comments above, paste your versions into <code>docs</code>.</p>
+      <div id="tfidf-python"></div>
     </section>
 
     <!-- ================= Recap ================= -->
     <section class="card fade" id="recap" style="--d:0.30s" aria-labelledby="recap-h">
-      <p class="stage-eyebrow">Remember</p>
-      <h2 id="recap-h">Six lines to keep</h2>
+      <p class="stage-eyebrow">Summary</p>
+      <h2 id="recap-h">What to remember</h2>
       <ul>
         <li><strong>Tokenization</strong> decides what counts as a word: <code>The</code> &ne; <code>the</code> until you lowercase, and <code>week.</code> &ne; <code>week</code> until you strip punctuation.</li>
-        <li><strong>Stopword lists are a choice.</strong> A default list can delete meaning: <code>not working</code> becomes <code>working</code>.</li>
-        <li><strong>Bag-of-words discards order.</strong> Bigrams (n-grams) recover short phrases like <code>not working</code>, but only words that survive filtering can form them.</li>
-        <li><strong>TF-IDF = frequent here, rare elsewhere.</strong> A term in every document scores zero; a term shared by two documents can&rsquo;t tell them apart.</li>
-        <li><strong>Top terms describe the corpus you built, not the world.</strong> Four synthetic comments are not evidence about Berkeley students or campus opinion.</li>
-        <li><strong>Interpretation limits:</strong> a model cannot use evidence that preprocessing removed, so write claims that survive your preprocessing choices.</li>
+        <li><strong>Someone chooses the stopword list.</strong> A default list can remove meaning: <code>not working</code> becomes <code>working</code>.</li>
+        <li><strong>A bag of words loses word order.</strong> Bigrams (n-grams) bring back short phrases like <code>not working</code>, but only words that are still there after stopword removal can form them.</li>
+        <li><strong>TF-IDF favors terms that are common in one document and rare in the others.</strong> A term in every document scores zero. A term shared by two documents can&rsquo;t tell them apart.</li>
+        <li><strong>Top terms only describe your own corpus.</strong> Four made-up comments tell you nothing about Berkeley students or campus opinion.</li>
+        <li><strong>Be careful what you claim.</strong> A model cannot use words that preprocessing removed. Only make claims that would still hold under other reasonable preprocessing choices.</li>
       </ul>
     </section>
 
@@ -1078,7 +1094,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
       var uniRow = el("div", "chips-row");
       var uni = view[d].uni;
       if (uni.length === 0) {
-        uniRow.appendChild(el("span", "empty-doc", "(no tokens survive)"));
+        uniRow.appendChild(el("span", "empty-doc", "(no tokens left)"));
       } else {
         for (var i = 0; i < uni.length; i++) {
           uniRow.appendChild(makeChip(uni[i].text, uni[i].neg ? "neg" : "uni", uni[i].ghost));
@@ -1091,7 +1107,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
         biRow.appendChild(el("span", "bigram-label", "bigrams"));
         var bi = view[d].bi;
         if (bi.length === 0) {
-          biRow.appendChild(el("span", "empty-doc", "(none: needs two surviving tokens in a row)"));
+          biRow.appendChild(el("span", "empty-doc", "(none: needs two remaining tokens in a row)"));
         } else {
           for (var j = 0; j < bi.length; j++) {
             biRow.appendChild(makeChip(bi[j].text, "bi", bi[j].ghost));
@@ -1169,11 +1185,11 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
       msg = "Showing the " + m.columns.length + " most frequent of " + m.vocabSize +
         " vocabulary terms (" + m.uniCount + " unigrams" +
         (m.opts.bigrams ? ", " + m.biCount + " bigrams" : "") +
-        "). Real document-term matrices are far wider than this, and mostly zeros (sparse).";
+        "). Real document-term matrices have far more columns than this, and most cells are zeros (a sparse matrix).";
     } else {
       msg = "Showing all " + m.vocabSize + " vocabulary terms (" + m.uniCount + " unigrams" +
         (m.opts.bigrams ? ", " + m.biCount + " bigrams" : "") +
-        "). Real document-term matrices are far wider than this, and mostly zeros (sparse).";
+        "). Real document-term matrices have far more columns than this, and most cells are zeros (a sparse matrix).";
     }
     vocabNote.textContent = msg;
   }
@@ -1236,7 +1252,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
         }
         if (i === rowMaxIdx && rowMax > 0) {
           td.classList.add("topcell");
-          td.title = "D" + (d + 1) + "'s strongest term shown";
+          td.title = "D" + (d + 1) + "'s highest-scoring term in this table";
         }
         tr.appendChild(td);
       }
@@ -1244,7 +1260,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     }
     tfidfTable.appendChild(tbody);
 
-    tfidfNote.textContent = "Same " + m.columns.length + " columns as Stage B. weight = TF × ln(4 ÷ DF); hover a column header for its DF and IDF.";
+    tfidfNote.textContent = "Same " + m.columns.length + " columns as Stage B. weight = TF × ln(4 ÷ DF). Hover over a column header to see its DF and IDF.";
   }
 
   /* ---------- Stage D: top terms ---------- */
@@ -1260,7 +1276,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
       card.appendChild(snip);
 
       if (m.tops[d].length === 0) {
-        card.appendChild(el("p", "none", "no distinctive terms: every surviving term also appears elsewhere (or the document is empty)"));
+        card.appendChild(el("p", "none", "no distinctive terms: every remaining term appears in all four documents (or the document is empty)"));
       } else {
         var ol = document.createElement("ol");
         for (var i = 0; i < m.tops[d].length; i++) {
@@ -1325,9 +1341,9 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     renderTops(m);
     renderStoplist();
     renderStrips(stripView || stripViewFromModel(m));
-    announce("Recomputed. Vocabulary: " + m.vocabSize + " terms (" + m.uniCount +
+    announce("Updated. Vocabulary: " + m.vocabSize + " terms (" + m.uniCount +
       " unigrams" + (m.opts.bigrams ? ", " + m.biCount + " bigrams" : "") +
-      "). Matrix shows " + m.columns.length + " columns.");
+      "). The tables show " + m.columns.length + " columns.");
   }
 
   function update() {
@@ -1374,7 +1390,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     renderTops(m);
     renderStoplist();
     renderStrips(view);
-    announce("Stopword filtering changed. Ghosted chips are being removed. Vocabulary: " +
+    announce("Stopword removal changed. Faded chips are being removed. Vocabulary: " +
       m.vocabSize + " terms.");
 
     setTimeout(function () {
@@ -1433,18 +1449,18 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
   var PREDICTS = {
     p1: {
       answer: "the",
-      why: "On the page, “the” appears three times. But look at the count matrix: with lowercase off, the computer counts “The” (2) and “the” (1) as two different terms. Tokenization decides what counts as a word.",
-      nudge: "Try it: flip lowercase on and watch The + the merge into the (count 3). Then flip remove stopwords on and watch the corpus’s most frequent term vanish entirely. Raw frequency ≠ meaning."
+      why: "You can see “the” three times in the comments. But look at the count table: with lowercase off, the computer counts “The” (2) and “the” (1) as two different terms. Tokenization decides what counts as a word.",
+      nudge: "Try it: turn on lowercase and watch The and the merge into the (count 3). Then turn on remove stopwords and watch the most frequent term disappear. The most frequent word is not always the most meaningful one."
     },
     p2: {
       answer: "not-removed",
-      why: "Standard English stopword lists (scikit-learn’s included) usually contain “not”. With it gone, D1’s surviving tokens read library · wifi · working: the complaint now looks almost like praise. The negation was deleted before any model could see it.",
-      nudge: "Two fixes, both on this page: flip keep negations (a curated stopword list), or flip include bigrams so “not working” becomes one feature. Bigrams are built after stopword removal, so the bigram only exists if “not” survives filtering first."
+      why: "Standard English stopword lists, including scikit-learn’s, usually contain “not”. Without it, D1 keeps words like library, wifi, and working, so the complaint now looks almost like praise. The negation was deleted before any model could see it.",
+      nudge: "To fix it on this page, turn on keep negations (an edited stopword list). Turning on include bigrams alone won’t help: bigrams are built after stopwords are removed, so “not working” only appears if “not” is still there. Try both together."
     },
     p3: {
       answer: "tie",
-      why: "“shuttle” appears in D3 and D4 (DF = 2), so its weight is identical in both: ln(4÷2) × 1 = 0.69 each. It cannot separate the two documents. Compare “coffee”: only in D4 (DF = 1), so its IDF is twice as large.",
-      nudge: "Shared terms discriminate less. TF-IDF surfaces distinctive terms rather than important ones. “shuttle” may matter most to riders, but it cannot point at one document."
+      why: "“shuttle” appears in D3 and D4 (DF = 2), so its weight is the same in both: ln(4÷2) × 1 = 0.69 each. It cannot tell the two documents apart. Compare “coffee”: it is only in D4 (DF = 1), so its IDF is twice as large.",
+      nudge: "Terms that documents share are less useful for telling them apart. TF-IDF finds terms that are distinctive, which is not the same as important. “shuttle” may matter most to riders, but it cannot point to one document."
     }
   };
 
@@ -1467,7 +1483,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
       var right = chosen.value === conf.answer;
       verdict.className = "verdict show " + (right ? "good" : "bad");
       verdict.appendChild(el("span", "headline",
-        right ? "Correct." : "Not this time. Check the highlighted answer in the tables above."));
+        right ? "Correct." : "Not quite. Check the tables above to see the answer."));
       verdict.appendChild(el("span", "why", conf.why));
       verdict.appendChild(el("span", "nudge", conf.nudge));
     });
@@ -1479,6 +1495,34 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
   tgKeepNeg.disabled = !tgStop.checked;
   update();
 })();
+</script>
+<script src="sandbox/sandbox.js"></script>
+<script>
+Sandbox.python(document.getElementById("tfidf-python"), {
+  packages: ["pandas", "scikit-learn"],
+  root: "/home/you/tfidf",
+  setup: 'import pandas as pd\npd.set_option("display.width", 200)\npd.set_option("display.max_columns", 40)',
+  code: [
+    "import pandas as pd",
+    "from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, TfidfVectorizer",
+    "",
+    "docs = [",
+    '    "The library wifi is not working again this week.",',
+    '    "Late night library wifi keeps dropping during finals.",',
+    '    "The campus shuttle schedule is great this semester.",',
+    '    "Great coffee near the shuttle stop makes mornings easier.",',
+    "]",
+    "",
+    'vectorizer = TfidfVectorizer(stop_words="english")',
+    "matrix = vectorizer.fit_transform(docs)",
+    "",
+    "print(len(vectorizer.get_feature_names_out()), \"words in the vocabulary\")",
+    'print("Is \'not\' in it?", "not" in vectorizer.vocabulary_)',
+    'scores = pd.DataFrame(matrix.toarray(), columns=vectorizer.get_feature_names_out(), index=["D1", "D2", "D3", "D4"])',
+    "scores.round(2)",
+    ""
+  ].join("\n")
+});
 </script>
 </body>
 </html>
