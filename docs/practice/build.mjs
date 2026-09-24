@@ -1,0 +1,13 @@
+import {mkdir,copyFile} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import {join} from 'node:path';
+import {skills} from './catalog.mjs';
+import {activities} from './exercises.mjs';
+import {skillChecks} from './skill-checks.mjs';
+const root=fileURLToPath(new URL('.',import.meta.url));
+if(new Set(skills.map(s=>s.id)).size!==skills.length)throw new Error('Every skill needs a unique, permanent ID.');
+for(const a of activities)if(!skills.some(s=>s.id===a.skill&&s.activity===a.id))throw new Error('Activity has no matching skill: '+a.id);
+for(const s of skills)if(!s.activity&&!skillChecks[s.id])throw new Error('Missing practice for '+s.id);
+await mkdir(join(root,'dist'),{recursive:true});
+for(const name of ['index.html','styles.css','app.mjs','catalog.mjs','schedule.mjs','exercises.mjs','python-worker.mjs','skill-checks.mjs'])await copyFile(join(root,name),join(root,'dist',name));
+console.log('Built practice studio: 57 directly accessible skills, 54 quick checks, 9 interactive examples.');
