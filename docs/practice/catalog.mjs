@@ -484,8 +484,8 @@ export const skills = [
     "weeks": "Week 4",
     "releaseWeek": 4,
     "activity": null,
-    "practice": "Lab 4 §§1–3 — Navigate folders, run a script, and explain a relative-path failure.",
-    "url": "https://github.com/macss-berkeley/compss-211a/blob/main/lab/lab04_cli_git_recovery.ipynb"
+    "practice": "Lab 4: run the baseline and repair a path error — Navigate folders, run a script, and explain a relative-path failure.",
+    "url": "https://github.com/macss-berkeley/compss-211a/blob/main/lab/lab04_run_adapt_check.ipynb"
   },
   {
     "id": "scripts-vs-notebooks",
@@ -495,8 +495,8 @@ export const skills = [
     "weeks": "Week 4",
     "releaseWeek": 4,
     "activity": null,
-    "practice": "Lab 4 §§2, 6 — Run a saved script and explain when you would choose a notebook instead.",
-    "url": "https://github.com/macss-berkeley/compss-211a/blob/main/lab/lab04_cli_git_recovery.ipynb"
+    "practice": "Lab 4: run and inspect the baseline — Distinguish saving code, running a script, and opening its CSV.",
+    "url": "https://github.com/macss-berkeley/compss-211a/blob/main/lab/lab04_run_adapt_check.ipynb"
   },
   {
     "id": "import-your-own-code",
@@ -518,7 +518,7 @@ export const skills = [
     "releaseWeek": 4,
     "activity": null,
     "practice": "Lab 4 — Locate the script, its input CSV, and project folders; explain the file paths.",
-    "url": "https://github.com/macss-berkeley/compss-211a/blob/main/lab/lab04_cli_git_recovery.ipynb"
+    "url": "https://github.com/macss-berkeley/compss-211a/blob/main/lab/lab04_run_adapt_check.ipynb"
   },
   {
     "id": "edit-rerun-and-check",
@@ -528,8 +528,8 @@ export const skills = [
     "weeks": "Week 4",
     "releaseWeek": 4,
     "activity": null,
-    "practice": "Lab 4 §2 — Change head() to tail(), save, rerun, and check the output.",
-    "url": "https://github.com/macss-berkeley/compss-211a/blob/main/lab/lab04_cli_git_recovery.ipynb"
+    "practice": "Lab 4: reuse the calculation and verify the result — Save a category report and compare its counts with the input.",
+    "url": "https://github.com/macss-berkeley/compss-211a/blob/main/lab/lab04_run_adapt_check.ipynb"
   },
   {
     "id": "git-and-github",

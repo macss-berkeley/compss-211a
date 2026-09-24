@@ -12,5 +12,5 @@ for(const s of skills)if(!s.activity&&!skillChecks[s.id])throw new Error('Missin
 if(new Set(flashcards.map(c=>c.id)).size!==flashcards.length)throw new Error('Duplicate flashcard IDs');
 for(const c of flashcards)if(!skills.some(s=>s.id===c.skill)||!c.prompt||(!c.answer&&!c.answerCode))throw new Error('Invalid flashcard: '+c.id);
 await mkdir(join(root,'dist'),{recursive:true});
-for(const name of ['index.html','styles.css','app.mjs','catalog.mjs','schedule.mjs','flashcards.mjs','flashcard-ui.mjs','exercises.mjs','python-worker.mjs','skill-checks.mjs'])await copyFile(join(root,name),join(root,'dist',name));
+for(const name of ['index.html','styles.css','app.mjs','catalog.mjs','schedule.mjs','flashcards.mjs','flashcard-ui.mjs','exercises.mjs','python-worker.mjs','skill-checks.mjs','activity-client.mjs'])await copyFile(join(root,name),join(root,'dist',name));
 console.log('Built practice studio: 57 directly accessible skills, 54 quick checks, 9 interactive examples.');

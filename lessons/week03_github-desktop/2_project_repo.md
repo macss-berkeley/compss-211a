@@ -264,7 +264,7 @@ to choose between a notebook and a script, write a `.py` file, or run the
 README's terminal setup commands to complete today's Markdown exercise.
 
 We'll discuss scripts and command-line work in
-[Week 4](../week04_command-line/README.md), and return to setting up and running
+[Week 4](../week04_reproducible-analyses/README.md), and return to setting up and running
 Python in your team's repository then.
 
 ## Next week: publish a website with GitHub Pages

@@ -1,5 +1,5 @@
 import {availableCards,dueCards,reviewOptions,scheduleReview,setCardSuspended,intervalLabel} from './flashcards.mjs?v=20260924-wording';
-export function createFlashcards({getProgress,save,getWeek,skills,esc,title}){
+export function createFlashcards({getProgress,save,getWeek,skills,esc,title,track=()=>{}}){
   const state={deck:'all',scope:'covered',skill:null,card:null,revealed:false,note:'',draft:'',knownOpen:false};
   const reviews=()=>getProgress().flashcards||{};
   const available=()=>availableCards({week:getWeek(),scope:state.scope,deck:state.deck,skill:state.skill});
@@ -35,6 +35,7 @@ export function createFlashcards({getProgress,save,getWeek,skills,esc,title}){
     if(name==='flash-reveal'&&state.card){state.revealed=true;return true;}
     if(name==='flash-grade'&&state.card&&state.revealed){
       const grade=button.dataset.grade;if(!['again','hard','good','easy'].includes(grade))return false;
+      const card=available().find(c=>c.id===state.card);if(card)track('flashcard',card.skill,grade,'flashcard');
       const p=getProgress(),next=scheduleReview(reviews()[state.card],grade);
       p.flashcards??={};p.flashcards[state.card]=next;
       save();reset();state.note=`Saved. Next review: ${new Date(next.dueAt).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'})}.`;return true;

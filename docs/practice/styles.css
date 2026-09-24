@@ -106,3 +106,5 @@ h1,h2,h3{font-family:var(--heading)}h1{font-weight:800;letter-spacing:-.015em}
 .square-tooltip[hidden]{display:none}
 .square-tooltip strong{display:block;font-size:16px;margin-bottom:3px}
 .square-tooltip>span{display:block;color:#e3ebfa}
+
+.practice-content{min-width:0}.activity-notice,.activity-details{margin:18px 34px 0;font-size:.875rem;line-height:1.55}.activity-notice{padding:12px 16px;background:#f1f4f8;border-left:3px solid #002676}.activity-details{color:#4b5563;margin-top:6px}.activity-details summary{cursor:pointer}.activity-details p{max-width:850px}@media(max-width:700px){.activity-notice,.activity-details{margin-left:18px;margin-right:18px}}
