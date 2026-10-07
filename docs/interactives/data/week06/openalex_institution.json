@@ -1,0 +1,82 @@
+{
+ "id": "https://openalex.org/I95457486",
+ "ror": "https://ror.org/01an7q238",
+ "display_name": "University of California, Berkeley",
+ "country_code": "US",
+ "type": "education",
+ "type_id": "https://openalex.org/institution-types/education",
+ "lineage": [
+  "https://openalex.org/I95457486"
+ ],
+ "homepage_url": "https://www.berkeley.edu",
+ "image_url": "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Seal%20of%20University%20of%20California%2C%20Berkeley.svg",
+ "image_thumbnail_url": "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Seal%20of%20University%20of%20California%2C%20Berkeley.svg&width=300",
+ "display_name_acronyms": [
+  "UCB"
+ ],
+ "display_name_alternatives": [
+  "Cal Berkeley",
+  "UC Berkeley",
+  "Universidad de California en Berkeley",
+  "University of California at Berkeley",
+  "University of California, Berkeley",
+  "Université de Californie à Berkeley"
+ ],
+ "repositories": [
+  {
+   "id": "https://openalex.org/S7407050879",
+   "display_name": "UC Berkeley",
+   "host_organization": "https://openalex.org/I95457486",
+   "host_organization_name": "University of California, Berkeley",
+   "host_organization_lineage": [
+    "https://openalex.org/I95457486"
+   ]
+  }
+ ],
+ "works_count": 513567,
+ "cited_by_count": 64059888,
+ "summary_stats": {
+  "2yr_mean_citedness": 2.7551321059929132,
+  "h_index": 2016,
+  "i10_index": 544074
+ },
+ "ids": {
+  "openalex": "https://openalex.org/I95457486",
+  "ror": "https://ror.org/01an7q238",
+  "grid": "grid.47840.3f",
+  "wikipedia": "http://en.wikipedia.org/wiki/University_of_California,_Berkeley",
+  "wikidata": "Q168756"
+ },
+ "geo": {
+  "city": "Berkeley",
+  "geonames_city_id": "5327684",
+  "region": "California",
+  "country_code": "US",
+  "country": "United States",
+  "latitude": 37.87159,
+  "longitude": -122.27275
+ },
+ "international": {},
+ "roles": [
+  {
+   "role": "funder",
+   "id": "https://openalex.org/F4320309411",
+   "works_count": 5822
+  },
+  {
+   "role": "institution",
+   "id": "https://openalex.org/I95457486",
+   "works_count": 513567
+  },
+  {
+   "role": "publisher",
+   "id": "https://openalex.org/P4310316198",
+   "works_count": 568
+  }
+ ],
+ "is_super_system": false,
+ "status": "active",
+ "works_api_url": "https://api.openalex.org/works?filter=institutions.id:I95457486",
+ "updated_date": "2026-10-07T06:00:19",
+ "created_date": "2016-06-24T00:00:00"
+}

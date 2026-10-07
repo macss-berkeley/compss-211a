@@ -129,7 +129,7 @@ footer{border-top:1px solid var(--line);padding:18px 0 30px;font-size:.85rem;col
 <div class="brief">
   <p><b>The question.</b> Which works from 2024 with a UC Berkeley author are cited most, and who wrote them? A work is what OpenAlex calls a paper, a book or a dataset.</p>
   <ol class="stages" id="stages" aria-label="Where you are">
-    <li data-stage="request"><span>Request</span></li><li data-stage="response"><span>Response</span></li><li data-stage="values"><span>Read values</span></li><li data-stage="all"><span>Every work</span></li><li data-stage="table"><span>Table</span></li>
+    <li data-stage="basics"><span>Basics</span></li><li data-stage="request"><span>Request</span></li><li data-stage="response"><span>Response</span></li><li data-stage="values"><span>Read values</span></li><li data-stage="all"><span>Every work</span></li><li data-stage="table"><span>Table</span></li>
   </ol>
   <div class="source" role="group" aria-labelledby="sourceLabel">
     <span id="sourceLabel">Requests go to</span>
@@ -160,7 +160,7 @@ footer{border-top:1px solid var(--line);padding:18px 0 30px;font-size:.85rem;col
 <script>
 'use strict';
 // The saved responses. Each file sits in data/week06/ next to this page and is read by the Python code as a file.
-const DATA_FILES = ['openalex_page1.json', 'openalex_page2.json'];
+const DATA_FILES = ['openalex_page1.json', 'openalex_page2.json', 'openalex_institution.json'];
 const FILES = {};
 const ROOT = '/home/you/week06';
 
@@ -187,12 +187,35 @@ const LIVE_SETUP = 'import pyodide_http\npyodide_http.patch_all()\nimport reques
 // check.labels: what to call an expression in a message. check.truths: for a live request, tests on the student's own result, because a second request would give a different response.
 // pre: code run before the student's code, for a value an earlier step made. live: the step sends a real request.
 // example: code that is shown and can be run. after: shown once the answer is correct.
-// stage: where the step sits in Request, Response, Read values, Every work, Table. intro and after can be a list of paragraphs.
+// stage: where the step sits in Basics, Request, Response, Read values, Every work, Table. intro and after can be a list of paragraphs.
 const STEPS = [
-  {topic: 'Write the request', stage: 'request',
-   intro: ['OpenAlex is a free catalogue of research. It has a web API: you send it a web address that says what you want, and it sends back data instead of a web page.',
-           'A request has two parts. The endpoint is the address of the service: <code>https://api.openalex.org/works</code>. The parameters say what you want. In Python they go in a dictionary, and <code>urlencode</code> turns the dictionary into the text after the <code>?</code>. Here <code>filter</code> picks the works, <code>sort</code> puts the most-cited first (<code>desc</code> means from high to low), <code>per_page</code> says how many to send at a time, and <code>cursor</code> says which page: <code>*</code> is the first.'],
-   task: 'Fill in the two blanks so that the request asks for works from <b>2024</b>, <b>five</b> at a time. <code>I95457486</code> is OpenAlex\'s ID for UC Berkeley, and <code>has_abstract:true</code> keeps the works that have a summary.',
+  {topic: 'Send a GET request', stage: 'basics', live: true,
+   intro: ['OpenAlex is a free catalogue of research. It has a web API: you send a request to a web address, and it sends back data instead of a web page.',
+           'The simplest request is a GET request. It asks for what is at one address. In Python the <code>requests</code> package sends it: <code>requests.get(address)</code> sends the request and waits for the answer. What comes back is called the response. Its status code says how the request went: 200 means the server accepted it, and a number from 400 up means it did not.',
+           '<span data-source-note="short"></span>'],
+   task: 'Send a GET request to the address in the box. It is the address of one record in OpenAlex: the institution with the ID <code>I95457486</code>. Make <code>status</code>: the status code of the response.',
+   starter: 'import requests\n\nresponse = requests.____("https://api.openalex.org/institutions/I95457486")\nstatus = response.____\nstatus',
+   answer: 'import requests\n\nresponse = requests.get("https://api.openalex.org/institutions/I95457486")\nstatus = response.status_code\nstatus',
+   check: {truths: [['status != 429', 'OpenAlex answered 429: this network has used up its requests for today. Choose Simulated OpenAlex above the steps and run the code again.'],
+                    ['status == 200', 'status should be 200, the code for a request the server accepted. Take it from response.status_code, and check that the address is unchanged.']]},
+   hint: 'The first blank is <code>get</code>. The status code is <code>response.status_code</code>.',
+   after: 'The server accepted the request. The status code does not say what came back. The next step looks at that.'},
+  {topic: 'Look at the JSON', stage: 'basics', live: true,
+   intro: ['A response also has a body: the data, as text. <code>response.text</code> gives that text. It is written in JSON, a text format for data. Curly brackets hold keys with their values and square brackets hold lists, much like dictionaries and lists in Python.',
+           '<code>response.json()</code> turns the text into Python data, so that you can take a value out with square brackets and a key.'],
+   example: 'import requests\n\nresponse = requests.get("https://api.openalex.org/institutions/I95457486")\nprint(response.text[:300])',
+   task: 'Run the example and read the text. Which institution is this, and which key holds its name? Then make <code>record</code>: the body as Python data, and <code>name</code>: the name of the institution.',
+   starter: 'import requests\n\nresponse = requests.get("https://api.openalex.org/institutions/I95457486")\nrecord = response.____()\nname = record["____"]\nprint(type(record))\nprint(name)',
+   answer: 'import requests\n\nresponse = requests.get("https://api.openalex.org/institutions/I95457486")\nrecord = response.json()\nname = record["display_name"]\nprint(type(record))\nprint(name)',
+   check: {truths: [['response.status_code != 429', 'OpenAlex answered 429: this network has used up its requests for today. Choose Simulated OpenAlex above the steps and run the code again.'],
+                    ['isinstance(record, dict)', 'record should be a dictionary. response.json() makes one from the body.'],
+                    ['name == record.get("display_name")', 'name should be the value stored under the key display_name.']]},
+   hint: 'The first blank is <code>json</code>. The name is stored under <code>display_name</code>.',
+   after: 'So <code>I95457486</code> is the ID that OpenAlex gives UC Berkeley. The body that the actual OpenAlex sends has 29 keys. <a href="https://api.openalex.org/institutions/I95457486" target="_blank" rel="noopener">Open the address in a new tab</a> to see all of it. The next steps use this ID to ask for works with a Berkeley author.'},
+  {topic: 'Write a request with parameters', stage: 'request',
+   intro: ['That request asked for one record by its ID. To ask for a list of records that match some conditions, you send parameters with the request. The address they go to is called the endpoint. For works it is <code>https://api.openalex.org/works</code>.',
+           'In Python the parameters go in a dictionary, and <code>urlencode</code> turns the dictionary into the text after the <code>?</code> in the address. Here <code>filter</code> picks the works, <code>sort</code> puts the most-cited first (<code>desc</code> means from high to low), <code>per_page</code> says how many to send at a time, and <code>cursor</code> says which page: <code>*</code> is the first.'],
+   task: 'Fill in the two blanks so that the request asks for works from <b>2024</b>, <b>five</b> at a time. <code>institutions.id:I95457486</code> keeps the works with a UC Berkeley author, and <code>has_abstract:true</code> keeps the works that have a summary.',
    starter: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:____,has_abstract:true",\n    "sort": "cited_by_count:desc",\n    "per_page": ____,\n    "cursor": "*",\n}\nurl = "https://api.openalex.org/works?" + urlencode(params)\nurl',
    answer: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:2024,has_abstract:true",\n    "sort": "cited_by_count:desc",\n    "per_page": 5,\n    "cursor": "*",\n}\nurl = "https://api.openalex.org/works?" + urlencode(params)\nurl',
    check: {exprs: ['params["filter"]', 'str(params["per_page"])'], labels: {'params["filter"]': 'The filter', 'str(params["per_page"])': 'per_page'}},
@@ -200,18 +223,19 @@ const STEPS = [
    after: 'That address is the whole request. <a href="https://api.openalex.org/works?filter=institutions.id%3AI95457486%2Cpublication_year%3A2024%2Chas_abstract%3Atrue&amp;sort=cited_by_count%3Adesc&amp;per_page=5&amp;cursor=%2A" target="_blank" rel="noopener">Open it in a new tab</a> to see what OpenAlex sends back to a browser. The next step sends it from Python.'},
   {topic: 'Send the request', stage: 'response', live: true,
    pre: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:2024,has_abstract:true",\n    "sort": "cited_by_count:desc",\n    "per_page": 5,\n    "cursor": "*",\n}',
-   intro: ['<code>requests.get</code> sends the request and waits for the answer. What comes back is called the response. It has a status code, which says how the request went (200 means the server accepted it), and a body: the data, as text.',
-           '<span data-source-note></span>'],
-   task: 'Send the request. Make <code>status</code>: the status code of the response. <code>params</code> is loaded from the last step.',
-   starter: 'response = requests.get("https://api.openalex.org/works", params=params, timeout=30)\nstatus = response.____\nprint(status)\nprint(response.text[:200])',
-   answer: 'response = requests.get("https://api.openalex.org/works", params=params, timeout=30)\nstatus = response.status_code\nprint(status)\nprint(response.text[:200])',
+   intro: ['You do not have to build the address yourself. <code>requests.get</code> takes the endpoint and, as <code>params=</code>, the dictionary, and puts the two together. <code>timeout=30</code> makes it stop waiting after 30 seconds. <code>response.url</code> is the address the request went to.',
+           '<span data-source-note="budget"></span>'],
+   task: 'Send the request with its parameters. <code>params</code> is loaded from the last step. Make <code>status</code>: the status code of the response.',
+   starter: 'import requests\n\nresponse = requests.get("https://api.openalex.org/works", params=____, timeout=30)\nstatus = response.____\nprint(status)\nprint(response.url)\nprint(response.text[:200])',
+   answer: 'import requests\n\nresponse = requests.get("https://api.openalex.org/works", params=params, timeout=30)\nstatus = response.status_code\nprint(status)\nprint(response.url)\nprint(response.text[:200])',
    check: {truths: [['status != 429', 'OpenAlex answered 429: this network has used up its requests for today. Choose Simulated OpenAlex above the steps and run the code again.'],
+                    ['"per_page=5" in response.url', 'The request went out without the parameters from the last step. Pass them as params=params.'],
                     ['status == 200', 'status should be 200, the code for a request the server accepted. Take it from response.status_code, and check that the address and params are unchanged.']]},
-   hint: 'The status code is <code>response.status_code</code>.',
-   after: 'The text you printed is the first 200 characters of the body. It is written in JSON, a text format for data that looks much like Python dictionaries and lists. The body that the actual OpenAlex sends for this request is about 200,000 characters long.'},
+   hint: 'The first blank is the name of the dictionary: <code>params</code>. The status code is <code>response.status_code</code>.',
+   after: 'The address under the status code is the one you built by hand in the last step. The text under it is the first 200 characters of the body. The body that the actual OpenAlex sends for this request is about 200,000 characters long.'},
   {topic: 'From text to Python data', stage: 'response',
-   intro: ['From here on, the steps use a saved copy of the response to the request you wrote in the first step. It was saved on October 7, 2026, so everyone has the same data and the answers can be checked. The copy is shortened: OpenAlex sends 51 fields for each work, and the copy keeps seven. The simulated OpenAlex answers with this same copy.',
-           '<code>response.json()</code> turns the JSON text of a response into Python data. <code>data</code> is what it returned for the saved response, as if you had written <code>data = response.json()</code>.',
+   intro: ['From here on, the steps use a saved copy of the response to that request. It was saved on October 7, 2026, so everyone has the same data and the answers can be checked. The copy is shortened: OpenAlex sends 51 fields for each work, and the copy keeps seven. The simulated OpenAlex answers with this same copy.',
+           '<code>data</code> is what <code>response.json()</code> returned for the saved response, as if you had written <code>data = response.json()</code>.',
            'The data is built from two things you know. A dictionary holds values under keys, and a list holds values in order. <code>type(x)</code> tells you which one you have, and <code>list(d.keys())</code> lists the keys of a dictionary <code>d</code>.'],
    example: 'type(data)',
    task: 'Make <code>top_keys</code>: a list of the keys of <code>data</code>.',
@@ -456,19 +480,28 @@ def _ws_truths(user_ns, spec_json):
     return ""
 
 # ---------- The simulated OpenAlex ----------
-# It answers the request from the first step, and its next page, with the saved copies. A wrong request gets the
-# status code and message that the actual OpenAlex gave for it on October 7, 2026.
+# It answers the requests in the steps with the saved copies: the record of one institution, and the works request
+# with its next page. A wrong request gets the status code and body that the actual OpenAlex gave for it on October 7, 2026.
 _WS_ROOT = "${ROOT}"
 _WS_SIM = {"real_send": None, "count": 0}
 _WS_SIM_PARAMS = "apc_sum, api-key, api_key, cited_by_count_sum, corpus, cursor, data-version, data_version, filter, format, group-by, group-bys, group_by, group_bys, include-xpac, include_xpac, mailto, page, per-page, per_page, q, rerank, sample, search, seed, select, sort, warm"
 _WS_SIM_FILTER = {"institutions.id:I95457486", "publication_year:2024", "has_abstract:true"}
-_WS_SIM_OUTSIDE = (501, {"error": "Simulated OpenAlex", "message": "The simulated OpenAlex only answers the request from the first step of this workspace (works from 2024, sorted by cited_by_count:desc, five per page) and its next page. Choose Actual OpenAlex above the steps to send other requests."})
+_WS_SIM_OUTSIDE = (501, {"error": "Simulated OpenAlex", "message": "The simulated OpenAlex only answers the requests in the steps of this workspace: the record of institution I95457486, and the works request (2024, sorted by cited_by_count:desc, five per page) with its next page. Choose Actual OpenAlex above the steps to send other requests."})
+_WS_SIM_NOT_FOUND = _WS_NL.join(["<!doctype html>", "<html lang=en>", "<title>404 Not Found</title>", "<h1>Not Found</h1>", "<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>", ""])
 
 def _ws_sim_answer(method, path, query):
-    # The status code and the body for one request.
+    # The status code and the body for one request. A dictionary goes out as JSON, text as a web page.
     segments = [part for part in path.split("/") if part]
     if method != "GET":
         return _WS_SIM_OUTSIDE
+    if len(segments) == 2 and segments[0] == "institutions":
+        if segments[1].upper() != "I95457486":
+            # Another ID of the right form may exist. Anything else gets the page the actual OpenAlex sends.
+            return _WS_SIM_OUTSIDE if segments[1][:1] in "Ii" and segments[1][1:].isdigit() else (404, _WS_SIM_NOT_FOUND)
+        if set(query) - {"mailto", "api_key", "api-key"}:
+            return _WS_SIM_OUTSIDE
+        with open(_WS_ROOT + "/openalex_institution.json") as f:
+            return 200, json.load(f)
     if segments != ["works"]:
         lists = {"works", "authors", "sources", "institutions", "topics", "keywords", "publishers", "funders", "concepts"}
         return _WS_SIM_OUTSIDE if segments and segments[0] in lists else (404, {"message": "OpenAlex ID format not recognized"})
@@ -517,10 +550,13 @@ def _ws_sim_send(self, request, **kwargs):
     response = requests.Response()
     response.status_code = status
     response.reason = {200: "OK", 400: "Bad Request", 404: "Not Found", 501: "Not Implemented"}[status]
-    response._content = json.dumps(body, separators=(", ", ": ") if status == 200 else (",", ":")).encode("utf-8")
+    # OpenAlex puts spaces in the JSON of a list of records, and none in a single record or an error.
+    spaced = status == 200 and isinstance(body, dict) and "meta" in body
+    text = body if isinstance(body, str) else json.dumps(body, separators=(", ", ": ") if spaced else (",", ":"))
+    response._content = text.encode("utf-8")
     response._content_consumed = True
     response.encoding = "utf-8"
-    response.headers["Content-Type"] = "application/json"
+    response.headers["Content-Type"] = "text/html; charset=utf-8" if isinstance(body, str) else "application/json"
     response.headers["X-Simulated"] = "COMPSS 211A Week 6 workspace"
     response.url = request.url
     response.request = request
@@ -567,16 +603,18 @@ function freshNamespace(py, step, live) {
 const SOURCE_STORE = 'compss211a-week06-api-source';
 const SOURCES = {
   actual: {line: 'They are sent over the internet to api.openalex.org.',
-           note: 'Requests now go to the <b>actual OpenAlex</b>, so this step needs an internet connection. Run it once or twice, not many times. OpenAlex limits the requests a network can send in a day, and the class shares one network. If the request fails, choose Simulated OpenAlex above the steps.'},
-  simulated: {line: 'They stay in your browser. The response is built from the saved copy.',
-              note: 'Requests now go to the <b>simulated OpenAlex</b>. The request stays in your browser, and the response is built from a copy of the actual response, saved on October 7, 2026. You can run it as often as you like.'}
+           short: 'Requests now go to the <b>actual OpenAlex</b>, so this step needs an internet connection. If the request fails, choose Simulated OpenAlex above the steps.',
+           budget: 'Requests now go to the <b>actual OpenAlex</b>, so this step needs an internet connection. Run it once or twice, not many times. OpenAlex limits the requests for lists that a network can send in a day, and the class shares one network. If the request fails, choose Simulated OpenAlex above the steps.'},
+  simulated: {line: 'They stay in your browser. The response is built from a saved copy.',
+              short: 'Requests now go to the <b>simulated OpenAlex</b>. The request stays in your browser, and the response is built from a saved copy of the actual one.',
+              budget: 'Requests now go to the <b>simulated OpenAlex</b>. The request stays in your browser, and the response is built from a copy of the actual response, saved on October 7, 2026. You can run it as often as you like.'}
 };
 let source = 'actual';
 function setSource(value, keep = true) {
   source = SOURCES[value] ? value : 'actual';
   document.querySelectorAll('[data-source]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.source === source)));
   $('sourceLine').textContent = SOURCES[source].line;
-  document.querySelectorAll('[data-source-note]').forEach(el => { el.innerHTML = SOURCES[source].note; });
+  document.querySelectorAll('[data-source-note]').forEach(el => { el.innerHTML = SOURCES[source][el.dataset.sourceNote]; });
   if (keep) try { localStorage.setItem(SOURCE_STORE, source); } catch (error) { /* storage is unavailable */ }
 }
 const LIMIT = 12000;   // characters of output shown
@@ -607,6 +645,8 @@ function explainError(html) {
   if (/^TypeError: string indices must be integers/.test(text)) return 'This value is text, not a dictionary. You have gone one level too deep.';
   if (/^IndexError: list index out of range/.test(text)) return 'The list is shorter than that position. len() tells you how many items it has, and the first is at 0.';
   if ((m = text.match(/^NameError: name '(.+)' is not defined/))) return `Python does not know the name ${m[1]}. Check the spelling, and that an earlier line in this box makes it. Each run starts fresh.`;
+  if ((m = text.match(/^AttributeError: '(.+)' object has no attribute '(.+)'/))) return `A ${m[1] === 'Response' ? 'response' : m[1]} has nothing called ${m[2]}. Check the spelling of what comes after the dot.`;
+  if (/JSONDecodeError/.test(text)) return 'The body is not JSON, so response.json() cannot read it. Print response.status_code and response.text to see what came back.';
   if (/^SyntaxError|^IndentationError/.test(text)) return 'Python could not read the code. Look at the line the message points to for a missing bracket, quotation mark or colon, or uneven indentation.';
   if (/simulated OpenAlex only answers/.test(text)) return '';   // the message itself says what to do
   if (/ConnectionError|Timeout|NetworkError|XMLHttpRequest|Failed to (execute|fetch)|JsException/.test(text)) return 'The request did not get through. Check the internet connection and try again, or choose Simulated OpenAlex above the steps.';

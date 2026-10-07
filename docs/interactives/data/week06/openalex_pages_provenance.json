@@ -1,7 +1,8 @@
 {
  "files": {
   "openalex_page1.json": "fe8a88edf5f2ecd23999f9225e06d0723f5dcd037c237634ff674b1d439239be",
-  "openalex_page2.json": "8f17f87e37fb8c018b8dcc5224353aa2e6c95b034e2b9eafe46d550c7af0e385"
+  "openalex_page2.json": "8f17f87e37fb8c018b8dcc5224353aa2e6c95b034e2b9eafe46d550c7af0e385",
+  "openalex_institution.json": "18a6aca4916e1274acfaa837b24941c3f2a14e4f6a880ac67d05eb71edec5225"
  },
  "retrieved_at_utc": "2026-10-07T21:20:37Z",
  "method": "GET",
@@ -23,12 +24,25 @@
  "authentication_used": false,
  "coverage_statement": "The ten most-cited works in OpenAlex with at least one UC Berkeley-affiliated authorship, publication year 2024, and an abstract, as ranked on the retrieval date.",
  "construction_notes": [
-  "The request is the one students write in the first step of the Week 6 API workspace.",
+  "The request is the one students write in the “Write a request with parameters” step of the Week 6 API workspace.",
   "Both files keep the shape of an OpenAlex list response: meta, results, group_by. They are shortened copies; nothing was added or changed.",
   "meta keeps count, db_response_time_ms, page, per_page, next_cursor and groups_count; the long x_query entry and cost_usd are left out.",
   "OpenAlex sent 51 fields for each work. Each work here keeps seven: id, doi, display_name, publication_year, cited_by_count, authorships and primary_topic.",
   "Each authorship keeps author_position, the author's id, display_name and orcid, and each institution's id, display_name and country_code. OpenAlex lists at most 100 authorships per work in a list response.",
   "primary_topic keeps id, display_name, field and domain.",
   "OpenAlex records change over time; these files are the fixed copy the workspace checks answers against."
- ]
+ ],
+ "institution_record": {
+  "file": "openalex_institution.json",
+  "retrieved_at_utc": "2026-10-07T22:12:12Z",
+  "method": "GET",
+  "request_url": "https://api.openalex.org/institutions/I95457486",
+  "response_status": 200,
+  "authentication_used": false,
+  "construction_notes": [
+   "The record OpenAlex holds for UC Berkeley, as students request it in the first two steps of the workspace.",
+   "OpenAlex sent 29 keys. The copy keeps 25 and leaves out four long lists: associated_institutions, counts_by_year, topics and topic_share. Nothing was added or changed.",
+   "The simulated OpenAlex in the workspace answers with this copy."
+  ]
+ }
 }
