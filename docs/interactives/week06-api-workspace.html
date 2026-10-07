@@ -213,25 +213,25 @@ const STEPS = [
    hint: 'The first blank is <code>len</code>, which counts the authors. The second is <code>is</code>.',
    after: 'Two of the seven authors have no ORCID. <code>None</code> in JSON data is what <code>NULL</code> is in SQL and <code>NaN</code> is in pandas. Missing data can also be an empty list: three of these authors have <code>[]</code> as their <code>institutions</code>.'},
   {topic: 'Build a request',
-   intro: 'A request is a web address: an endpoint, then <code>?</code>, then the parameters. In Python the parameters go in a dictionary, and <code>urlencode</code> turns the dictionary into the text after the <code>?</code>. For OpenAlex, <code>filter</code> says which works you want and <code>per_page</code> says how many to send at a time.',
-   task: 'The saved reply came from a request for works from <b>2024</b> that have a Berkeley author and an abstract, <b>five</b> per page. Fill in the two blanks so that <code>params</code> describes that request.',
-   starter: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:____,has_abstract:true",\n    "per_page": ____,\n}\nurl = "https://api.openalex.org/works?" + urlencode(params)\nurl',
-   answer: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:2024,has_abstract:true",\n    "per_page": 5,\n}\nurl = "https://api.openalex.org/works?" + urlencode(params)\nurl',
+   intro: 'A request is a web address: an endpoint, then <code>?</code>, then the parameters. In Python the parameters go in a dictionary, and <code>urlencode</code> turns the dictionary into the text after the <code>?</code>. For OpenAlex, <code>filter</code> says which works you want, <code>per_page</code> says how many to send at a time, and <code>cursor</code> says which page: <code>*</code> is the first.',
+   task: 'The saved reply came from a request like this one: works from <b>2024</b> that have a Berkeley author and an abstract, <b>five</b> per page. Fill in the two blanks so that <code>params</code> describes it.',
+   starter: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:____,has_abstract:true",\n    "per_page": ____,\n    "cursor": "*",\n}\nurl = "https://api.openalex.org/works?" + urlencode(params)\nurl',
+   answer: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:2024,has_abstract:true",\n    "per_page": 5,\n    "cursor": "*",\n}\nurl = "https://api.openalex.org/works?" + urlencode(params)\nurl',
    check: {exprs: ['params["filter"]', 'str(params["per_page"])'], labels: {'params["filter"]': 'The filter', 'str(params["per_page"])': 'per_page'}},
    hint: 'The year is <code>2024</code> and the number per page is <code>5</code>.',
    after: '<code>I95457486</code> is OpenAlex\'s ID for UC Berkeley. The filter decides what the data can tell you about: these are works with at least one Berkeley-affiliated author, which is not the same as all research done at Berkeley.'},
   {topic: 'Send a real request', live: true,
    intro: 'So far you have read a saved reply. <code>requests.get</code> sends a real request and waits for the answer. Read the status code first: 200 means the server accepted the request. This step needs an internet connection. If the request fails in the room, go on to the next step.',
    task: 'Send the request. Make <code>status</code>: the status code of the response. Make <code>n_now</code>: the number of works that match today.',
-   starter: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:2024,has_abstract:true",\n    "per_page": 5,\n}\nresponse = requests.get("https://api.openalex.org/works", params=params, timeout=30)\nstatus = response.____\nlive = response.json()\nn_now = live["meta"]["____"]\nprint(status, n_now)',
-   answer: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:2024,has_abstract:true",\n    "per_page": 5,\n}\nresponse = requests.get("https://api.openalex.org/works", params=params, timeout=30)\nstatus = response.status_code\nlive = response.json()\nn_now = live["meta"]["count"]\nprint(status, n_now)',
+   starter: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:2024,has_abstract:true",\n    "per_page": 5,\n    "cursor": "*",\n}\nresponse = requests.get("https://api.openalex.org/works", params=params, timeout=30)\nstatus = response.____\nlive = response.json()\nn_now = live["meta"]["____"]\nprint(status, n_now)',
+   answer: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:2024,has_abstract:true",\n    "per_page": 5,\n    "cursor": "*",\n}\nresponse = requests.get("https://api.openalex.org/works", params=params, timeout=30)\nstatus = response.status_code\nlive = response.json()\nn_now = live["meta"]["count"]\nprint(status, n_now)',
    check: {truths: [['status == 200', 'status should be 200. Take it from response.status_code.'],
                     ['isinstance(live, dict) and len(live["results"]) == 5', 'The reply should hold five works. Leave params as it was.'],
                     ['n_now == live["meta"]["count"]', 'n_now should be the count inside meta.']]},
    hint: 'The status code is <code>response.status_code</code>. The number of matching works is under <code>count</code>, as in the saved reply.',
    after: 'Compare <code>n_now</code> with the 11,207 in the saved reply. OpenAlex keeps adding and correcting records, so a live count can change. A saved copy stays the same.'},
   {topic: 'Get the next page',
-   intro: 'The reply holds five works out of 11,207. To get the next five, you send the same request again and add the <code>next_cursor</code> value from <code>meta</code>. <code>page2</code> is the saved reply to that second request. <code>+</code> joins two lists into one.',
+   intro: 'The reply holds five works out of 11,207, and its <code>meta</code> has a <code>next_cursor</code> value. To get the next five, you send the same request with that value as the <code>cursor</code>. <code>page2</code> is the saved reply to that second request. <code>+</code> joins two lists into one.',
    task: 'Make <code>cursor</code>: the <code>next_cursor</code> value in <code>payload</code>. Then make <code>all_works</code>: the works of both pages in one list.',
    starter: 'cursor = payload["meta"]["____"]\nall_works = payload["results"] + page2["____"]\nprint(cursor)\nprint(len(all_works))',
    answer: 'cursor = payload["meta"]["next_cursor"]\nall_works = payload["results"] + page2["results"]\nprint(cursor)\nprint(len(all_works))',
@@ -250,7 +250,7 @@ const STEPS = [
    hint: 'Start with an empty list. In the loop, append one dictionary for each work, with the keys <code>title</code>, <code>year</code> and <code>cited_by</code>. Then pass the list to <code>pd.DataFrame</code>.',
    after: 'From here on it is the pandas you know: the reply has become a table with one row for each work.'},
   {topic: 'Now work in the notebook', handoff: true,
-   intro: 'The practice in the browser ends here. For the rest of the class, work in the Week 6 notebook in VS Code, where you send your own request and save the reply to a file.'}
+   intro: 'The practice in the browser ends here. For the rest of the class, work in the Week 6 notebook in VS Code. There you send a request of your own, save the reply to a file and turn it into a table.'}
 ];
 
 const $ = id => document.getElementById(id);
@@ -474,7 +474,7 @@ function renderSteps() {
   $('steps').innerHTML = STEPS.map((s, i) => {
     const example = s.example ? `<div class="example"><div class="label">Example</div><pre>${esc(s.example)}</pre></div>
       <p><button data-act="example" data-q="${i}" disabled>Run the example</button></p><pre class="out" id="s${i}-example"></pre>` : '';
-    const work = s.handoff ? `<p>Open <code>week06_live_workspace.ipynb</code>, in the <code>lessons/week06_web-apis</code> folder of the course repo.</p>
+    const work = s.handoff ? `<p>Open <code>week06_openalex_practice.ipynb</code>, in the <code>lessons/week06_web-apis</code> folder of the course repo.</p>
         <p><a class="button" href="https://github.com/macss-berkeley/compss-211a/tree/main/lessons/week06_web-apis" target="_blank" rel="noopener">See the folder on GitHub</a></p>`
       : `<h4>Your turn</h4><p class="task">${s.task}</p>
       <label class="small" for="s${i}-code">Your code</label>

@@ -30,3 +30,6 @@ wandb/
 
 # Week 5: students' copies of the SQL script
 *_mine.sql
+
+# Week 6: replies students save from their own requests
+*_mine.json
