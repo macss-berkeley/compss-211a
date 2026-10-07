@@ -167,7 +167,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     vocabulary as the Friday quizzes and labs.
   </p>
   <div class="chips rise d4">
-    <span class="chip chip-gold">7 interactives</span>
+    <span class="chip chip-gold" id="cardCount">Interactives</span>
     <span class="chip chip-line">Short browser activities</span>
     <span class="chip chip-line">No grades are submitted</span>
   </div>
@@ -251,6 +251,14 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     <span class="go">Open</span>
   </a>
 
+  <a class="card rise d7" data-open="2026-10-12T00:00:00-07:00" href="interactives/week06-api-workspace.html">
+    <span class="meta"><span class="week">Week 6 · in class</span><span class="mins">≈ 30 min</span></span>
+    <h2>Week 6 API workspace</h2>
+    <p>Write a request to OpenAlex, send it from Python and read the response: keys, lists, loops and a table. Then send a request of your own in a notebook.</p>
+    <span class="quiz">pairs with: web APIs &middot; JSON &middot; Monday class</span>
+    <span class="go">Open</span>
+  </a>
+
   <a class="card rise d8" data-open="2026-10-26T00:00:00-07:00" href="interactives/week08-understanding-tf-idf.html">
     <span class="meta"><span class="week">Week 8</span><span class="mins">≈ 8 min</span></span>
     <h2>Understanding TF-IDF</h2>
@@ -296,6 +304,9 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
   document.querySelectorAll(".card[data-open]").forEach(function (card) {
     if (preview || now >= new Date(card.getAttribute("data-open"))) card.classList.add("is-open");
   });
+  /* The first chip counts the cards that are shown: the whole-course ones and the weeks that have started. */
+  var shown = document.querySelectorAll("a.card:not([data-open]), a.card.is-open").length;
+  document.getElementById("cardCount").textContent = shown + (shown === 1 ? " interactive" : " interactives");
   /* The practice studio has the same switch: carry the preview over, without joining the class report. */
   if (preview) document.querySelectorAll('a.card[href*="/practice/"]').forEach(function (card) {
     card.setAttribute("href", "practice/?preview");
