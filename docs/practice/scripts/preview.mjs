@@ -11,7 +11,7 @@ import {sqliteDatabase} from '../tests/sqlite-adapter.mjs';
 globalThis.crypto??=webcrypto;
 const dir=mkdtempSync(join(tmpdir(),'practice-preview-'));
 const env={DB:sqliteDatabase(join(dir,'preview.sqlite')),CLASS_CODE:'a'.repeat(48),REPORT_KEY:'local-preview-only'};
-const files=new Set(['index.html','styles.css','app.mjs','catalog.mjs','schedule.mjs','flashcards.mjs','flashcard-ui.mjs','exercises.mjs','python-worker.mjs','skill-checks.mjs','activity-client.mjs','activity-config.mjs','progress-sync.mjs','drills.mjs','drill-data.mjs','drill-ui.mjs','drill-worker.mjs']);
+const files=new Set(['index.html','styles.css','app.mjs','catalog.mjs','schedule.mjs','flashcards.mjs','flashcard-ui.mjs','exercises.mjs','python-worker.mjs','skill-checks.mjs','activity-client.mjs','activity-config.mjs','progress-sync.mjs','drills.mjs','drill-data.mjs','drill-ui.mjs','drill-worker.mjs','reference.mjs','reference-ui.mjs']);
 createServer(async(req,res)=>{
  try{
  const url=new URL(req.url,'http://'+(req.headers.host||'127.0.0.1:8766'));

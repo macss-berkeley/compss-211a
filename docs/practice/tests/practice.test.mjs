@@ -6,6 +6,7 @@ import {skills} from '../catalog.mjs';
 import {skillChecks,checkSkillAnswer} from '../skill-checks.mjs';
 import {checkFilter,checkDebug,functions,freshProgress,validateProgress,mergeProgress} from '../exercises.mjs';
 import {drills,drillSetup,drillSetupVariant,drillTopics,variantCode} from '../drills.mjs';
+import {referenceGroups} from '../reference.mjs';
 import {weekReleases as releases} from '../schedule.mjs';
 test('filters handle inclusive/exclusive boundaries, AND, OR and missing values',()=>{
   assert.equal(checkFilter(0,['B','C','E']).passed,true);
@@ -116,6 +117,22 @@ test('every code drill has a stable ID, a real skill, a released week and a chec
     // Starting lines the checker swaps must be in both the starter and the model answer.
     for(const [from] of d.check.variants||[]){assert.ok(d.starter.includes(from),d.id);assert.ok(d.solution.includes(from),d.id);}
     assert.equal(variantCode(d,d.starter).missing,undefined,d.id);
+  }
+});
+test('every reference entry has a stable ID, a real skill, a released week, practice data and an example',()=>{
+  const entries=referenceGroups.flatMap(g=>g.entries);
+  assert.ok(entries.length>=100);
+  assert.equal(new Set(entries.map(e=>e.id)).size,entries.length);
+  assert.equal(new Set(referenceGroups.map(g=>g.id)).size,referenceGroups.length);
+  for(const g of referenceGroups)assert.ok(g.title&&g.entries.length,g.id);
+  for(const e of entries){
+    assert.ok(/^[a-z0-9-]+$/.test(e.id),e.id);
+    assert.ok(skills.some(s=>s.id===e.skill),e.id);
+    assert.ok(e.week>=1&&e.week<=releases.length,e.id);
+    assert.ok(Object.hasOwn(drillSetup,e.setup),e.id);
+    assert.ok(e.code&&e.does&&e.example,e.id);
+    // An example that runs shows real output. One that can't run says why.
+    if(e.run)assert.ok(e.output.trim(),e.id);else assert.ok(e.note,e.id);
   }
 });
 test('backups keep drill results and drafts, and a passed drill stays passed after a merge',()=>{

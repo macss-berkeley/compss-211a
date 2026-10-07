@@ -89,6 +89,15 @@ function check(py,d,code,output){
 self.onmessage=async({data})=>{
   const {id,mode,drillId,code}=data;
   try{
+    // A reference example: any code, run on one of the practice datasets. Nothing is checked.
+    if(mode==='reference'){
+      const setup=drillSetup[data.setup]||'',py=await python(id),needed=[...(data.packages||[])];
+      if(setup.includes('import sqlite3')&&!needed.includes('sqlite3'))needed.push('sqlite3');
+      if(needed.length)await py.loadPackage(needed,{messageCallback:()=>{}});
+      self.postMessage({id,type:'running'});
+      const output=[],r=run(py,setup,code,output);r.ns.destroy();
+      self.postMessage({id,type:'result',mode,output,ok:r.ok});return;
+    }
     const d=drills.find(d=>d.id===drillId);
     if(!d)throw new Error('This drill no longer exists. Reload the page.');
     const py=await python(id);

@@ -91,6 +91,18 @@ adding or editing a drill, run `uv run python docs/practice/scripts/check_drills
 from the repository. It confirms that each model answer passes, each starter fails,
 and each second run changes the answer. `npm test` checks IDs, skills, and weeks.
 
+## Python and pandas reference
+
+The reference view (`#functions`) lists what students write in the course, grouped by
+the job it does. Each entry has a short example with its real output, the week it
+opens, and a link to its skill. “Try it” runs the example in the drill worker.
+
+The entries are written in `scripts/build_reference.py`, which runs every example in
+real Python on the practice data and writes `reference.mjs`. After adding or editing
+an entry, run `uv run python docs/practice/scripts/build_reference.py` from the
+repository; with `--check` it fails if `reference.mjs` is out of date. Examples that
+need the network, a key or a spreadsheet are marked `run=False` and say so in a note.
+
 Drills run in `drill-worker.mjs`, a Web Worker with Pyodide 0.27.7 and pandas 2.2.3
 from jsDelivr (about 30 MB on first use, then cached). This is a separate runtime from
 the function exercise, matching the course interactives.

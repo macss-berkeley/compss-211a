@@ -149,3 +149,21 @@ h1,h2,h3{font-family:var(--heading)}h1{font-weight:800;letter-spacing:-.015em}
 .sync-connect{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .sync-connect input{flex:1 1 200px;min-width:0;padding:10px 12px;border:1px solid #aab5c4;border-radius:4px;font:15px var(--mono);letter-spacing:.04em;text-transform:uppercase}
 .sync-connect input::placeholder{text-transform:none;color:#8b96a6}
+
+/* Python and pandas reference: one line per entry, which opens to show an example. */
+.ref-group{margin:0 0 30px}.ref-group>h2{font-size:20px;margin:0 0 10px}
+.ref-list{border:1px solid var(--line);border-radius:4px;background:white}
+.ref-entry{margin:0;border-top:1px solid var(--line)}.ref-entry:first-child{border-top:0}
+.ref-entry>summary{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:6px 22px;align-items:baseline;padding:11px 16px;cursor:pointer;list-style:none}
+.ref-entry>summary::-webkit-details-marker{display:none}
+.ref-entry>summary:hover{background:var(--blue-light)}
+.ref-entry[open]>summary{background:var(--blue-light);border-bottom:1px solid var(--line)}
+.ref-code{display:block;position:relative;padding-left:18px;font:600 14px/1.5 var(--mono);color:var(--blue);overflow-wrap:anywhere}
+.ref-code::before{content:"▸";position:absolute;left:0;color:var(--muted);font-weight:400}
+.ref-entry[open] .ref-code::before{content:"▾"}
+.ref-does{font-size:15px;color:var(--ink)}
+.ref-body{padding:14px 16px 18px 32px}
+.ref-body .code{margin:0}.ref-body .drill-output{margin-top:8px}.ref-body .micro{margin:8px 0 0}
+.ref-meta{font-size:14px;color:var(--muted);margin:0 0 12px}
+.ref-editor{min-height:0}
+@media(max-width:760px){.ref-entry>summary{grid-template-columns:minmax(0,1fr);padding:10px 12px}.ref-body{padding:12px}}
