@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Week 6 API Workspace · COMPSS 211A</title>
-<meta name="description" content="Practice reading replies from a web API in Python.">
+<meta name="description" content="Ask a web API a question from Python, and read what it sends back.">
 <style>
 :root{--navy:#002676;--gold:#FDBA12;--ink:#1A1A1A;--muted:#465973;--line:#CBD4E1;--pale:#EEF3FA;--paper:#fff;--mark:#FFF1CC;--good:#17643C;--bad:#9B1C1C;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 *{box-sizing:border-box}
@@ -75,6 +75,24 @@ a.button{display:inline-block;border:1px solid var(--navy);border-radius:4px;pad
 a.button:hover{background:var(--pale)}
 .scratch{border:1px solid var(--line);border-radius:6px;padding:10px 18px;margin-top:16px}
 .scratch textarea{min-height:96px}
+.brief{border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:4px;padding:10px 14px 12px;margin:0 0 16px;background:#FFFDF5}
+.brief p{margin:0 0 8px}
+.stages{display:flex;flex-wrap:wrap;gap:6px 0;list-style:none;margin:0;padding:0;font-size:.88rem;color:var(--muted)}
+.stages li{display:flex;align-items:center}
+.stages li + li::before{content:"→";margin:0 8px;color:var(--muted)}
+.stages span{padding:2px 9px;border-radius:3px}
+.stages li[aria-current=step] span{background:var(--navy);color:white;font-weight:600}
+.stages li.done span{color:var(--good)}
+.source{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:.88rem}
+.switch{display:inline-flex}
+.switch button{padding:3px 11px;font-size:.86rem;font-weight:400;border-radius:4px 0 0 4px}
+.switch button + button{border-left:0;border-radius:0 4px 4px 0}
+.switch button[aria-pressed=true]{background:var(--navy);color:white;font-weight:600}
+.reference > details + details{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.outline ul{list-style:none;margin:0;padding-left:14px;border-left:1px solid var(--line)}
+.outline > ul{padding-left:0;border-left:0}
+.outline li{margin:1px 0;font-family:var(--mono);font-size:.82rem;line-height:1.5;color:var(--navy)}
+.outline .kind{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;font-size:.78rem;color:var(--muted)}
 footer{border-top:1px solid var(--line);padding:18px 0 30px;font-size:.85rem;color:var(--muted)}
 [hidden]{display:none!important}
 @media(max-width:860px){.wrap{padding-left:16px;padding-right:16px}.layout{grid-template-columns:minmax(0,1fr);gap:16px}.reference{position:static;max-height:none}.q{padding:14px 12px}.progress{margin-left:0}.pager select{width:100%}}
@@ -84,7 +102,7 @@ footer{border-top:1px solid var(--line);padding:18px 0 30px;font-size:.85rem;col
 <div class="mast"><div class="wrap"><span><span class="brand">UC Berkeley</span>COMPSS 211A · Computing I</span><a href="../index.html">All interactives</a></div></div>
 <header><div class="wrap">
 <h1>Week 6 API workspace</h1>
-<p>Practice reading replies from a web API in Python.</p>
+<p>Ask a web API a question from Python, and read what it sends back.</p>
 <div class="meta">Week 6 · In class · Needs an internet connection</div>
 </div></header>
 
@@ -92,18 +110,33 @@ footer{border-top:1px solid var(--line);padding:18px 0 30px;font-size:.85rem;col
 <aside class="reference" aria-label="What is loaded">
 <details id="loadedBox" open><summary>Already loaded</summary>
   <p class="small">Click a name to put it in your code.</p>
-  <h3><button type="button" class="name" data-name="payload">payload</button></h3>
-  <p class="small">A saved reply from the OpenAlex API.</p>
+  <h3><button type="button" class="name" data-name="data">data</button></h3>
+  <p class="small">The saved response, as Python data.</p>
   <h3><button type="button" class="name" data-name="page2">page2</button></h3>
-  <p class="small">The saved reply for the next page.</p>
+  <p class="small">The saved response for the next page.</p>
   <h3><button type="button" class="name" data-name="pd">pd</button></h3>
   <p class="small">pandas.</p>
-  <p class="small" style="margin-top:12px">To look at a value, put its name on the last line and run the code, or use <code>print()</code>.</p>
+</details>
+<details id="outlineBox"><summary>Outline of <code>data</code></summary>
+  <p class="small">Its keys and what each one holds. A dictionary takes a key in the brackets, such as <code>["meta"]</code>. A list takes a position, such as <code>[0]</code>.</p>
+  <div class="outline" id="outline"><p class="small">Loading…</p></div>
+  <p class="small" style="margin-top:10px">To see a value, put it on the last line and run the code, or use <code>print()</code>.</p>
 </details>
 </aside>
 
 <div class="work">
-<div class="status" id="engineStatus" role="status">Loading the saved replies…</div>
+<div class="status" id="engineStatus" role="status">Loading the saved responses…</div>
+<div class="brief">
+  <p><b>The question.</b> Which works from 2024 with a UC Berkeley author are cited most, and who wrote them? A work is what OpenAlex calls a paper, a book or a dataset.</p>
+  <ol class="stages" id="stages" aria-label="Where you are">
+    <li data-stage="request"><span>Request</span></li><li data-stage="response"><span>Response</span></li><li data-stage="values"><span>Read values</span></li><li data-stage="all"><span>Every work</span></li><li data-stage="table"><span>Table</span></li>
+  </ol>
+  <div class="source" role="group" aria-labelledby="sourceLabel">
+    <span id="sourceLabel">Requests go to</span>
+    <span class="switch"><button type="button" data-source="actual" aria-pressed="true">Actual OpenAlex</button><button type="button" data-source="simulated" aria-pressed="false">Simulated OpenAlex</button></span>
+    <span class="small" id="sourceLine" aria-live="polite"></span>
+  </div>
+</div>
 <nav class="pager" aria-label="Steps">
   <select id="picker" aria-label="Go to step"></select>
   <button id="prev">Previous</button>
@@ -112,8 +145,8 @@ footer{border-top:1px solid var(--line);padding:18px 0 30px;font-size:.85rem;col
 </nav>
 <div id="steps"></div>
 <details class="scratch"><summary>Scratch code</summary>
-  <p class="small">Run any Python here. It does not change your answers.</p>
-  <textarea id="scratch" spellcheck="false" autocomplete="off" aria-label="Scratch code">payload["meta"]</textarea>
+  <p class="small">Run any Python here. It does not change your answers. <code>requests</code> is loaded when your code uses it, and follows the “Requests go to” switch above the steps.</p>
+  <textarea id="scratch" spellcheck="false" autocomplete="off" aria-label="Scratch code">data["meta"]</textarea>
   <div class="actions"><button data-act="scratch" disabled>Run</button></div>
   <pre class="out" id="scratch-out"></pre>
 </details>
@@ -121,12 +154,12 @@ footer{border-top:1px solid var(--line);padding:18px 0 30px;font-size:.85rem;col
 </div>
 </main>
 
-<footer><div class="wrap">COMPSS 211A · UC Berkeley · CC BY 4.0. Python runs in your browser with Pyodide. Your code is saved in this browser only and is not sent anywhere. <code>payload</code> and <code>page2</code> are two replies from the <a href="https://openalex.org">OpenAlex</a> API, saved on October 5, 2026 and shortened.</div></footer>
+<footer><div class="wrap">COMPSS 211A · UC Berkeley · CC BY 4.0. Python runs in your browser with Pyodide. Your code is saved in this browser only and is not sent anywhere. <code>data</code> and <code>page2</code> are two responses from the <a href="https://openalex.org">OpenAlex</a> API, saved on October 7, 2026 and shortened. <a href="data/week06/openalex_pages_provenance.json">How the copies were made</a>.</div></footer>
 
 <script src="sandbox/sandbox.js"></script>
 <script>
 'use strict';
-// The saved replies. Each file sits in data/week06/ next to this page and is read by the Python code as a file.
+// The saved responses. Each file sits in data/week06/ next to this page and is read by the Python code as a file.
 const DATA_FILES = ['openalex_page1.json', 'openalex_page2.json'];
 const FILES = {};
 const ROOT = '/home/you/week06';
@@ -140,7 +173,7 @@ const SETUP = [
   'pd.set_option("display.max_columns", 20)',
   'pd.set_option("display.max_colwidth", 60)',
   'with open("openalex_page1.json") as f:',
-  '    payload = json.load(f)',
+  '    data = json.load(f)',
   'with open("openalex_page2.json") as f:',
   '    page2 = json.load(f)',
 ].join('\n');
@@ -150,112 +183,122 @@ const LIVE_SETUP = 'import pyodide_http\npyodide_http.patch_all()\nimport reques
 // One entry per step.
 // starter: what the box starts with; scaffold: a starting point with blanks, offered in the hint.
 // answer: the model code. check.exprs: expressions compared after the student's code and after the model code.
-// check.labels: what to call an expression in a message. check.truths: for a live request, tests on the student's own result, because a second request would give a different reply.
+// live: the step sends a request; where it goes follows the “Requests go to” switch.
+// check.labels: what to call an expression in a message. check.truths: for a live request, tests on the student's own result, because a second request would give a different response.
 // pre: code run before the student's code, for a value an earlier step made. live: the step sends a real request.
 // example: code that is shown and can be run. after: shown once the answer is correct.
+// stage: where the step sits in Request, Response, Read values, Every work, Table. intro and after can be a list of paragraphs.
 const STEPS = [
-  {topic: 'What is in a reply?',
-   intro: 'A web API answers a request with text in JSON format. In Python, JSON becomes dictionaries and lists. <code>payload</code> is a saved reply from OpenAlex, a catalogue of research papers. It is a dictionary, and you cannot see what is in it until you ask. <code>list(d.keys())</code> lists the keys of a dictionary <code>d</code>.',
-   task: 'Make <code>top_keys</code>: a list of the keys of <code>payload</code>.',
+  {topic: 'Write the request', stage: 'request',
+   intro: ['OpenAlex is a free catalogue of research. It has a web API: you send it a web address that says what you want, and it sends back data instead of a web page.',
+           'A request has two parts. The endpoint is the address of the service: <code>https://api.openalex.org/works</code>. The parameters say what you want. In Python they go in a dictionary, and <code>urlencode</code> turns the dictionary into the text after the <code>?</code>. Here <code>filter</code> picks the works, <code>sort</code> puts the most-cited first (<code>desc</code> means from high to low), <code>per_page</code> says how many to send at a time, and <code>cursor</code> says which page: <code>*</code> is the first.'],
+   task: 'Fill in the two blanks so that the request asks for works from <b>2024</b>, <b>five</b> at a time. <code>I95457486</code> is OpenAlex\'s ID for UC Berkeley, and <code>has_abstract:true</code> keeps the works that have a summary.',
+   starter: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:____,has_abstract:true",\n    "sort": "cited_by_count:desc",\n    "per_page": ____,\n    "cursor": "*",\n}\nurl = "https://api.openalex.org/works?" + urlencode(params)\nurl',
+   answer: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:2024,has_abstract:true",\n    "sort": "cited_by_count:desc",\n    "per_page": 5,\n    "cursor": "*",\n}\nurl = "https://api.openalex.org/works?" + urlencode(params)\nurl',
+   check: {exprs: ['params["filter"]', 'str(params["per_page"])'], labels: {'params["filter"]': 'The filter', 'str(params["per_page"])': 'per_page'}},
+   hint: 'The year is <code>2024</code> and the number per page is <code>5</code>.',
+   after: 'That address is the whole request. <a href="https://api.openalex.org/works?filter=institutions.id%3AI95457486%2Cpublication_year%3A2024%2Chas_abstract%3Atrue&amp;sort=cited_by_count%3Adesc&amp;per_page=5&amp;cursor=%2A" target="_blank" rel="noopener">Open it in a new tab</a> to see what OpenAlex sends back to a browser. The next step sends it from Python.'},
+  {topic: 'Send the request', stage: 'response', live: true,
+   pre: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:2024,has_abstract:true",\n    "sort": "cited_by_count:desc",\n    "per_page": 5,\n    "cursor": "*",\n}',
+   intro: ['<code>requests.get</code> sends the request and waits for the answer. What comes back is called the response. It has a status code, which says how the request went (200 means the server accepted it), and a body: the data, as text.',
+           '<span data-source-note></span>'],
+   task: 'Send the request. Make <code>status</code>: the status code of the response. <code>params</code> is loaded from the last step.',
+   starter: 'response = requests.get("https://api.openalex.org/works", params=params, timeout=30)\nstatus = response.____\nprint(status)\nprint(response.text[:200])',
+   answer: 'response = requests.get("https://api.openalex.org/works", params=params, timeout=30)\nstatus = response.status_code\nprint(status)\nprint(response.text[:200])',
+   check: {truths: [['status != 429', 'OpenAlex answered 429: this network has used up its requests for today. Choose Simulated OpenAlex above the steps and run the code again.'],
+                    ['status == 200', 'status should be 200, the code for a request the server accepted. Take it from response.status_code, and check that the address and params are unchanged.']]},
+   hint: 'The status code is <code>response.status_code</code>.',
+   after: 'The text you printed is the first 200 characters of the body. It is written in JSON, a text format for data that looks much like Python dictionaries and lists. The body that the actual OpenAlex sends for this request is about 200,000 characters long.'},
+  {topic: 'From text to Python data', stage: 'response',
+   intro: ['From here on, the steps use a saved copy of the response to the request you wrote in the first step. It was saved on October 7, 2026, so everyone has the same data and the answers can be checked. The copy is shortened: OpenAlex sends 51 fields for each work, and the copy keeps seven. The simulated OpenAlex answers with this same copy.',
+           '<code>response.json()</code> turns the JSON text of a response into Python data. <code>data</code> is what it returned for the saved response, as if you had written <code>data = response.json()</code>.',
+           'The data is built from two things you know. A dictionary holds values under keys, and a list holds values in order. <code>type(x)</code> tells you which one you have, and <code>list(d.keys())</code> lists the keys of a dictionary <code>d</code>.'],
+   example: 'type(data)',
+   task: 'Make <code>top_keys</code>: a list of the keys of <code>data</code>.',
    starter: 'top_keys = list(____.keys())\ntop_keys',
-   answer: 'top_keys = list(payload.keys())\ntop_keys',
+   answer: 'top_keys = list(data.keys())\ntop_keys',
    check: {exprs: ['list(top_keys)']},
-   hint: 'Replace the blank with the name of the dictionary. Clicking <code>payload</code> in the list puts it in the box.',
-   after: 'The reply has three parts. <code>meta</code> describes the whole result, <code>results</code> holds the records, and <code>group_by</code> is empty for this request.'},
-  {topic: 'Read a value',
-   intro: 'Square brackets with a key give you the value stored under that key. The value can be another dictionary, and then you can use brackets again.',
-   example: 'payload["meta"]',
-   task: 'Make <code>n_matching</code>: the number of works that matched the request. It is stored under <code>count</code>, inside <code>meta</code>.',
-   starter: 'n_matching = payload["____"]["____"]\nn_matching',
-   answer: 'n_matching = payload["meta"]["count"]\nn_matching',
+   hint: 'Replace the blank with the name of the dictionary. Clicking <code>data</code> in the side panel puts it in the box.',
+   after: 'The response has three parts. <code>meta</code> describes the whole result, <code>results</code> holds the works, and <code>group_by</code> is empty for this request. To see every level at once, open “Outline of data” in the side panel.'},
+  {topic: 'Read a value', stage: 'values',
+   intro: 'Square brackets with a key give you the value stored under that key. <code>data["meta"]</code> is another dictionary, so you can use brackets again on it.',
+   example: 'data["meta"]',
+   task: 'Make <code>n_matching</code>: how many works matched the request. It is stored under <code>count</code>, inside <code>meta</code>.',
+   starter: 'n_matching = data["____"]["____"]\nn_matching',
+   answer: 'n_matching = data["meta"]["count"]\nn_matching',
    check: {exprs: ['n_matching']},
    hint: 'The first key is <code>meta</code> and the second is <code>count</code>.',
-   after: '11,207 works matched the request. One reply does not hold them all, as the next step shows.'},
-  {topic: 'Look inside a list',
-   intro: '<code>payload["results"]</code> is a list with one dictionary for each work. <code>len()</code> counts the items in a list, and a number in square brackets picks one of them. Python counts from 0, so <code>[0]</code> is the first.',
-   task: 'Make <code>n_on_page</code>: how many works are in <code>payload["results"]</code>. Then make <code>first_title</code>: the <code>display_name</code> of the first work.',
-   starter: 'n_on_page = ____(payload["results"])\nfirst_title = payload["results"][____]["display_name"]\nprint(n_on_page)\nprint(first_title)',
-   answer: 'n_on_page = len(payload["results"])\nfirst_title = payload["results"][0]["display_name"]\nprint(n_on_page)\nprint(first_title)',
+   after: '11,231 works from 2024 have a Berkeley author and an abstract. One response does not hold them all, as the next step shows.'},
+  {topic: 'Look inside a list', stage: 'values',
+   intro: '<code>data["results"]</code> is a list with one dictionary for each work. <code>len()</code> counts the items in a list. A list takes a position in the brackets, not a key. Python counts from 0, so <code>[0]</code> is the first item.',
+   example: 'print(type(data["results"]))\nprint(type(data["results"][0]))',
+   task: 'Make <code>n_on_page</code>: how many works are in <code>data["results"]</code>. Then make <code>first_title</code>: the <code>display_name</code> of the first work.',
+   starter: 'n_on_page = ____(data["results"])\nfirst_title = data["results"][____]["display_name"]\nprint(n_on_page)\nprint(first_title)',
+   answer: 'n_on_page = len(data["results"])\nfirst_title = data["results"][0]["display_name"]\nprint(n_on_page)\nprint(first_title)',
    check: {exprs: ['n_on_page', 'first_title']},
    hint: '<code>len(...)</code> counts the works. The first work is at position <code>0</code>.',
-   after: 'This reply holds five works out of the 11,207 that matched. An API sends its results one page at a time.'},
-  {topic: 'Go deeper',
-   intro: 'A value can sit several levels down. Each work has a list of <code>authorships</code>. Each authorship has an <code>author</code>, and the author has a <code>display_name</code>. Write the path from left to right, with one pair of brackets for each level.',
-   example: 'payload["results"][0]["authorships"][0]',
+   after: 'The response holds five works, because the request said <code>per_page</code> 5. They are the five most-cited of the 11,231.'},
+  {topic: 'Go deeper, one level at a time', stage: 'values',
+   intro: ['The name of an author sits several levels down. Go one level at a time, and look at what you have before you go on. If it is a dictionary, the next brackets take a key. If it is a list, they take a position.',
+           'The example takes the first work, lists its keys, and then looks at its list of authorships. An authorship says who an author is and where they work.'],
+   example: 'work = data["results"][0]\nprint(list(work.keys()))\nauthorships = work["authorships"]\nprint(type(authorships), len(authorships))\nauthorships[0]',
    task: 'Make <code>first_author</code>: the name of the first author of the first work.',
-   starter: 'first_author = payload["results"][0]["____"][0]["____"]["display_name"]\nfirst_author',
-   answer: 'first_author = payload["results"][0]["authorships"][0]["author"]["display_name"]\nfirst_author',
+   starter: 'work = data["results"][0]\nauthorship = work["____"][0]\nfirst_author = authorship["____"]["display_name"]\nfirst_author',
+   answer: 'work = data["results"][0]\nauthorship = work["authorships"][0]\nfirst_author = authorship["author"]["display_name"]\nfirst_author',
    check: {exprs: ['first_author']},
-   hint: 'The two blanks are the keys <code>authorships</code> and <code>author</code>.'},
-  {topic: 'Write it yourself: one value',
-   intro: 'Write the whole line; you can look back at earlier steps. To see what a work contains, print it first: <code>payload["results"][1]</code>.',
+   hint: 'The first blank is the key that holds the list of authorships: <code>authorships</code>. The second is the key inside one authorship that holds the person: <code>author</code>.',
+   after: 'The same path fits on one line: <code>data["results"][0]["authorships"][0]["author"]["display_name"]</code>. Read it from left to right: the first work, its first authorship, that authorship\'s author, the author\'s name.'},
+  {topic: 'Write it yourself: one value', stage: 'values',
+   intro: 'Write the whole thing; you can look back at earlier steps. “Outline of data” in the side panel shows where <code>primary_topic</code> sits. Go one level at a time, or write the path on one line.',
    task: 'Make <code>topic</code>: the <code>display_name</code> of the <code>primary_topic</code> of the <b>second</b> work.',
    starter: '',
-   scaffold: 'topic = payload["results"][____]["____"]["____"]\ntopic',
-   answer: 'topic = payload["results"][1]["primary_topic"]["display_name"]\ntopic',
+   scaffold: 'work = data["results"][____]\ntopic = work["____"]["____"]\ntopic',
+   answer: 'work = data["results"][1]\ntopic = work["primary_topic"]["display_name"]\ntopic',
    check: {exprs: ['topic']},
    hint: 'The second work is at position <code>1</code>. From there, follow two keys: <code>primary_topic</code>, then <code>display_name</code>.'},
-  {topic: 'Loop over the works',
+  {topic: 'Loop over the works', stage: 'all',
    intro: 'To get the same value from every work, loop over the list. Each time around the loop, <code>work</code> is the dictionary for one work.',
-   example: 'for work in payload["results"]:\n    print(work["publication_year"], work["cited_by_count"])',
-   task: 'Make <code>titles</code>: a list with the <code>display_name</code> of every work in <code>payload["results"]</code>.',
-   starter: 'titles = []\nfor work in payload["results"]:\n    titles.append(work["____"])\ntitles',
-   answer: 'titles = []\nfor work in payload["results"]:\n    titles.append(work["display_name"])\ntitles',
+   example: 'for work in data["results"]:\n    print(work["publication_year"], work["cited_by_count"])',
+   task: 'Make <code>titles</code>: a list with the <code>display_name</code> of every work in <code>data["results"]</code>.',
+   starter: 'titles = []\nfor work in data["results"]:\n    titles.append(work["____"])\ntitles',
+   answer: 'titles = []\nfor work in data["results"]:\n    titles.append(work["display_name"])\ntitles',
    check: {exprs: ['list(titles)']},
    hint: 'The blank is the key that holds a work\'s title: <code>display_name</code>.'},
-  {topic: 'Find missing values',
+  {topic: 'Find missing values', stage: 'all',
    intro: 'JSON writes a missing value as <code>null</code>, and Python reads it as <code>None</code>. Test for it with <code>is None</code>. An ORCID is an ID number for a researcher, and some authors have none on record.',
-   example: 'payload["results"][1]["authorships"][0]["author"]',
+   example: 'data["results"][1]["authorships"][0]["author"]',
    task: 'Look at the <b>third</b> work. Make <code>n_authors</code>: how many authors it lists. Make <code>n_no_orcid</code>: how many of them have no ORCID.',
-   starter: 'authorships = payload["results"][2]["authorships"]\nn_authors = ____(authorships)\nn_no_orcid = 0\nfor authorship in authorships:\n    if authorship["author"]["orcid"] ____ None:\n        n_no_orcid += 1\nprint(n_authors, n_no_orcid)',
-   answer: 'authorships = payload["results"][2]["authorships"]\nn_authors = len(authorships)\nn_no_orcid = 0\nfor authorship in authorships:\n    if authorship["author"]["orcid"] is None:\n        n_no_orcid += 1\nprint(n_authors, n_no_orcid)',
+   starter: 'authorships = data["results"][2]["authorships"]\nn_authors = ____(authorships)\nn_no_orcid = 0\nfor authorship in authorships:\n    if authorship["author"]["orcid"] ____ None:\n        n_no_orcid += 1\nprint(n_authors, n_no_orcid)',
+   answer: 'authorships = data["results"][2]["authorships"]\nn_authors = len(authorships)\nn_no_orcid = 0\nfor authorship in authorships:\n    if authorship["author"]["orcid"] is None:\n        n_no_orcid += 1\nprint(n_authors, n_no_orcid)',
    check: {exprs: ['n_authors', 'n_no_orcid']},
    hint: 'The first blank is <code>len</code>, which counts the authors. The second is <code>is</code>.',
    after: 'Two of the seven authors have no ORCID. <code>None</code> in JSON data is what <code>NULL</code> is in SQL and <code>NaN</code> is in pandas. Missing data can also be an empty list: three of these authors have <code>[]</code> as their <code>institutions</code>.'},
-  {topic: 'Build a request',
-   intro: 'A request is a web address: an endpoint, then <code>?</code>, then the parameters. In Python the parameters go in a dictionary, and <code>urlencode</code> turns the dictionary into the text after the <code>?</code>. For OpenAlex, <code>filter</code> says which works you want, <code>per_page</code> says how many to send at a time, and <code>cursor</code> says which page: <code>*</code> is the first.',
-   task: 'The saved reply came from a request like this one: works from <b>2024</b> that have a Berkeley author and an abstract, <b>five</b> per page. Fill in the two blanks so that <code>params</code> describes it.',
-   starter: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:____,has_abstract:true",\n    "per_page": ____,\n    "cursor": "*",\n}\nurl = "https://api.openalex.org/works?" + urlencode(params)\nurl',
-   answer: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:2024,has_abstract:true",\n    "per_page": 5,\n    "cursor": "*",\n}\nurl = "https://api.openalex.org/works?" + urlencode(params)\nurl',
-   check: {exprs: ['params["filter"]', 'str(params["per_page"])'], labels: {'params["filter"]': 'The filter', 'str(params["per_page"])': 'per_page'}},
-   hint: 'The year is <code>2024</code> and the number per page is <code>5</code>.',
-   after: '<code>I95457486</code> is OpenAlex\'s ID for UC Berkeley. The filter decides what the data can tell you about: these are works with at least one Berkeley-affiliated author, which is not the same as all research done at Berkeley.'},
-  {topic: 'Send a real request', live: true,
-   intro: 'So far you have read a saved reply. <code>requests.get</code> sends a real request and waits for the answer. Read the status code first: 200 means the server accepted the request. This step needs an internet connection. If the request fails in the room, go on to the next step.',
-   task: 'Send the request. Make <code>status</code>: the status code of the response. Make <code>n_now</code>: the number of works that match today.',
-   starter: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:2024,has_abstract:true",\n    "per_page": 5,\n    "cursor": "*",\n}\nresponse = requests.get("https://api.openalex.org/works", params=params, timeout=30)\nstatus = response.____\nlive = response.json()\nn_now = live["meta"]["____"]\nprint(status, n_now)',
-   answer: 'params = {\n    "filter": "institutions.id:I95457486,publication_year:2024,has_abstract:true",\n    "per_page": 5,\n    "cursor": "*",\n}\nresponse = requests.get("https://api.openalex.org/works", params=params, timeout=30)\nstatus = response.status_code\nlive = response.json()\nn_now = live["meta"]["count"]\nprint(status, n_now)',
-   check: {truths: [['status == 200', 'status should be 200. Take it from response.status_code.'],
-                    ['isinstance(live, dict) and len(live["results"]) == 5', 'The reply should hold five works. Leave params as it was.'],
-                    ['n_now == live["meta"]["count"]', 'n_now should be the count inside meta.']]},
-   hint: 'The status code is <code>response.status_code</code>. The number of matching works is under <code>count</code>, as in the saved reply.',
-   after: 'Compare <code>n_now</code> with the 11,207 in the saved reply. OpenAlex keeps adding and correcting records, so a live count can change. A saved copy stays the same.'},
-  {topic: 'Get the next page',
-   intro: 'The reply holds five works out of 11,207, and its <code>meta</code> has a <code>next_cursor</code> value. To get the next five, you send the same request with that value as the <code>cursor</code>. <code>page2</code> is the saved reply to that second request. <code>+</code> joins two lists into one.',
-   task: 'Make <code>cursor</code>: the <code>next_cursor</code> value in <code>payload</code>. Then make <code>all_works</code>: the works of both pages in one list.',
-   starter: 'cursor = payload["meta"]["____"]\nall_works = payload["results"] + page2["____"]\nprint(cursor)\nprint(len(all_works))',
-   answer: 'cursor = payload["meta"]["next_cursor"]\nall_works = payload["results"] + page2["results"]\nprint(cursor)\nprint(len(all_works))',
+  {topic: 'Get the next page', stage: 'all',
+   intro: 'The response holds five works out of 11,231, and its <code>meta</code> has a <code>next_cursor</code> value. To get the next five, you send the same request with that value as the <code>cursor</code>. <code>page2</code> is the saved response to that second request. <code>+</code> joins two lists into one.',
+   task: 'Make <code>cursor</code>: the <code>next_cursor</code> value in <code>data</code>. Then make <code>all_works</code>: the works of both pages in one list.',
+   starter: 'cursor = data["meta"]["____"]\nall_works = data["results"] + page2["____"]\nprint(cursor)\nprint(len(all_works))',
+   answer: 'cursor = data["meta"]["next_cursor"]\nall_works = data["results"] + page2["results"]\nprint(cursor)\nprint(len(all_works))',
    check: {exprs: ['cursor', '[work["id"] for work in all_works]'], labels: {'[work["id"] for work in all_works]': 'all_works'}},
    hint: 'The first blank is <code>next_cursor</code>. The works of the second page are under <code>results</code>, as in the first.',
-   after: 'That makes ten works. Collecting all 11,207 at five per page would take 2,242 requests, so decide how many pages you need before you start.'},
-  {topic: 'Write it yourself: make a table',
-   pre: 'all_works = payload["results"] + page2["results"]',
-   intro: 'A list of dictionaries becomes a table with <code>pd.DataFrame</code>: one dictionary for each row, one key for each column. <code>all_works</code> is loaded for this step: the ten works from both pages. Build the list of rows in a loop, as in the “Loop over the works” step.',
-   example: 'rows = [{"title": "A", "year": 2024}, {"title": "B", "year": 2025}]\npd.DataFrame(rows)',
-   task: 'Make <code>table</code>: a DataFrame with one row for each work in <code>all_works</code> and three columns: <code>title</code> (the work\'s <code>display_name</code>), <code>year</code> (its <code>publication_year</code>) and <code>cited_by</code> (its <code>cited_by_count</code>). Write the whole thing.',
+   after: 'That makes ten works. Collecting all 11,231 at five per page would take 2,247 requests, so decide how many pages you need before you start.'},
+  {topic: 'Write it yourself: make a table', stage: 'table',
+   pre: 'all_works = data["results"] + page2["results"]',
+   intro: 'A list of dictionaries becomes a table with <code>pd.DataFrame</code>: one dictionary for each row, one key for each column. <code>all_works</code> is loaded for this step: the ten works from both pages. Build the list of rows in a loop, as in the “Loop over the works” step. The path to an author\'s name is in the “Go deeper” step.',
+   example: 'rows = [{"title": "A", "cited_by": 12}, {"title": "B", "cited_by": 7}]\npd.DataFrame(rows)',
+   task: 'Make <code>table</code>: a DataFrame with one row for each work in <code>all_works</code> and three columns: <code>title</code> (the work\'s <code>display_name</code>), <code>cited_by</code> (its <code>cited_by_count</code>) and <code>first_author</code> (the name of its first author). Write the whole thing.',
    starter: '',
-   scaffold: 'rows = []\nfor work in all_works:\n    rows.append({"title": work["____"], "year": work["____"], "cited_by": work["____"]})\ntable = pd.DataFrame(rows)\ntable',
-   answer: 'rows = []\nfor work in all_works:\n    rows.append({"title": work["display_name"], "year": work["publication_year"], "cited_by": work["cited_by_count"]})\ntable = pd.DataFrame(rows)\ntable',
+   scaffold: 'rows = []\nfor work in all_works:\n    rows.append({\n        "title": work["____"],\n        "cited_by": work["____"],\n        "first_author": work["authorships"][____]["author"]["____"],\n    })\ntable = pd.DataFrame(rows)\ntable',
+   answer: 'rows = []\nfor work in all_works:\n    rows.append({\n        "title": work["display_name"],\n        "cited_by": work["cited_by_count"],\n        "first_author": work["authorships"][0]["author"]["display_name"],\n    })\ntable = pd.DataFrame(rows)\ntable',
    check: {exprs: ['table'], ordered: true, names: true},
-   hint: 'Start with an empty list. In the loop, append one dictionary for each work, with the keys <code>title</code>, <code>year</code> and <code>cited_by</code>. Then pass the list to <code>pd.DataFrame</code>.',
-   after: 'From here on it is the pandas you know: the reply has become a table with one row for each work.'},
-  {topic: 'Now work in the notebook', handoff: true,
-   intro: 'The practice in the browser ends here. For the rest of the class, work in the Week 6 notebook in VS Code. There you send a request of your own, save the reply to a file and turn it into a table.'}
+   hint: 'Start with an empty list. In the loop, append one dictionary for each work, with the keys <code>title</code>, <code>cited_by</code> and <code>first_author</code>. Then pass the list to <code>pd.DataFrame</code>.',
+   after: 'That table answers the question: the ten most-cited 2024 works with a Berkeley author, and the first author of each. From here on it is the pandas you know.'},
+  {topic: 'Now work in the notebook', stage: 'table', handoff: true,
+   intro: 'The practice in the browser ends here. For the rest of the class, work in the Week 6 notebook in VS Code. There you send a request of your own, save the response to a file and turn it into a table.'}
 ];
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
-const STORE = 'compss211a-week06-api-workspace';
+const STORE = 'compss211a-week06-api-workspace-2';
 let current = 0;
 const solved = new Set();
 // tried: steps where a checked answer was wrong. An answer can be opened once the student has tried.
@@ -411,6 +454,90 @@ def _ws_truths(user_ns, spec_json):
         if not ok:
             return message
     return ""
+
+# ---------- The simulated OpenAlex ----------
+# It answers the request from the first step, and its next page, with the saved copies. A wrong request gets the
+# status code and message that the actual OpenAlex gave for it on October 7, 2026.
+_WS_ROOT = "${ROOT}"
+_WS_SIM = {"real_send": None, "count": 0}
+_WS_SIM_PARAMS = "apc_sum, api-key, api_key, cited_by_count_sum, corpus, cursor, data-version, data_version, filter, format, group-by, group-bys, group_by, group_bys, include-xpac, include_xpac, mailto, page, per-page, per_page, q, rerank, sample, search, seed, select, sort, warm"
+_WS_SIM_FILTER = {"institutions.id:I95457486", "publication_year:2024", "has_abstract:true"}
+_WS_SIM_OUTSIDE = (501, {"error": "Simulated OpenAlex", "message": "The simulated OpenAlex only answers the request from the first step of this workspace (works from 2024, sorted by cited_by_count:desc, five per page) and its next page. Choose Actual OpenAlex above the steps to send other requests."})
+
+def _ws_sim_answer(method, path, query):
+    # The status code and the body for one request.
+    segments = [part for part in path.split("/") if part]
+    if method != "GET":
+        return _WS_SIM_OUTSIDE
+    if segments != ["works"]:
+        lists = {"works", "authors", "sources", "institutions", "topics", "keywords", "publishers", "funders", "concepts"}
+        return _WS_SIM_OUTSIDE if segments and segments[0] in lists else (404, {"message": "OpenAlex ID format not recognized"})
+    for name in query:
+        if name not in _WS_SIM_PARAMS.split(", "):
+            return 400, {"error": "Invalid query parameters error.", "message": f"{name} is not a valid parameter. Valid parameters are: {_WS_SIM_PARAMS}."}
+    try:
+        per_page = int(query.get("per_page", query.get("per-page", "25")))
+    except ValueError:
+        return 400, {"error": "Invalid query parameters error.", "message": "Param per-page must be a number."}
+    if not 1 <= per_page <= 200:
+        return 400, {"error": "Pagination error.", "message": "per-page parameter must be between 1 and 200."}
+    answered = {"filter", "sort", "per_page", "per-page", "cursor", "page", "mailto", "api_key", "api-key"}
+    wanted = {part.strip() for part in query.get("filter", "").split(",")}
+    if set(query) - answered or wanted != _WS_SIM_FILTER or query.get("sort", "cited_by_count:desc") != "cited_by_count:desc" or per_page != 5:
+        return _WS_SIM_OUTSIDE
+    pages = []
+    for name in ("openalex_page1.json", "openalex_page2.json"):
+        with open(_WS_ROOT + "/" + name) as f:
+            pages.append(json.load(f))
+    if "cursor" in query:
+        cursors = {"*": 0, pages[0]["meta"]["next_cursor"]: 1}
+        if query["cursor"] == pages[1]["meta"]["next_cursor"]:
+            return _WS_SIM_OUTSIDE
+        if query["cursor"] not in cursors:
+            return 400, {"error": "Pagination error.", "message": "Invalid cursor value"}
+        return 200, pages[cursors[query["cursor"]]]
+    # Without a cursor, OpenAlex numbers the pages and leaves next_cursor out of meta.
+    if query.get("page", "1") != "1":
+        return _WS_SIM_OUTSIDE
+    body = pages[0]
+    body["meta"] = {key: value for key, value in body["meta"].items() if key != "next_cursor"}
+    body["meta"]["page"] = 1
+    return 200, body
+
+def _ws_sim_send(self, request, **kwargs):
+    # Stands in for requests' Session.send: builds the response here, and sends nothing.
+    import requests
+    from urllib.parse import urlsplit, parse_qs
+    parts = urlsplit(request.url)
+    if parts.hostname != "api.openalex.org":
+        raise requests.exceptions.ConnectionError(f"The simulated OpenAlex only answers at api.openalex.org, not at {parts.hostname}. Choose Actual OpenAlex above the steps to send this request.")
+    query = {name: values[-1] for name, values in parse_qs(parts.query, keep_blank_values=True).items()}
+    status, body = _ws_sim_answer(request.method, parts.path, query)
+    _WS_SIM["count"] += 1
+    response = requests.Response()
+    response.status_code = status
+    response.reason = {200: "OK", 400: "Bad Request", 404: "Not Found", 501: "Not Implemented"}[status]
+    response._content = json.dumps(body, separators=(", ", ": ") if status == 200 else (",", ":")).encode("utf-8")
+    response._content_consumed = True
+    response.encoding = "utf-8"
+    response.headers["Content-Type"] = "application/json"
+    response.headers["X-Simulated"] = "COMPSS 211A Week 6 workspace"
+    response.url = request.url
+    response.request = request
+    return response
+
+def _ws_source(mode):
+    # Every request that requests sends passes through Session.send, so that is the one place to switch.
+    _WS_SIM["count"] = 0
+    if "requests" not in sys.modules:
+        return
+    sessions = sys.modules["requests"].sessions
+    if _WS_SIM["real_send"] is None:
+        _WS_SIM["real_send"] = sessions.Session.send
+    sessions.Session.send = _ws_sim_send if mode == "simulated" else _WS_SIM["real_send"]
+
+def _ws_sim_count():
+    return _WS_SIM["count"]
 `;
 
 let pythonReady = null, helpersLoaded = false;
@@ -432,10 +559,28 @@ function freshNamespace(py, step, live) {
   const ns = py.toPy({'__name__': '__main__'});
   const run = py.globals.get('_ws_run');
   run(SETUP + (live ? '\n' + LIVE_SETUP : '') + (step && step.pre ? '\n' + step.pre : ''), ns);
+  py.globals.get('_ws_source')(source);
   return ns;
 }
+// Where requests go: the actual OpenAlex, over the internet, or a simulated one that answers in the browser
+// with the saved copies. The choice is kept apart from the saved code, so that "Start over" leaves it alone.
+const SOURCE_STORE = 'compss211a-week06-api-source';
+const SOURCES = {
+  actual: {line: 'They are sent over the internet to api.openalex.org.',
+           note: 'Requests now go to the <b>actual OpenAlex</b>, so this step needs an internet connection. Run it once or twice, not many times. OpenAlex limits the requests a network can send in a day, and the class shares one network. If the request fails, choose Simulated OpenAlex above the steps.'},
+  simulated: {line: 'They stay in your browser. The response is built from the saved copy.',
+              note: 'Requests now go to the <b>simulated OpenAlex</b>. The request stays in your browser, and the response is built from a copy of the actual response, saved on October 7, 2026. You can run it as often as you like.'}
+};
+let source = 'actual';
+function setSource(value, keep = true) {
+  source = SOURCES[value] ? value : 'actual';
+  document.querySelectorAll('[data-source]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.source === source)));
+  $('sourceLine').textContent = SOURCES[source].line;
+  document.querySelectorAll('[data-source-note]').forEach(el => { el.innerHTML = SOURCES[source].note; });
+  if (keep) try { localStorage.setItem(SOURCE_STORE, source); } catch (error) { /* storage is unavailable */ }
+}
 const LIMIT = 12000;   // characters of output shown
-// Run code and collect what it prints. Returns {ok, html, ns}; the caller destroys ns.
+// Run code and collect what it prints. Returns {ok, html, ns, simulated}; the caller destroys ns.
 async function execute(code, step, live) {
   const py = await getPython(live);
   const ns = freshNamespace(py, step, live);
@@ -450,7 +595,7 @@ async function execute(code, step, live) {
   const ok = await Sandbox.capture(() => py.globals.get('_ws_run')(code, ns), sink);
   if (cut) html += '\n<span class="dim">The output is longer than this box shows. Print a smaller part.</span>';
   if (!html) html = '<span class="dim">(no output)</span>';
-  return {ok, html, ns, py};
+  return {ok, html, ns, py, simulated: py.globals.get('_ws_sim_count')() > 0};
 }
 // What a common error message means, in a sentence. The Python message stays above it.
 function explainError(html) {
@@ -463,7 +608,8 @@ function explainError(html) {
   if (/^IndexError: list index out of range/.test(text)) return 'The list is shorter than that position. len() tells you how many items it has, and the first is at 0.';
   if ((m = text.match(/^NameError: name '(.+)' is not defined/))) return `Python does not know the name ${m[1]}. Check the spelling, and that an earlier line in this box makes it. Each run starts fresh.`;
   if (/^SyntaxError|^IndentationError/.test(text)) return 'Python could not read the code. Look at the line the message points to for a missing bracket, quotation mark or colon, or uneven indentation.';
-  if (/ConnectionError|Timeout|NetworkError|Failed to execute 'send'/.test(text)) return 'The request did not get through. Check the internet connection and try again, or go on to the next step.';
+  if (/simulated OpenAlex only answers/.test(text)) return '';   // the message itself says what to do
+  if (/ConnectionError|Timeout|NetworkError|XMLHttpRequest|Failed to (execute|fetch)|JsException/.test(text)) return 'The request did not get through. Check the internet connection and try again, or choose Simulated OpenAlex above the steps.';
   return '';
 }
 
@@ -493,7 +639,7 @@ function renderSteps() {
     return `<section class="q" id="s${i}" aria-labelledby="s${i}-title" hidden>
       <div class="level">Step ${i + 1} of ${STEPS.length}</div>
       <h2 id="s${i}-title" tabindex="-1">${esc(s.topic)}</h2>
-      ${s.intro ? `<p>${s.intro}</p>` : ''}
+      ${[].concat(s.intro || []).map(text => `<p>${text}</p>`).join('')}
       ${example}
       ${work}
     </section>`;
@@ -532,22 +678,42 @@ function show(i, focus = true) {
     $(`s${n}-answer`).hidden = !open;
     $(`s${n}-answer-wait`).hidden = open;
   });
+  // The strip above the step: which part of the work this step belongs to.
+  const stages = [...$('stages').children], at = stages.findIndex(li => li.dataset.stage === STEPS[current].stage);
+  stages.forEach((li, n) => { li.classList.toggle('done', n < at); if (n === at) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current'); });
   const main = STEPS.map((s, n) => n).filter(n => STEPS[n].answer);
   $('progress').textContent = `${main.filter(n => solved.has(n)).length} of ${main.length} checked`;
   if (focus) $(`s${current}-title`).focus();
   save();
 }
 
-// Clicking a name in the list puts it into the code box that was used last, at the cursor or in the next blank.
+// The outline in the side panel: the keys of the saved response and what each one holds, without the values.
+const kindOf = v => v === null ? 'None' : Array.isArray(v) ? `list of ${v.length}` : typeof v === 'object' ? 'dictionary' : typeof v === 'string' ? 'text' : typeof v === 'number' ? 'number' : 'True or False';
+function outlineHTML(value) {
+  if (Array.isArray(value)) {
+    const first = value[0];
+    return first !== null && typeof first === 'object' ? `<ul><li><button type="button" class="name" data-pos="0">[0]</button> <span class="kind">one item: a ${kindOf(first)}</span>${outlineHTML(first)}</li></ul>` : '';
+  }
+  if (value && typeof value === 'object')
+    return '<ul>' + Object.entries(value).map(([key, v]) => `<li><button type="button" class="name" data-key="${esc(key)}">${esc(key)}</button> <span class="kind">${kindOf(v)}</span>${outlineHTML(v)}</li>`).join('') + '</ul>';
+  return '';
+}
+
+// Clicking in the side panel puts text into the code box that was used last. It fills the next blank if there is one;
+// otherwise it goes in at the cursor. A name goes in as it is, a key as ["key"] and a position as [0].
 let lastBox = null;
 for (const type of ['focusin', 'pointerdown', 'input']) document.addEventListener(type, e => { if (e.target.matches && e.target.matches('textarea')) lastBox = e.target; });
-function insertName(name) {
+function insertText(inBlank, atCursor) {
   const visible = STEPS[current].answer ? $(`s${current}-code`) : null;
   const box = lastBox && lastBox.offsetParent !== null ? lastBox : visible || $('scratch');
   if (!box) return;
   const blank = box.value.indexOf('____');
-  if (blank !== -1) box.setRangeText(name, blank, blank + 4, 'end');
-  else box.setRangeText(name, box.selectionStart, box.selectionEnd, 'end');
+  if (blank !== -1) {
+    box.setRangeText(inBlank, blank, blank + 4, 'end');
+    // Leave the cursor after the closing bracket, so that the next click adds the next level.
+    const end = blank + inBlank.length, close = box.value.slice(end).match(/^"?\]/);
+    if (close) box.setSelectionRange(end + close[0].length, end + close[0].length);
+  } else box.setRangeText(atCursor, box.selectionStart, box.selectionEnd, 'end');
   box.dispatchEvent(new Event('input', {bubbles: true}));
   box.focus();
 }
@@ -572,7 +738,7 @@ async function runBox(button) {
   try {
     result = await execute(code, act === 'scratch' ? null : s, live);
     const plain = result.ok ? '' : explainError(result.html);
-    out.innerHTML = result.html;
+    out.innerHTML = result.html + (result.simulated ? `${/\n$/.test(result.html) ? '' : '\n'}<span class="dim">Answered by the simulated OpenAlex.</span>` : '');
     if (act !== 'run' && act !== 'check') return;
     if (act === 'run') {
       if (plain) setFeedback(fb, 'bad', esc(plain)); else fb.className = 'feedback';
@@ -588,7 +754,7 @@ async function runBox(button) {
     }
     if (!message) {
       solved.add(i);
-      setFeedback(fb, 'good', `<p><strong>Correct.</strong></p>${s.after ? `<p>${s.after}</p>` : ''}`);
+      setFeedback(fb, 'good', `<p><strong>Correct.</strong></p>${[].concat(s.after || []).map(text => `<p>${text}</p>`).join('')}`);
     } else {
       tried.add(i);
       setFeedback(fb, 'bad', esc(message));
@@ -607,8 +773,14 @@ async function runBox(button) {
 
 document.addEventListener('click', e => {
   if (e.target.closest('[data-next]')) { show(current + 1); return; }
+  const where = e.target.closest('[data-source]');
+  if (where) { setSource(where.dataset.source); return; }
   const name = e.target.closest('[data-name]');
-  if (name) { insertName(name.dataset.name); return; }
+  if (name) { insertText(name.dataset.name, name.dataset.name); return; }
+  const key = e.target.closest('[data-key]');
+  if (key) { insertText(key.dataset.key, `["${key.dataset.key}"]`); return; }
+  const pos = e.target.closest('[data-pos]');
+  if (pos) { insertText(pos.dataset.pos, `[${pos.dataset.pos}]`); return; }
   const scaffold = e.target.closest('[data-scaffold]');
   if (scaffold) {
     const i = Number(scaffold.dataset.scaffold), box = $(`s${i}-code`);
@@ -650,6 +822,11 @@ document.addEventListener('input', e => { if (e.target.matches('textarea')) save
 
 renderSteps();
 restore();
+{
+  let kept = null;
+  try { kept = localStorage.getItem(SOURCE_STORE); } catch (error) { /* storage is unavailable */ }
+  setSource(kept, false);
+}
 $('picker').addEventListener('change', e => show(Number(e.target.value)));
 $('prev').addEventListener('click', () => show(current - 1));
 $('next').addEventListener('click', () => show(current + 1));
@@ -659,7 +836,7 @@ $('reset').addEventListener('click', () => {
   location.reload();
 });
 // On a narrow screen the list starts closed, so the step is visible first.
-if (window.matchMedia('(max-width: 860px)').matches) $('loadedBox').open = false;
+if (window.matchMedia('(max-width: 860px)').matches) { $('loadedBox').open = false; $('outlineBox').open = false; }
 show(current, false);
 
 (async () => {
@@ -669,6 +846,7 @@ show(current, false);
       if (!response.ok) throw new Error('Could not load ' + name);
       FILES[name] = await response.text();
     }
+    $('outline').innerHTML = outlineHTML(JSON.parse(FILES['openalex_page1.json']));
     setEngine('Starting Python in your browser…');
     await getPython(false);
     document.querySelectorAll('button[data-act]').forEach(b => { b.disabled = false; });

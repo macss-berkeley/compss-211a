@@ -1,10 +1,10 @@
 {
  "meta": {
-  "count": 11207,
-  "db_response_time_ms": 28,
+  "count": 11231,
+  "db_response_time_ms": 16,
   "page": null,
   "per_page": 5,
-  "next_cursor": "IlsxMDAuMCwgNTQyLCAnaHR0cHM6Ly9vcGVuYWxleC5vcmcvVzQ0MDIyNjI4NzgnXSI=",
+  "next_cursor": "Ils1NDQsIDEwMC4wLCA1NDQsICdodHRwczovL29wZW5hbGV4Lm9yZy9XNDQwMjI2Mjg3OCddIg==",
   "groups_count": null
  },
  "results": [
@@ -13,7 +13,7 @@
    "doi": "https://doi.org/10.3390/info15090517",
    "display_name": "Recurrent Neural Networks: A Comprehensive Review of Architectures, Variants, and Applications",
    "publication_year": 2024,
-   "cited_by_count": 603,
+   "cited_by_count": 606,
    "authorships": [
     {
      "author_position": "first",
@@ -62,8 +62,8 @@
     }
    ],
    "primary_topic": {
-    "id": "https://openalex.org/T12611",
-    "display_name": "Neural Networks and Reservoir Computing",
+    "id": "https://openalex.org/T10320",
+    "display_name": "Neural Networks and Applications",
     "field": {
      "id": "https://openalex.org/fields/17",
      "display_name": "Computer Science"
@@ -79,7 +79,7 @@
    "doi": "https://doi.org/10.1038/s41586-024-07558-y",
    "display_name": "Neuronal wiring diagram of an adult brain",
    "publication_year": 2024,
-   "cited_by_count": 573,
+   "cited_by_count": 574,
    "authorships": [
     {
      "author_position": "first",
@@ -1399,7 +1399,7 @@
    "doi": "https://doi.org/10.1002/sd.3221",
    "display_name": "AI ‐driven adaptive learning for sustainable educational transformation",
    "publication_year": 2024,
-   "cited_by_count": 554,
+   "cited_by_count": 558,
    "authorships": [
     {
      "author_position": "first",
@@ -1500,7 +1500,7 @@
    "doi": "https://doi.org/10.1016/j.cell.2024.03.045",
    "display_name": "The plant immune system: From discovery to deployment",
    "publication_year": 2024,
-   "cited_by_count": 547,
+   "cited_by_count": 550,
    "authorships": [
     {
      "author_position": "first",
@@ -1581,7 +1581,7 @@
    "doi": "https://doi.org/10.1126/science.adn3747",
    "display_name": "Climate change exacerbates the environmental impacts of agriculture",
    "publication_year": 2024,
-   "cited_by_count": 542,
+   "cited_by_count": 544,
    "authorships": [
     {
      "author_position": "first",

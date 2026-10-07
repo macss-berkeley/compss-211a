@@ -1,10 +1,10 @@
 {
  "meta": {
-  "count": 11207,
-  "db_response_time_ms": 37,
+  "count": 11231,
+  "db_response_time_ms": 16,
   "page": null,
   "per_page": 5,
-  "next_cursor": "IlsxMDAuMCwgNzAwLCAnaHR0cHM6Ly9vcGVuYWxleC5vcmcvVzQzOTExNjA2ODInXSI=",
+  "next_cursor": "Ils3MDIsIDEwMC4wLCA3MDIsICdodHRwczovL29wZW5hbGV4Lm9yZy9XNDM5MTE2MDY4MiddIg==",
   "groups_count": null
  },
  "results": [
@@ -13,7 +13,7 @@
    "doi": "https://doi.org/10.1002/alz.13859",
    "display_name": "Revised criteria for diagnosis and staging of Alzheimer's disease: Alzheimer's Association Workgroup",
    "publication_year": 2024,
-   "cited_by_count": 2724,
+   "cited_by_count": 2737,
    "authorships": [
     {
      "author_position": "first",
@@ -343,7 +343,7 @@
    "doi": "https://doi.org/10.1093/restud/rdae007",
    "display_name": "Revisiting Event-Study Designs: Robust and Efficient Estimation",
    "publication_year": 2024,
-   "cited_by_count": 2137,
+   "cited_by_count": 2143,
    "authorships": [
     {
      "author_position": "first",
@@ -424,7 +424,7 @@
    "doi": "https://doi.org/10.1162/tacl_a_00638",
    "display_name": "Lost in the Middle: How Language Models Use Long Contexts",
    "publication_year": 2024,
-   "cited_by_count": 1370,
+   "cited_by_count": 1381,
    "authorships": [
     {
      "author_position": "first",
@@ -532,7 +532,7 @@
    "doi": "https://doi.org/10.1038/s41467-024-45563-x",
    "display_name": "Structured information extraction from scientific text with large language models",
    "publication_year": 2024,
-   "cited_by_count": 731,
+   "cited_by_count": 734,
    "authorships": [
     {
      "author_position": "first",
@@ -686,11 +686,11 @@
     }
    ],
    "primary_topic": {
-    "id": "https://openalex.org/T11948",
-    "display_name": "Machine Learning in Materials Science",
+    "id": "https://openalex.org/T10028",
+    "display_name": "Topic Modeling",
     "field": {
-     "id": "https://openalex.org/fields/25",
-     "display_name": "Materials Science"
+     "id": "https://openalex.org/fields/17",
+     "display_name": "Computer Science"
     },
     "domain": {
      "id": "https://openalex.org/domains/3",
@@ -703,7 +703,7 @@
    "doi": "https://doi.org/10.1038/s41586-023-06879-8",
    "display_name": "Rapid groundwater decline and some cases of recovery in aquifers globally",
    "publication_year": 2024,
-   "cited_by_count": 700,
+   "cited_by_count": 702,
    "authorships": [
     {
      "author_position": "first",
