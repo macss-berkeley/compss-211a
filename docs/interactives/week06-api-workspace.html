@@ -186,7 +186,7 @@ const LIVE_SETUP = 'import pyodide_http\npyodide_http.patch_all()\nimport reques
 // live: the step sends a request; where it goes follows the “Requests go to” switch.
 // check.labels: what to call an expression in a message. check.truths: for a live request, tests on the student's own result, because a second request would give a different response.
 // pre: code run before the student's code, for a value an earlier step made. live: the step sends a real request.
-// example: code that is shown and can be run. after: shown once the answer is correct.
+// example: code that is shown and can be run. after: shown once the answer is correct. optional: labelled, and left out of the count of checked steps.
 // stage: where the step sits in Basics, Request, Response, Read values, Every work, Table. intro and after can be a list of paragraphs.
 const STEPS = [
   {topic: 'Send a GET request', stage: 'basics', live: true,
@@ -211,7 +211,20 @@ const STEPS = [
                     ['isinstance(record, dict)', 'record should be a dictionary. response.json() makes one from the body.'],
                     ['name == record.get("display_name")', 'name should be the value stored under the key display_name.']]},
    hint: 'The first blank is <code>json</code>. The name is stored under <code>display_name</code>.',
-   after: 'So <code>I95457486</code> is the ID that OpenAlex gives UC Berkeley. The body that the actual OpenAlex sends has 29 keys. <a href="https://api.openalex.org/institutions/I95457486" target="_blank" rel="noopener">Open the address in a new tab</a> to see all of it. The next steps use this ID to ask for works with a Berkeley author.'},
+   after: 'So <code>I95457486</code> is the ID that OpenAlex gives UC Berkeley. The body that the actual OpenAlex sends has 29 keys. <a href="https://api.openalex.org/institutions/I95457486" target="_blank" rel="noopener">Open the address in a new tab</a> to see all of it. The next step is optional: it reads a few more values from this record. The steps after it use the ID to ask for works with a Berkeley author.'},
+  {topic: 'Read more of the record', stage: 'basics', live: true, optional: true,
+   intro: ['This step is optional practice with the same record. The body is a dictionary, so <code>list(record.keys())</code> lists what it holds, and square brackets with a key give you one value.',
+           'A value can itself be a dictionary or a list. Then you use brackets again: a key for a dictionary, a position for a list. Python counts from 0, so <code>[0]</code> is the first item.'],
+   example: 'import requests\n\nresponse = requests.get("https://api.openalex.org/institutions/I95457486")\nrecord = response.json()\nprint(list(record.keys()))\nprint(record["geo"])\nprint(record["display_name_acronyms"])',
+   task: 'Run the example to see the keys, and what is stored under <code>geo</code> and <code>display_name_acronyms</code>. Then make <code>n_works</code>: the number of works OpenAlex counts for Berkeley, <code>city</code>: the city, and <code>acronym</code>: the first acronym in the list.',
+   starter: 'import requests\n\nresponse = requests.get("https://api.openalex.org/institutions/I95457486")\nrecord = response.json()\nn_works = record["____"]\ncity = record["geo"]["____"]\nacronym = record["display_name_acronyms"][____]\nprint(n_works, city, acronym)',
+   answer: 'import requests\n\nresponse = requests.get("https://api.openalex.org/institutions/I95457486")\nrecord = response.json()\nn_works = record["works_count"]\ncity = record["geo"]["city"]\nacronym = record["display_name_acronyms"][0]\nprint(n_works, city, acronym)',
+   check: {truths: [['response.status_code != 429', 'OpenAlex answered 429: this network has used up its requests for today. Choose Simulated OpenAlex above the steps and run the code again.'],
+                    ['n_works == record["works_count"]', 'n_works should be the value stored under the key works_count.'],
+                    ['city == record["geo"]["city"]', 'city should be the value stored under city, inside geo.'],
+                    ['acronym == record["display_name_acronyms"][0]', 'acronym should be the first item of the list, which is at position 0.']]},
+   hint: 'The first blank is <code>works_count</code> and the second is <code>city</code>. The first item of a list is at position <code>0</code>.',
+   after: 'The later steps use the same three moves: a key, a key inside a key, and a position in a list. The record also holds the address for its own works, under <code>works_api_url</code>: the address for works, a <code>?</code>, and a filter with this ID. The next step writes a request like that.'},
   {topic: 'Write a request with parameters', stage: 'request',
    intro: ['That request asked for one record by its ID. To ask for a list of records that match some conditions, you send parameters with the request. The address they go to is called the endpoint. For works it is <code>https://api.openalex.org/works</code>.',
            'In Python the parameters go in a dictionary, and <code>urlencode</code> turns the dictionary into the text after the <code>?</code> in the address. Here <code>filter</code> picks the works, <code>sort</code> puts the most-cited first (<code>desc</code> means from high to low), <code>per_page</code> says how many to send at a time, and <code>cursor</code> says which page: <code>*</code> is the first.'],
@@ -606,7 +619,7 @@ const SOURCES = {
            short: 'Requests now go to the <b>actual OpenAlex</b>, so this step needs an internet connection. If the request fails, choose Simulated OpenAlex above the steps.',
            budget: 'Requests now go to the <b>actual OpenAlex</b>, so this step needs an internet connection. Run it once or twice, not many times. OpenAlex limits the requests for lists that a network can send in a day, and the class shares one network. If the request fails, choose Simulated OpenAlex above the steps.'},
   simulated: {line: 'They stay in your browser. The response is built from a saved copy.',
-              short: 'Requests now go to the <b>simulated OpenAlex</b>. The request stays in your browser, and the response is built from a saved copy of the actual one.',
+              short: 'Requests now go to the <b>simulated OpenAlex</b>. The request stays in your browser, and the response is built from a saved, shortened copy of the actual one.',
               budget: 'Requests now go to the <b>simulated OpenAlex</b>. The request stays in your browser, and the response is built from a copy of the actual response, saved on October 7, 2026. You can run it as often as you like.'}
 };
 let source = 'actual';
@@ -677,7 +690,7 @@ function renderSteps() {
       <details id="s${i}-answer" hidden><summary>One possible answer</summary><pre class="answer">${esc(s.answer)}</pre></details>
       <p class="small" id="s${i}-answer-wait">One possible answer appears here after you have checked an answer of your own.</p>`;
     return `<section class="q" id="s${i}" aria-labelledby="s${i}-title" hidden>
-      <div class="level">Step ${i + 1} of ${STEPS.length}</div>
+      <div class="level">Step ${i + 1} of ${STEPS.length}${s.optional ? ' · Optional' : ''}</div>
       <h2 id="s${i}-title" tabindex="-1">${esc(s.topic)}</h2>
       ${[].concat(s.intro || []).map(text => `<p>${text}</p>`).join('')}
       ${example}
@@ -707,7 +720,7 @@ function restore() {
 function show(i, focus = true) {
   current = Math.max(0, Math.min(STEPS.length - 1, i));
   STEPS.forEach((_, n) => { $(`s${n}`).hidden = n !== current; });
-  $('picker').innerHTML = STEPS.map((s, n) => `<option value="${n}"${n === current ? ' selected' : ''}>${n + 1}. ${esc(s.topic)}${solved.has(n) ? ' ✓' : ''}</option>`).join('');
+  $('picker').innerHTML = STEPS.map((s, n) => `<option value="${n}"${n === current ? ' selected' : ''}>${n + 1}. ${esc(s.topic)}${s.optional ? ' (optional)' : ''}${solved.has(n) ? ' ✓' : ''}</option>`).join('');
   $('prev').disabled = current === 0;
   $('next').disabled = current === STEPS.length - 1;
   STEPS.forEach((s, n) => {
@@ -721,7 +734,7 @@ function show(i, focus = true) {
   // The strip above the step: which part of the work this step belongs to.
   const stages = [...$('stages').children], at = stages.findIndex(li => li.dataset.stage === STEPS[current].stage);
   stages.forEach((li, n) => { li.classList.toggle('done', n < at); if (n === at) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current'); });
-  const main = STEPS.map((s, n) => n).filter(n => STEPS[n].answer);
+  const main = STEPS.map((s, n) => n).filter(n => STEPS[n].answer && !STEPS[n].optional);
   $('progress').textContent = `${main.filter(n => solved.has(n)).length} of ${main.length} checked`;
   if (focus) $(`s${current}-title`).focus();
   save();
