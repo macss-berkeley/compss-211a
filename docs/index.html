@@ -96,6 +96,16 @@ a.card:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 .card .go::after{content:"→";transition:transform .18s ease}
 a.card:hover .go::after{transform:translateX(4px)}
 .quiz{font-family:var(--mono);font-size:.76rem;color:#6B7890}
+/* Whole-course pages get a navy card, so they stand apart from the weekly ones. */
+a.card.course{background:var(--berkeley);border-color:var(--berkeley)}
+a.card.course::before{background:var(--gold)}
+a.card.course:hover,a.card.course:focus-visible{border-color:var(--gold)}
+a.card.course h2{color:#fff}
+a.card.course p{color:#DCE5F7}
+a.card.course .week{background:var(--gold);color:var(--berkeley)}
+a.card.course .mins{color:#fff;border-color:rgba(255,255,255,.45)}
+a.card.course .quiz{color:#B9C7E6}
+a.card.course .go{color:var(--gold)}
 /* ---------- note ---------- */
 .note{
   background:linear-gradient(0deg, rgba(253,186,18,.07), rgba(253,186,18,.07)),var(--card);
@@ -171,11 +181,18 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 </section>
 
 <main class="grid">
-  <a class="card" href="https://macss-berkeley.github.io/compss-211a/practice/#class/fa667cca8488390e591cf06e9cb55d4dbf8f8232f83f6397">
+  <a class="card course" href="https://macss-berkeley.github.io/compss-211a/practice/#class/fa667cca8488390e591cf06e9cb55d4dbf8f8232f83f6397">
     <span class="meta"><span class="week">Whole course</span><span class="mins">2–4 min per activity</span></span>
     <h2>Skills Checklist &amp; Practice</h2>
     <p>Review the skills covered so far, practise each one, and save your self-check ratings. Code drills let you write real Python on the course data. New weeks appear automatically.</p>
     <span class="quiz">includes: skill checklist &middot; code drills &middot; flashcards &middot; progress backup</span>
+    <span class="go">Open</span>
+  </a>
+  <a class="card course" href="practice/#functions">
+    <span class="meta"><span class="week">Whole course</span><span class="mins">look things up</span></span>
+    <h2>Python and pandas reference</h2>
+    <p>What you write in this course, grouped by what you want to do. Each entry has a short example on the course data that you can change and run. New entries appear when their week starts.</p>
+    <span class="quiz">includes: Python basics &middot; pandas &middot; SQL from Python &middot; web APIs &middot; text analysis</span>
     <span class="go">Open</span>
   </a>
   <a class="card rise d5" data-open="2026-09-21T00:00:00-07:00" href="interactives/week03-how-git-thinks.html">
