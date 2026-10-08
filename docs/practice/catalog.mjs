@@ -242,8 +242,8 @@ export const skills = [
     "weeks": "Weeks 5–6",
     "releaseWeek": 5,
     "activity": null,
-    "practice": "Week 6 reference: JSON traversal — Trace a key/index path through a nested response.",
-    "url": "https://github.com/macss-berkeley/compss-211a/blob/main/lessons/week06_web-apis/01_web_api_reference.md"
+    "practice": "Week 6 practice notebook — Go one level at a time through a nested OpenAlex response.",
+    "url": "https://github.com/macss-berkeley/compss-211a/blob/main/lessons/week06_web-apis/week06_openalex_practice.ipynb"
   },
   {
     "id": "other-file-formats",
@@ -297,8 +297,8 @@ export const skills = [
     "weeks": "Week 6",
     "releaseWeek": 6,
     "activity": null,
-    "practice": "Week 6 reference — Build a request, validate its response, and explain pagination.",
-    "url": "https://github.com/macss-berkeley/compss-211a/blob/main/lessons/week06_web-apis/01_web_api_reference.md"
+    "practice": "Week 6 practice notebook — Send a request with parameters, check the status code, and turn the response into a table.",
+    "url": "https://github.com/macss-berkeley/compss-211a/blob/main/lessons/week06_web-apis/week06_openalex_practice.ipynb"
   },
   {
     "id": "explore-a-new-dataset",
