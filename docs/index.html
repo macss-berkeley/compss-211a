@@ -68,14 +68,15 @@ a.card{
   position:relative;overflow:hidden;
 }
 a.card::before{
-  content:"";position:absolute;inset:0 auto 0 0;width:5px;background:var(--berkeley);
-  transform:scaleY(0);transform-origin:top;transition:transform .22s ease;
+  content:"";position:absolute;top:0;right:0;width:28px;height:28px;background:var(--berkeley);
+  clip-path:polygon(0 0,100% 0,100% 100%);
+  transform:scale(0);transform-origin:top right;transition:transform .22s ease;
 }
 a.card:hover,a.card:focus-visible{
   transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,38,118,.13);
   border-color:#C4C9D4;
 }
-a.card:hover::before,a.card:focus-visible::before{transform:scaleY(1)}
+a.card:hover::before,a.card:focus-visible::before{transform:scale(1)}
 a.card:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 .card .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .week{
