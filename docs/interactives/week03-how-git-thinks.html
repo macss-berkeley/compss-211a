@@ -69,8 +69,8 @@
 
   /* ---------- mission brief ---------- */
   .brief{
-    border-left:3px solid var(--gold); background:var(--gold-soft);
-    border-radius:0 4px 4px 0; padding:10px 14px; margin:0 0 16px; font-size:.95rem;
+    background:var(--gold-soft);
+    border-radius:4px; padding:10px 14px; margin:0 0 16px; font-size:.95rem;
   }
   .brief strong{ font-family:var(--serif); font-weight:640; color:var(--berkeley); }
 
@@ -194,7 +194,7 @@
   /* ---------- prompts ---------- */
   .promptzone{ margin:14px 0 0; }
   .prompt{
-    border:1px solid var(--line); border-left:3px solid var(--gold); border-radius:0 4px 4px 0;
+    border:1px solid var(--line); border-radius:4px;
     background:#FAFAFA; padding:14px 16px;
   }
   .prompt fieldset{ border:0; margin:0; padding:0; }
@@ -216,10 +216,9 @@
   .pickhint{ font-size:.82rem; color:var(--err); }
   .scenedesc{ margin:6px 0 10px; font-size:.9rem; color:#3B4A63; }
   .notecard{
-    border:1px solid var(--line); border-left:3px solid var(--blue-mid); border-radius:0 4px 4px 0;
+    border:1px solid var(--line); border-radius:4px;
     background:#FAFAFA; padding:12px 16px; font-size:.9rem;
   }
-  .notecard.finale{ border-left-color:var(--ok); }
   .notecard.finale strong{ color:var(--ok); }
 
   /* ---------- mission checklist ---------- */
@@ -1344,7 +1343,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     }
 
     G.SCEN.basics = {
-      id: 'basics', title: 'Save, commit, push, pull', tag: 'start here · ≈ 6 min',
+      id: 'basics', title: 'Save, commit, push, pull', tag: 'start here · about 5 min',
       intro: 'In this tab you edit a file, commit the change, and push it to GitHub. Each numbered dot is a commit. Real Git names each commit with a hash, a short code such as <code>9be02f1</code>, instead of a number.',
       autoStage: false,
       commitMessages: ['Add favorite tool to the guide', 'Clarify the data sources section', 'Update the site headline'],
@@ -1426,7 +1425,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     }
 
     G.SCEN['pull-first'] = {
-      id: 'pull-first', title: 'A refused push', tag: 'pull, then push · ≈ 3 min',
+      id: 'pull-first', title: 'A refused push', tag: 'pull, then push · a few min',
       intro: 'You and Maya both cloned the same repository. She committed and pushed. You did not pull, and made a commit of your own. The two commits changed different lines, so Git can combine them. See what happens to your push and how to fix it.',
       autoStage: true,
       commitMessages: ['Tidy the README'],
@@ -1525,7 +1524,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     var GH = 'On github.com';
 
     G.SCEN.branches = {
-      id: 'branches', title: 'Branch, pull request, merge', tag: 'propose and review a change · ≈ 5 min',
+      id: 'branches', title: 'Branch, pull request, merge', tag: 'propose and review a change · about 5 min',
       intro: 'A branch is a second line of history inside the same repository. In this tab you create a branch, commit on it, open a pull request, and merge it. After each step, check which copies changed.',
       autoStage: true,
       commitMessages: ['Add a note on the archive', 'Second note'],
@@ -1702,7 +1701,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     }
 
     G.SCEN.conflict = {
-      id: 'conflict', title: 'Resolve a conflict', tag: 'optional · ≈ 2 min',
+      id: 'conflict', title: 'Resolve a conflict', tag: 'optional · a few min',
       intro: 'You and Maya both changed the only line in <code>next-step.md</code>. She committed (4) and pushed. You committed (5) without pulling. When you pulled, Git could not combine the two versions and stopped.',
       autoStage: true,
       missions: ['Resolve the conflict', 'Commit and push the merge'],
@@ -1844,7 +1843,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     }
 
     G.SCEN.pages = {
-      id: 'pages', title: 'Publish with GitHub Pages', tag: 'publish a site from docs/ · ≈ 3 min',
+      id: 'pages', title: 'Publish with GitHub Pages', tag: 'publish a site from docs/ · a few min',
       intro: 'GitHub Pages turns the <code>docs/</code> folder of your repository’s <code>main</code> branch, <em>on GitHub</em>, into a website. It reads the copy on GitHub, not the files on your computer.',
       autoStage: true,
       commitMessages: ['Write the introduction', 'Explain the sources in the README', 'Fix a typo in the introduction', 'Add opening hours'],

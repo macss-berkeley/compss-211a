@@ -206,7 +206,6 @@ header h1{
   display:flex; align-items:center; gap:12px; flex-wrap:wrap;
   background:var(--gold-soft);
   border:1px solid var(--gold);
-  border-left:5px solid var(--gold);
   border-radius:4px;
   padding:12px 14px;
   font-size:1rem;
@@ -220,7 +219,6 @@ header h1{
   background:var(--gold-soft); color:var(--ink);
   border-radius:3px; padding:3px 10px;
 }
-.strip.all-done{ border-left-color:var(--ok); }
 .strip.all-done .strip-badge{ background:var(--ok); color:#fff; }
 #strip-text code{ background:#fff; border-color:rgba(18,35,61,.18); color:var(--berkeley); font-weight:500; padding:2px 7px; white-space:nowrap; }
 .mission .mtext code, .qcard code{ white-space:nowrap; }
@@ -323,7 +321,6 @@ header h1{
   display:flex; align-items:center; gap:7px;
   padding:3px 8px 3px calc(var(--d) * 15px + 8px);
   border-radius:4px;
-  border-left:3px solid transparent;
 }
 .trow .ticon{ flex:none; display:inline-flex; color:var(--blue-mid); }
 .trow.is-file .ticon{ color:#6B7A93; }
@@ -332,7 +329,6 @@ header h1{
 .trow.is-hidden .tname{ color:#6B7A93; }
 .trow.here{
   background:var(--gold-soft);
-  border-left-color:var(--gold);
 }
 .here-pill{
   margin-left:auto;
@@ -397,14 +393,12 @@ ol.missions > .mission:last-child{ border-bottom:0; }
   grid-column:1 / -1;
   margin-top:8px;
   border:1px solid var(--line);
-  border-left:4px solid var(--gold);
   border-radius:4px;
   background:var(--paper);
   padding:13px 15px;
 }
 .q-slot .qcard{ margin-top:0; }
 .qmoved{ grid-column:1 / -1; margin:6px 0 0; font-size:.8rem; color:#4A5A74; font-style:italic; }
-.qcard.locked{ border-left-color:var(--line); }
 .qcard.locked .qbody{ display:none; }
 .qcard .qlock{
   margin:0; font-size:.83rem; color:#4A5A74; font-style:italic;
@@ -544,7 +538,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     <h1>Terminal navigator</h1>
     <div class="chips">
       <span class="chip chip-gold">Week 4 &middot; Command line</span>
-      <span class="chip chip-outline">&asymp; 14 minutes</span>
+      <span class="chip chip-outline">10–15 minutes</span>
     </div>
     <p class="promise">Practice moving around a file system in a simulated terminal. Find out where you are, run a script from the right folder and the wrong one, then create, copy, move, and delete files.</p>
     <hr class="gold-rule">
