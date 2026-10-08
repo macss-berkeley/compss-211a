@@ -112,7 +112,7 @@ footer{border-top:1px solid var(--line);padding:18px 0 30px;font-size:.85rem;col
   <p class="small">Click a name to put it in your code.</p>
   <h3><button type="button" class="name" data-name="data">data</button></h3>
   <p class="small">The saved response, as Python data.</p>
-  <h3><button type="button" class="name" data-name="page2">page2</button></h3>
+  <h3><button type="button" class="name" data-name="data2">data2</button></h3>
   <p class="small">The saved response for the next page.</p>
 </details>
 <details id="outlineBox"><summary>Outline of <code>data</code></summary>
@@ -151,7 +151,7 @@ footer{border-top:1px solid var(--line);padding:18px 0 30px;font-size:.85rem;col
 </div>
 </main>
 
-<footer><div class="wrap">COMPSS 211A · UC Berkeley · CC BY 4.0. Python runs in your browser with Pyodide. Your code is saved in this browser only and is not sent anywhere. <code>data</code> and <code>page2</code> are two responses from the <a href="https://openalex.org">OpenAlex</a> API, saved on October 7, 2026 and shortened. <a href="data/week06/openalex_pages_provenance.json">How the copies were made</a>.</div></footer>
+<footer><div class="wrap">COMPSS 211A · UC Berkeley · CC BY 4.0. Python runs in your browser with Pyodide. Your code is saved in this browser only and is not sent anywhere. <code>data</code> and <code>data2</code> are two responses from the <a href="https://openalex.org">OpenAlex</a> API, saved on October 7, 2026 and shortened. <a href="data/week06/openalex_pages_provenance.json">How the copies were made</a>.</div></footer>
 
 <script src="sandbox/sandbox.js"></script>
 <script>
@@ -172,7 +172,7 @@ const SETUP = [
   'with open("openalex_page1.json") as f:',
   '    data = json.load(f)',
   'with open("openalex_page2.json") as f:',
-  '    page2 = json.load(f)',
+  '    data2 = json.load(f)',
 ].join('\n');
 // Steps that send a real request also get requests. pyodide_http lets requests work inside a browser.
 const LIVE_SETUP = 'import pyodide_http\npyodide_http.patch_all()\nimport requests';
@@ -307,15 +307,15 @@ const STEPS = [
    hint: 'The first blank is <code>len</code>, which counts the authors. The second is <code>is</code>.',
    after: 'Two of the seven authors have no ORCID. Missing data can also be an empty list: three of these authors have <code>[]</code> as their <code>institutions</code>.'},
   {topic: 'Get the next page', stage: 'all',
-   intro: 'The response holds five works out of 11,231. To get the next five, you send the same request with the <code>next_cursor</code> value from <code>meta</code> as the <code>cursor</code>. <code>page2</code> is the saved response to that second request. <code>+</code> joins two lists into one.',
+   intro: 'The response holds five works out of 11,231. To get the next five, you send the same request with the <code>next_cursor</code> value from <code>meta</code> as the <code>cursor</code>. <code>data2</code> is the saved response to that second request. <code>+</code> joins two lists into one.',
    task: 'Make <code>cursor</code>: the <code>next_cursor</code> value in <code>data</code>. Then make <code>all_works</code>: the works of both pages in one list.',
-   starter: 'cursor = data["meta"]["____"]\nall_works = data["results"] + page2["____"]\nprint(cursor)\nprint(len(all_works))',
-   answer: 'cursor = data["meta"]["next_cursor"]\nall_works = data["results"] + page2["results"]\nprint(cursor)\nprint(len(all_works))',
+   starter: 'cursor = data["meta"]["____"]\nall_works = data["results"] + data2["____"]\nprint(cursor)\nprint(len(all_works))',
+   answer: 'cursor = data["meta"]["next_cursor"]\nall_works = data["results"] + data2["results"]\nprint(cursor)\nprint(len(all_works))',
    check: {exprs: ['cursor', '[work["id"] for work in all_works]'], labels: {'[work["id"] for work in all_works]': 'all_works'}},
    hint: 'The first blank is <code>next_cursor</code>. The works of the second page are under <code>results</code>, as in the first.',
    after: 'Ten works. All 11,231 at five per page would take 2,247 requests.'},
   {topic: 'Write it yourself: make a table', stage: 'table',
-   pre: 'all_works = data["results"] + page2["results"]',
+   pre: 'all_works = data["results"] + data2["results"]',
    intro: '<code>pd.DataFrame</code> turns a list of dictionaries into a table: one dictionary for each row, one key for each column. <code>all_works</code> is loaded for this step: the ten works from both pages.',
    example: 'rows = [{"title": "A", "cited_by": 12}, {"title": "B", "cited_by": 7}]\npd.DataFrame(rows)',
    task: 'Make <code>table</code>: a DataFrame with one row for each work in <code>all_works</code> and three columns: <code>title</code> (the work\'s <code>display_name</code>), <code>cited_by</code> (its <code>cited_by_count</code>) and <code>first_author</code> (the name of its first author).',
