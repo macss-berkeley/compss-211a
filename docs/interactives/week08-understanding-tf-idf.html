@@ -614,7 +614,6 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     <h1>Understanding TF-IDF</h1>
     <div class="chip-row">
       <span class="meta-chip gold">Week 8 &middot; NLP basics</span>
-      <span class="meta-chip outline">5–10 minutes</span>
     </div>
     <p class="promise">Follow four campus comments step by step: raw text, tokens, word counts, TF-IDF scores, and top terms. Everything updates as you type or flip a switch. Each text-cleaning (preprocessing) choice changes what you would conclude.</p>
     <hr class="gold-rule">
@@ -813,7 +812,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     <section class="card fade" style="--d:0.27s" aria-labelledby="staged-h">
       <p class="stage-eyebrow">Stage D &middot; Top terms</p>
       <h2 id="staged-h">The 3 most distinctive terms in each document</h2>
-      <p class="sub">Terms are ranked by TF-IDF weight across the whole vocabulary, including terms not shown in the columns above. Ties are sorted alphabetically. You will read lists like this in the homework. The list changes every time you flip a switch.</p>
+      <p class="sub">Terms are ranked by TF-IDF weight across the whole vocabulary, including terms not shown in the columns above. Ties are sorted alphabetically. The list changes every time you flip a switch.</p>
       <div class="tops-grid" id="tops"></div>
     </section>
 
@@ -821,7 +820,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     <section class="card fade" id="real-python" style="--d:0.28s" aria-labelledby="real-python-h">
       <p class="stage-eyebrow">Try it in Python</p>
       <h2 id="real-python-h">The same comments in scikit-learn</h2>
-      <p class="sub">This cell runs real Python with scikit-learn's <code>TfidfVectorizer</code>, the tool from class and HW4. The first time you run it, it downloads Python and scikit-learn (about 40 MB, only once). That takes a little while and needs an internet connection.</p>
+      <p class="sub">This cell runs real Python with scikit-learn's <code>TfidfVectorizer</code>. The first time you run it, it downloads Python and scikit-learn (about 40 MB, only once). That takes a little while and needs an internet connection.</p>
       <ol style="margin:0 0 6px 18px;padding:0;font-size:.95rem">
         <li>Press <strong>Run</strong>. Is <code>not</code> in the vocabulary? Why not?</li>
         <li>Add <code>ngram_range=(1, 2)</code> to the vectorizer. Do you get <code>not working</code>? What would you need to change to keep it?</li>
