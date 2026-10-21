@@ -104,7 +104,7 @@ footer{border-top:1px solid var(--line);padding:18px 0 30px;font-size:.85rem;col
 <details id="loadedBox" open><summary>Variables you can use</summary>
   <p class="small">Python variables made for you before this step. Type a name in your code, or click it. To see what one holds, print it.</p>
   <div id="varList"></div>
-  <p class="small" style="margin-top:10px">Also imported: <code>re</code>, <code>np</code>, <code>pd</code>, <code>CountVectorizer</code>, <code>TfidfVectorizer</code> and <code>ENGLISH_STOP_WORDS</code>.</p>
+  <p class="small" style="margin-top:10px">Also imported: <code>re</code>, <code>np</code> and <code>pd</code>.</p>
 </details>
 <details id="dataBox"><summary>The data</summary>
   <p class="small">1,512 comments that reply directly to a post on r/AmItheAsshole, from 2017 to 2019. They are among the highest-scored comments, so they are not a random sample of the forum. Comments with profanity, slurs, insults, sexual content, or graphic detail were removed. Some replies discuss family conflict.</p>
@@ -159,7 +159,7 @@ const SETUP = String.raw`import re
 import warnings
 import numpy as np
 import pandas as pd
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, ENGLISH_STOP_WORDS
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 warnings.filterwarnings("ignore", message="This pattern is interpreted as a regular expression")
 pd.set_option("display.width", 200)
 pd.set_option("display.max_columns", 20)
@@ -168,48 +168,44 @@ pd.set_option("display.max_rows", 40)
 comments = pd.read_csv("aita_replies.csv")
 STOP_WORDS = sorted(ENGLISH_STOP_WORDS - {"not", "no", "nor"})
 
-def leans(vectorizer, matrix):
-    """The comparison from step 2: mean in YTA replies minus mean in NTA replies, for every word.
-    n_yta and n_nta count the replies in each group that contain the word."""
-    yta, nta = matrix[is_yta], matrix[~is_yta]
-    table = pd.DataFrame({
-        "difference": np.asarray(yta.mean(axis=0)).ravel() - np.asarray(nta.mean(axis=0)).ravel(),
-        "n_yta": np.asarray((yta > 0).sum(axis=0)).ravel(),
-        "n_nta": np.asarray((nta > 0).sum(axis=0)).ravel(),
-    }, index=vectorizer.get_feature_names_out())
-    return table.sort_values("difference", kind="stable")
-
-def show_matches(pattern, group, n=5):
-    """Print n replies from one group that match pattern, with the text around the first match."""
-    found = replies[(replies["marker"] == group) & replies["body"].str.contains(pattern, case=False, regex=True)]
-    print(f"{len(found)} {group} replies match. Showing {min(n, len(found))}.")
-    for row in found.sample(min(n, len(found)), random_state=211).itertuples():
-        match = re.search(pattern, row.body, flags=re.IGNORECASE)
-        start, end = max(0, match.start() - 150), min(len(row.body), match.end() + 150)
-        text = " ".join(row.body[start:end].split())
-        print(f"\n{row.idstr}: {'…' if start else ''}{text}{'…' if end < len(row.body) else ''}")
+def show_replies(rows, pattern=None, n=5):
+    """Print n replies from a table (the same random sample each time), with the text around the first match of pattern."""
+    print(f"Showing {min(n, len(rows))} of {len(rows)} replies.")
+    for row in rows.sample(min(n, len(rows)), random_state=211).itertuples():
+        text = " ".join(row.body.split())
+        match = re.search(pattern, text, flags=re.IGNORECASE) if pattern else None
+        start = max(0, match.start() - 150) if match else 0
+        end = min(len(text), match.end() + 150) if match else min(len(text), 300)
+        print(f"\n{row.idstr}: {'…' if start else ''}{text[start:end]}{'…' if end < len(text) else ''}")
 
 def _ids(pattern, group, matching=True):
     rows = replies[replies["marker"] == group]
-    hit = rows["body"].str.contains(pattern, case=False, regex=True)
+    hit = rows["body"].str.contains(pattern, case=False)
     return set(rows.loc[hit if matching else ~hit, "idstr"])`;
 
 // Code that later steps load before the student's code, so a step does not depend on an earlier answer.
-const GROUPS = String.raw`comments["marker"] = comments["body"].str.extract(r"(?i)^\s*(NTA|YTA)\b", expand=False).str.upper()
-replies = comments.dropna(subset=["marker"]).reset_index(drop=True)
-is_yta = (replies["marker"] == "YTA").to_numpy()`;
-const NO_MARKERS = 'STOP_WORDS = sorted((ENGLISH_STOP_WORDS - {"not", "no", "nor"}) | {"nta", "yta"})';
-const COUNTS = 'counts = CountVectorizer(stop_words=STOP_WORDS, min_df=5)\ncount_matrix = counts.fit_transform(replies["body"])\ncount_leans = leans(counts, count_matrix)';
-const TFIDF = 'tfidf = TfidfVectorizer(stop_words=STOP_WORDS, min_df=5)\ntfidf_matrix = tfidf.fit_transform(replies["body"])\ntfidf_leans = leans(tfidf, tfidf_matrix)';
+const GROUPS = String.raw`comments["marker"] = comments["body"].str.upper().str.extract(r"^(NTA|YTA)\b", expand=False)
+replies = comments.dropna(subset=["marker"]).reset_index(drop=True)`;
+const COUNTS = String.raw`from sklearn.feature_extraction.text import CountVectorizer
+vectorizer = CountVectorizer(stop_words=STOP_WORDS, min_df=5)
+count_matrix = vectorizer.fit_transform(replies["body"])`;
+const NO_MARKERS = 'STOP_WORDS = STOP_WORDS + ["nta", "yta"]';
+const MEANS = String.raw`word_table = pd.DataFrame(count_matrix.toarray(), columns=vectorizer.get_feature_names_out())
+means = word_table.groupby(replies["marker"]).mean().T
+means["difference"] = means["YTA"] - means["NTA"]`;
+const TFIDF = String.raw`from sklearn.feature_extraction.text import TfidfVectorizer
+tfidf = TfidfVectorizer(stop_words=STOP_WORDS, min_df=5)
+tfidf_matrix = tfidf.fit_transform(replies["body"])
+tfidf_table = pd.DataFrame(tfidf_matrix.toarray(), columns=tfidf.get_feature_names_out())
+tfidf_means = tfidf_table.groupby(replies["marker"]).mean().T
+tfidf_means["difference"] = tfidf_means["YTA"] - tfidf_means["NTA"]`;
 
 // The variables in the side panel. from: the first step (counted from 0) that has the variable.
 const VARIABLES = [
   {name: 'comments', kind: 'table', what: 'every reply: <code>idstr</code> (its ID) and <code>body</code> (its text)'},
   {name: 'STOP_WORDS', kind: 'list', what: 'scikit-learn’s English stop words, keeping <code>not</code>, <code>no</code> and <code>nor</code>'},
   {name: 'replies', kind: 'table', what: 'the replies that begin with NTA or YTA, with <code>marker</code>', from: 1},
-  {name: 'is_yta', kind: 'True/False for each reply', what: 'True for each YTA reply in <code>replies</code>', from: 1},
-  {name: 'leans', kind: 'function', what: '<code>leans(vectorizer, matrix)</code>: the comparison from step 2, with <code>n_yta</code> and <code>n_nta</code>', from: 2},
-  {name: 'show_matches', kind: 'function', what: '<code>show_matches(pattern, group, n=5)</code>: prints matching replies from one group', from: 6},
+  {name: 'show_replies', kind: 'function', what: '<code>show_replies(rows, pattern, n=5)</code>: prints <code>n</code> replies from a table, with the text around the pattern', from: 6},
 ];
 
 // One entry per step.
@@ -221,68 +217,141 @@ const VARIABLES = [
 const STEPS = [
   {topic: 'Make the two groups', stage: 'groups',
    intro: ['<code>comments</code> has one row per comment that replies directly to a post, with two columns: <code>idstr</code>, the comment’s ID, and <code>body</code>, its text.',
-           'The code below copies a leading NTA or YTA into a new column, <code>marker</code>. In the pattern, <code>^</code> means the start of the text and <code>(?i)</code> ignores case, so <code>Nta.</code> counts. A reply that does not begin with a marker gets <code>NaN</code>.'],
+           '<code>str.extract</code> copies the part of each text that matches a pattern into a new column. In the pattern <code>(NTA|YTA)\\b</code>, <code>(NTA|YTA)</code> means NTA or YTA, and the part in brackets is what gets copied. <code>\\b</code> marks the end of a word. <code>.str.upper()</code> comes first, so <code>Nta</code> counts too. A reply with no match gets <code>NaN</code>.',
+           'A verdict comes at the start of a reply. In a pattern, <code>^</code> means the start of the text.'],
    example: 'print(comments.shape)\ncomments.head()',
-   task: 'Run the example. Then fill in the two blanks: the first is the column with the text, and the second is the column to check for missing values.',
-   starter: String.raw`comments["marker"] = comments[____].str.extract(r"(?i)^\s*(NTA|YTA)\b", expand=False).str.upper()
-print(comments["marker"].value_counts(dropna=False))
-
-replies = comments.dropna(subset=[____]).reset_index(drop=True)
-len(replies)`,
-   answer: String.raw`comments["marker"] = comments["body"].str.extract(r"(?i)^\s*(NTA|YTA)\b", expand=False).str.upper()
+   task: 'Run the example. Then fill in the blank so that the pattern finds NTA or YTA only at the start of the text, and run the box.',
+   starter: String.raw`comments["marker"] = comments["body"].str.upper().str.extract(r"____(NTA|YTA)\b", expand=False)
 print(comments["marker"].value_counts(dropna=False))
 
 replies = comments.dropna(subset=["marker"]).reset_index(drop=True)
 len(replies)`,
-   check: {exprs: ['len(replies)', 'list(replies["idstr"])'], labels: {'list(replies["idstr"])': 'replies'}},
-   errorHints: [["KeyError: '?Body", 'Column names are case-sensitive. The text is in "body".']],
-   hint: 'The first blank is <code>"body"</code>. The second is <code>"marker"</code>. Both need quotation marks.',
-   after: ['477 replies have no marker. One is t1_ed0g14e, “Um...NTA. Girl.”: the rule only reads a marker at the start. These replies are left out of the comparison, and we do not guess their verdict.',
-           'From the next step on, <code>replies</code> holds the 1,035 replies with a marker: 657 NTA and 378 YTA.']},
+   answer: String.raw`comments["marker"] = comments["body"].str.upper().str.extract(r"^(NTA|YTA)\b", expand=False)
+print(comments["marker"].value_counts(dropna=False))
 
-  {topic: 'Count the words in each group', stage: 'counts', pre: GROUPS,
-   intro: ['<code>CountVectorizer</code> turns a column of text into a table of numbers: one row per reply, one column per word, and in each cell how often the word appears in that reply. <code>min_df=5</code> keeps words that appear in at least five replies. <code>STOP_WORDS</code> is a list of common words to leave out.',
-           'To compare the groups, take the mean count of each word in the YTA replies and in the NTA replies, and subtract. <code>is_yta</code> is True for each YTA reply. <code>~</code> turns True into False, so <code>~is_yta</code> picks the NTA replies. A word with a difference above zero leans YTA.'],
-   example: 'counts = CountVectorizer(stop_words=STOP_WORDS, min_df=5)\ncount_matrix = counts.fit_transform(replies["body"])\nprint(count_matrix.shape)\ncounts.get_feature_names_out()[100:120]',
-   task: 'Run the example. Then fill in the two blanks to pick the YTA rows and the NTA rows of the table.',
-   starter: 'counts = CountVectorizer(stop_words=STOP_WORDS, min_df=5)\ncount_matrix = counts.fit_transform(replies["body"])\n\nmean_yta = np.asarray(count_matrix[____].mean(axis=0)).ravel()\nmean_nta = np.asarray(count_matrix[____].mean(axis=0)).ravel()\ndifference = pd.Series(mean_yta - mean_nta, index=counts.get_feature_names_out())\ndifference.sort_values().tail(10)',
-   answer: 'counts = CountVectorizer(stop_words=STOP_WORDS, min_df=5)\ncount_matrix = counts.fit_transform(replies["body"])\n\nmean_yta = np.asarray(count_matrix[is_yta].mean(axis=0)).ravel()\nmean_nta = np.asarray(count_matrix[~is_yta].mean(axis=0)).ravel()\ndifference = pd.Series(mean_yta - mean_nta, index=counts.get_feature_names_out())\ndifference.sort_values().tail(10)',
-   check: {exprs: ['difference.sort_index()'], labels: {'difference.sort_index()': 'difference'}},
-   hint: 'The first blank is <code>is_yta</code>. The second is <code>~is_yta</code>.',
-   after: ['<code>yta</code> is at the top of the list. Add <code>print(difference.sort_values().head(5))</code> to see the other end: <code>nta</code> is there. Every YTA reply begins with yta and every NTA reply with nta, because that is how the groups were made. The next step adds both to the stop words.']},
+replies = comments.dropna(subset=["marker"]).reset_index(drop=True)
+len(replies)`,
+   check: {truths: [['len(replies) <= 1035', 'Too many replies have a marker: the pattern also finds NTA or YTA later in the text. The blank should mark the start of the text.']],
+           exprs: ['len(replies)', 'list(replies["idstr"])'], labels: {'list(replies["idstr"])': 'replies'}},
+   hint: 'The blank is <code>^</code>, right before the opening bracket.',
+   after: ['Without <code>^</code>, the pattern finds NTA or YTA anywhere in the text, and 1,168 replies get a marker instead of 1,035. “Um...NTA. Girl.” (t1_ed0g14e) would count as NTA.',
+           '477 replies have no marker. They are left out, and we do not guess their verdict. From the next step on, <code>replies</code> holds the 1,035 replies with a marker: 657 NTA and 378 YTA.']},
 
-  {topic: 'Remove the words that made the groups', stage: 'counts', pre: GROUPS,
-   intro: ['From here on, <code>leans(vectorizer, matrix)</code> does the comparison from step 2. It returns a table with the <code>difference</code> for each word, and two more columns: <code>n_yta</code> and <code>n_nta</code>, the number of replies in each group that contain the word.',
-           '<code>|</code> joins two sets of words.'],
-   task: 'Fill in the two blanks with the two marker words, in lowercase, and run the box.',
-   starter: 'STOP_WORDS = sorted((ENGLISH_STOP_WORDS - {"not", "no", "nor"}) | {____, ____})\ncounts = CountVectorizer(stop_words=STOP_WORDS, min_df=5)\ncount_matrix = counts.fit_transform(replies["body"])\ncount_leans = leans(counts, count_matrix)\ncount_leans.tail(15)',
-   answer: NO_MARKERS + '\n' + COUNTS + '\ncount_leans.tail(15)',
-   check: {truths: [['"nta" not in count_leans.index and "yta" not in count_leans.index', 'nta and yta are still words in the table. Put both in the stop words, in quotation marks.']],
-           exprs: ['count_leans.sort_index()'], labels: {'count_leans.sort_index()': 'count_leans'}},
+  {topic: 'Turn text into counts', stage: 'counts', pre: GROUPS,
+   intro: ['scikit-learn turns text into numbers in three moves. First you make a vectorizer and give it its settings: <code>vectorizer = CountVectorizer()</code>. Nothing is counted yet. Then <code>vectorizer.fit(texts)</code> reads the texts and learns the vocabulary: the list of words that become columns. Then <code>vectorizer.transform(texts)</code> counts each word in each text and returns a table of numbers, one row per text.',
+           'The example does this for three short sentences, so you can see the whole table.'],
+   example: String.raw`from sklearn.feature_extraction.text import CountVectorizer
+
+examples = ["You are not wrong.", "You are wrong.", "Not wrong at all, NTA."]
+vectorizer = CountVectorizer()
+vectorizer.fit(examples)
+print(vectorizer.get_feature_names_out())
+
+matrix = vectorizer.transform(examples)
+pd.DataFrame(matrix.toarray(), columns=vectorizer.get_feature_names_out())`,
+   task: 'Run the example. Then do the same for the replies. This vectorizer has two settings: <code>stop_words=STOP_WORDS</code> leaves out common words such as <i>the</i> and <i>is</i>, and <code>min_df=5</code> keeps only words that appear in at least five replies. Fill in the two blanks: the method that learns the vocabulary, and the method that counts.',
+   starter: String.raw`from sklearn.feature_extraction.text import CountVectorizer
+
+vectorizer = CountVectorizer(stop_words=STOP_WORDS, min_df=5)
+vectorizer.____(replies["body"])
+count_matrix = vectorizer.____(replies["body"])
+print(count_matrix.shape)
+vectorizer.get_feature_names_out()[:20]`,
+   answer: String.raw`from sklearn.feature_extraction.text import CountVectorizer
+
+vectorizer = CountVectorizer(stop_words=STOP_WORDS, min_df=5)
+vectorizer.fit(replies["body"])
+count_matrix = vectorizer.transform(replies["body"])
+print(count_matrix.shape)
+vectorizer.get_feature_names_out()[:20]`,
+   check: {exprs: ['count_matrix.shape', 'list(vectorizer.get_feature_names_out())'], labels: {'list(vectorizer.get_feature_names_out())': 'The vocabulary'}},
+   errorHints: [['NotFittedError', 'The vectorizer has not learned a vocabulary yet. The first blank is the method that learns it.'],
+                ["object has no attribute 'shape'", 'fit returns the vectorizer itself, not a table. The second blank is the method that counts.']],
+   hint: 'The first blank is <code>fit</code>. The second is <code>transform</code>.',
+   after: ['<code>count_matrix</code> has 1,035 rows, one per reply, and 775 columns, one per word in the vocabulary. Numbers such as 10 count as words. Most cells are 0, so scikit-learn stores only the cells that are not 0. <code>.toarray()</code>, as in the example, turns it into a full table.',
+           '<code>fit_transform</code> does both steps in one call. The next steps use it.']},
+
+  {topic: 'Compare the two groups', stage: 'counts', pre: GROUPS + '\n' + COUNTS,
+   vars: [['vectorizer', 'CountVectorizer', 'the vectorizer from step 2, fitted to the replies'], ['count_matrix', 'counts', 'one row per reply, one column per word']],
+   intro: ['The example puts the counts in a pandas table with one column per word. <code>groupby</code> takes the mean count of each word in the NTA replies and in the YTA replies, and <code>.T</code> turns the result so that each word is a row. A word with a <code>difference</code> above zero is used more in YTA replies.'],
+   example: MEANS + '\nmeans.sort_values("difference")',
+   task: '<code>nta</code> is at the top of the sorted list and <code>yta</code> at the bottom. Every NTA reply begins with nta and every YTA reply with yta, because that is how the groups were made, so these two words say nothing new. Fill in the two blanks to add them to the stop words, and run the box.',
+   starter: String.raw`from sklearn.feature_extraction.text import CountVectorizer
+
+STOP_WORDS = STOP_WORDS + [____, ____]
+vectorizer = CountVectorizer(stop_words=STOP_WORDS, min_df=5)
+count_matrix = vectorizer.fit_transform(replies["body"])
+
+word_table = pd.DataFrame(count_matrix.toarray(), columns=vectorizer.get_feature_names_out())
+means = word_table.groupby(replies["marker"]).mean().T
+means["difference"] = means["YTA"] - means["NTA"]
+means.sort_values("difference").tail(15)`,
+   answer: 'from sklearn.feature_extraction.text import CountVectorizer\n\n' + NO_MARKERS + '\nvectorizer = CountVectorizer(stop_words=STOP_WORDS, min_df=5)\ncount_matrix = vectorizer.fit_transform(replies["body"])\n\n' + MEANS + '\nmeans.sort_values("difference").tail(15)',
+   check: {truths: [['"nta" not in means.index and "yta" not in means.index', 'nta and yta are still words in the table. Put both in the list, in lowercase and in quotation marks.']],
+           exprs: ['means.sort_index()'], labels: {'means.sort_index()': 'means'}},
    errorHints: [["NameError: name '(nta|yta)'", 'Put the words in quotation marks: "nta" and "yta".']],
    hint: 'The blanks are <code>"nta"</code> and <code>"yta"</code>.',
-   after: ['The top of the YTA end is now <code>not</code>, <code>time</code> and <code>just</code>: common words. Most words lean YTA. Add <code>(count_leans["difference"] &gt; 0).mean()</code> as the last line to see the share: 0.62.',
+   after: ['The top of the YTA end is now <code>not</code>, <code>time</code> and <code>just</code>: common words. Most words lean YTA. Add <code>(means["difference"] &gt; 0).mean()</code> as the last line to see the share: 0.62.',
            'YTA replies are longer: 54 words on average, against 45 for NTA replies. A longer reply contains more of almost every word. The next step uses weights that correct for this.']},
 
-  {topic: 'Weight the words with TF-IDF', stage: 'tfidf', pre: GROUPS + '\n' + NO_MARKERS + '\n' + COUNTS,
-   vars: [['count_leans', 'table', 'the word counts compared, from step 3']],
-   intro: ['<code>TfidfVectorizer</code> makes the same kind of table, with two changes. A word that appears in many replies gets less weight than a word that appears in a few. And each reply’s row is scaled to the same length, so a long reply does not add more weight than a short one.',
-           '<code>STOP_WORDS</code> now includes <code>nta</code> and <code>yta</code>. The example shows the top of the count list from step 3.'],
-   example: 'count_leans.tail(15)',
-   task: 'Run the example. Then fill in the blank with the TF-IDF vectorizer, and run the box.',
-   starter: 'tfidf = ____(stop_words=STOP_WORDS, min_df=5)\ntfidf_matrix = tfidf.fit_transform(replies["body"])\ntfidf_leans = leans(tfidf, tfidf_matrix)\ntfidf_leans.tail(15)',
-   answer: TFIDF + '\ntfidf_leans.tail(15)',
-   check: {exprs: ['tfidf_leans.sort_index()'], labels: {'tfidf_leans.sort_index()': 'tfidf_leans'}},
-   hint: 'The blank is <code>TfidfVectorizer</code>.',
-   after: ['Compare the two lists. Some words from the count list are gone, and some new ones appear. The next step finds them.',
+  {topic: 'Weight the words with TF-IDF', stage: 'tfidf', pre: GROUPS + '\n' + NO_MARKERS + '\n' + COUNTS + '\n' + MEANS,
+   vars: [['means', 'table', 'the mean counts and their difference, from step 3']],
+   intro: ['<code>TfidfVectorizer</code> works the same way: make it, then fit and transform. Its table holds weights instead of counts, with two changes. A word that appears in many texts gets less weight than a word that appears in a few. And each row is scaled to the same length, so a long reply does not add more weight than a short one.',
+           'In the example, <code>wrong</code> is in all three sentences, so it has the lowest weight in each row.'],
+   example: String.raw`from sklearn.feature_extraction.text import TfidfVectorizer
+
+examples = ["You are not wrong.", "You are wrong.", "Not wrong at all, NTA."]
+tfidf = TfidfVectorizer()
+matrix = tfidf.fit_transform(examples)
+pd.DataFrame(matrix.toarray(), columns=tfidf.get_feature_names_out()).round(2)`,
+   task: 'Run the example. Then fill in the two blanks: the same <code>min_df</code> as for the counts, so the two lists cover the same words, and the method that fits and transforms in one call. Run the box.',
+   starter: String.raw`from sklearn.feature_extraction.text import TfidfVectorizer
+
+tfidf = TfidfVectorizer(stop_words=STOP_WORDS, min_df=____)
+tfidf_matrix = tfidf.____(replies["body"])
+
+tfidf_table = pd.DataFrame(tfidf_matrix.toarray(), columns=tfidf.get_feature_names_out())
+tfidf_means = tfidf_table.groupby(replies["marker"]).mean().T
+tfidf_means["difference"] = tfidf_means["YTA"] - tfidf_means["NTA"]
+tfidf_means.sort_values("difference").tail(15)`,
+   answer: String.raw`from sklearn.feature_extraction.text import TfidfVectorizer
+
+tfidf = TfidfVectorizer(stop_words=STOP_WORDS, min_df=5)
+tfidf_matrix = tfidf.fit_transform(replies["body"])
+
+tfidf_table = pd.DataFrame(tfidf_matrix.toarray(), columns=tfidf.get_feature_names_out())
+tfidf_means = tfidf_table.groupby(replies["marker"]).mean().T
+tfidf_means["difference"] = tfidf_means["YTA"] - tfidf_means["NTA"]
+tfidf_means.sort_values("difference").tail(15)`,
+   check: {exprs: ['tfidf_means.sort_index()'], labels: {'tfidf_means.sort_index()': 'tfidf_means'}},
+   errorHints: [["object has no attribute 'toarray'", 'fit only learns the vocabulary and returns the vectorizer. The second blank is the method that fits and transforms in one call.']],
+   hint: 'The first blank is <code>5</code>. The second is <code>fit_transform</code>.',
+   after: ['Compare this list with the one from step 3. Some words are gone and some are new. The next step finds them.',
            'Fewer words lean YTA now: 427 of 773, against 483 with counts.']},
 
-  {topic: 'Find the words that moved', stage: 'tfidf', pre: GROUPS + '\n' + NO_MARKERS + '\n' + COUNTS + '\n' + TFIDF,
-   vars: [['count_leans', 'table', 'the word counts compared, from step 3'], ['tfidf_leans', 'table', 'the TF-IDF weights compared, from step 4']],
-   intro: ['<code>set(...)</code> makes a set from the words in an index. Subtracting one set from another keeps the words that are only in the first.'],
-   task: 'Fill in the two blanks so that <code>joined</code> holds the words in the TF-IDF list that are not in the count list. The last line shows both groups of words with their counts.',
-   starter: 'top_counts = set(count_leans.tail(15).index)\ntop_tfidf = set(tfidf_leans.tail(15).index)\n\nleft = sorted(top_counts - top_tfidf)\njoined = sorted(____ - ____)\nprint("left:", left)\nprint("joined:", joined)\ntfidf_leans.loc[left + joined]',
-   answer: 'top_counts = set(count_leans.tail(15).index)\ntop_tfidf = set(tfidf_leans.tail(15).index)\n\nleft = sorted(top_counts - top_tfidf)\njoined = sorted(top_tfidf - top_counts)\nprint("left:", left)\nprint("joined:", joined)\ntfidf_leans.loc[left + joined]',
+  {topic: 'Find the words that moved', stage: 'tfidf', pre: GROUPS + '\n' + NO_MARKERS + '\n' + COUNTS + '\n' + MEANS + '\n' + TFIDF,
+   vars: [['means', 'table', 'the counts compared, from step 3'], ['tfidf_means', 'table', 'the TF-IDF weights compared, from step 4'], ['word_table', 'table', 'the counts from step 3, one column per word']],
+   intro: ['<code>set(...)</code> makes a set of words. Subtracting one set from another keeps the words that are only in the first.',
+           '<code>word_table &gt; 0</code> is True wherever a reply contains a word. Adding it up by group counts the replies in each group that contain each word.'],
+   task: 'Fill in the two blanks so that <code>joined</code> holds the words in the TF-IDF list that are not in the count list, and run the box.',
+   starter: String.raw`top_counts = set(means.sort_values("difference").tail(15).index)
+top_tfidf = set(tfidf_means.sort_values("difference").tail(15).index)
+left = sorted(top_counts - top_tfidf)
+joined = sorted(____ - ____)
+print("left:", left)
+print("joined:", joined)
+
+replies_with_word = (word_table > 0).groupby(replies["marker"]).sum().T
+replies_with_word.loc[left + joined]`,
+   answer: String.raw`top_counts = set(means.sort_values("difference").tail(15).index)
+top_tfidf = set(tfidf_means.sort_values("difference").tail(15).index)
+left = sorted(top_counts - top_tfidf)
+joined = sorted(top_tfidf - top_counts)
+print("left:", left)
+print("joined:", joined)
+
+replies_with_word = (word_table > 0).groupby(replies["marker"]).sum().T
+replies_with_word.loc[left + joined]`,
    check: {exprs: ['left', 'joined']},
    hint: 'The first blank is <code>top_tfidf</code> and the second is <code>top_counts</code>.',
    after: ['The words that left are in many replies in both groups. <code>like</code> is in 86 of 378 YTA replies (23%) and 144 of 657 NTA replies (22%). It leaned YTA with counts because YTA replies are longer and use it more times.',
@@ -290,107 +359,116 @@ len(replies)`,
 
   {topic: 'Count the replies that use a word', stage: 'search', pre: GROUPS,
    intro: ['The lists show which words to look at. To describe a difference, count the replies in each group that contain the word, and divide by the size of the group.',
-           '<code>str.contains</code> is True for each reply whose text matches a pattern. <code>\\b</code> marks the edge of a word, so <code>\\bwife\\b</code> does not match <code>wifey</code>.'],
-   example: String.raw`pattern = r"\bwife\b"
-mentions = replies["body"].str.contains(pattern, case=False, regex=True)
-print(mentions.sum(), "of", len(replies), "replies match")`,
-   task: 'Run the example. Then fill in the two blanks: the column to group by, and the function that turns True and False into a share.',
-   starter: String.raw`pattern = r"\bwife\b"
-replies["mentions"] = replies["body"].str.contains(pattern, case=False, regex=True)
-shares = replies.groupby(____)["mentions"].agg(n_replies="size", n_mentions="sum", share=____)
-shares`,
-   answer: String.raw`pattern = r"\bwife\b"
-replies["mentions"] = replies["body"].str.contains(pattern, case=False, regex=True)
+           '<code>str.contains</code> is True for each reply whose text matches a pattern. A pattern also matches inside longer words: <code>mom</code> matches moment and mommy. <code>\\b</code> marks the edge of a word, so <code>\\bmom\\b</code> matches mom only as a whole word.'],
+   example: String.raw`print(replies["body"].str.contains("mom", case=False).sum())
+print(replies["body"].str.contains(r"\bmom\b", case=False).sum())`,
+   task: 'Run the example. Then fill in the two blanks so that the pattern matches wife only as a whole word, and run the box. The <code>r</code> before the quotation marks keeps each backslash as it is.',
+   starter: String.raw`pattern = r"____wife____"
+replies["mentions"] = replies["body"].str.contains(pattern, case=False)
 shares = replies.groupby("marker")["mentions"].agg(n_replies="size", n_mentions="sum", share="mean")
 shares`,
-   check: {exprs: ['shares']},
-   errorHints: [["NameError: name '(mean|marker)'", 'Put the name in quotation marks, like "size" and "sum".']],
-   hint: 'The first blank is <code>"marker"</code>. The second is <code>"mean"</code>: the mean of True and False values is the share of True.',
+   answer: String.raw`pattern = r"\bwife\b"
+replies["mentions"] = replies["body"].str.contains(pattern, case=False)
+shares = replies.groupby("marker")["mentions"].agg(n_replies="size", n_mentions="sum", share="mean")
+shares`,
+   check: {truths: [[String.raw`pattern == r"\bwife\b"`, 'The pattern should be wife with \\b on both sides.']], exprs: ['shares']},
+   hint: 'Both blanks are <code>\\b</code>.',
    after: ['29 of 378 YTA replies (7.7%) mention wife, and 27 of 657 NTA replies (4.1%). The counts are close because the NTA group is larger. Compare the shares, and report the counts with them.',
-           'Change the pattern and run the box again to try other words from the lists.']},
+           'In a pattern, <code>|</code> means or: <code>r"\\b(wife|husband)\\b"</code> matches either word. Change the pattern and run the box again to try other words from the lists.']},
 
   {topic: 'Read the matches', stage: 'read', pre: GROUPS,
-   intro: ['A share does not show how a word is used. <code>show_matches(pattern, group, n)</code> prints <code>n</code> matching replies from one group, with the text around the match. The replies are a fixed random sample, so you see the same ones each time.'],
-   example: String.raw`show_matches(r"\bwife\b", "YTA", n=5)`,
-   task: 'Run the example. Then fill in the blank to show five NTA matches, and run the box. Record the ID of one YTA reply where the wife is the person the poster treated badly, and one NTA reply where the wife is the person behaving badly.',
-   starter: String.raw`show_matches(r"\bwife\b", ____, n=5)
+   intro: ['A share does not show how a word is used. <code>show_replies(rows, pattern, n)</code> prints <code>n</code> replies from a table, with the text around the pattern. It shows the same random sample each time.'],
+   example: String.raw`pattern = r"\bwife\b"
+replies["mentions"] = replies["body"].str.contains(pattern, case=False)
+yta_matches = replies[replies["mentions"] & (replies["marker"] == "YTA")]
+show_replies(yta_matches, pattern)`,
+   task: 'Run the example. Then run the box to see the NTA matches. Record the ID of one YTA reply where the wife is the person the poster treated badly, and one NTA reply where the wife is the person behaving badly.',
+   starter: String.raw`pattern = r"\bwife\b"
+replies["mentions"] = replies["body"].str.contains(pattern, case=False)
+nta_matches = replies[replies["mentions"] & (replies["marker"] == "NTA")]
+show_replies(nta_matches, pattern)
 
 yta_example = ""   # paste the idstr of a YTA match
 nta_example = ""   # paste the idstr of an NTA match`,
-   answer: String.raw`show_matches(r"\bwife\b", "NTA", n=5)
+   answer: String.raw`pattern = r"\bwife\b"
+replies["mentions"] = replies["body"].str.contains(pattern, case=False)
+nta_matches = replies[replies["mentions"] & (replies["marker"] == "NTA")]
+show_replies(nta_matches, pattern)
 
 yta_example = "t1_eeo05h0"   # paste the idstr of a YTA match
 nta_example = "t1_ecnr90g"   # paste the idstr of an NTA match`,
-   check: {truths: [[String.raw`yta_example in _ids(r"\bwife\b", "YTA")`, 'yta_example should be the idstr of a YTA reply that matches, from the example output, in quotation marks.'],
-                    [String.raw`nta_example in _ids(r"\bwife\b", "NTA")`, 'nta_example should be the idstr of an NTA reply that matches, from your output, in quotation marks.']]},
-   hint: 'The blank is <code>"NTA"</code>. Each ID starts with <code>t1_</code>.',
+   check: {truths: [[String.raw`yta_example in _ids(r"\bwife\b", "YTA")`, 'yta_example should be the idstr of a YTA reply from the example output, in quotation marks.'],
+                    [String.raw`nta_example in _ids(r"\bwife\b", "NTA")`, 'nta_example should be the idstr of an NTA reply from your output, in quotation marks.']]},
+   hint: 'Copy each ID from the output, with its quotation marks around it, such as <code>"t1_abc1234"</code>.',
    after: ['In the YTA replies the wife is the person the poster treated badly: t1_eeo05h0 asks “When is your wife supposed to play when she’s working multiple jobs to support you?”',
            'The NTA replies are mixed. t1_ecnr90g says “Your wife, however, sounds unstable”, and t1_els53k1 is about the commenter’s own wife. The share in step 6 cannot show any of this.']},
 
   {topic: 'Find what the search missed', stage: 'read', pre: GROUPS,
-   intro: ['<code>\\bbehaviou?r\\b</code> matches <code>behavior</code> and <code>behaviour</code>: <code>?</code> makes the u optional. Its NTA matches mostly criticize how someone else acted. The example shows some.',
-           'A search counts only the replies that contain the word. Other replies can make the same point in other words.'],
-   example: String.raw`show_matches(r"\bbehaviou?r\b", "NTA", n=5)`,
-   task: 'Run the example. Then fill in the blank to keep the NTA replies that do not match, and run the box. Read them, and record the ID of one that criticizes how someone acted without the word.',
-   starter: String.raw`matches = replies["body"].str.contains(r"\bbehaviou?r\b", case=False, regex=True)
-missed = replies[____matches & (replies["marker"] == "NTA")]
+   intro: ['The NTA replies that use behavior mostly criticize how someone else acted. The example shows some. Some replies spell the word behaviour. In a pattern, <code>?</code> makes the character before it optional: <code>colou?r</code> matches color and colour.',
+           'A search counts only the replies that contain the word. Other replies can make the same point in other words. <code>~</code> turns True into False and False into True, so <code>~replies["mentions"]</code> picks the replies that do not match.'],
+   example: String.raw`pattern = r"\bbehavior\b"
+replies["mentions"] = replies["body"].str.contains(pattern, case=False)
+nta_matches = replies[replies["mentions"] & (replies["marker"] == "NTA")]
+show_replies(nta_matches, pattern)`,
+   task: 'Run the example. Then fill in the two blanks: make the u optional, and keep the NTA replies that do not match. Run the box, read the replies it prints, and record the ID of one that criticizes how someone acted without the word.',
+   starter: String.raw`pattern = r"\bbehaviou____r\b"
+replies["mentions"] = replies["body"].str.contains(pattern, case=False)
+missed = replies[____replies["mentions"] & (replies["marker"] == "NTA")]
 print(len(missed), "NTA replies do not match")
-for row in missed.sample(8, random_state=211).itertuples():
-    print(row.idstr, " ".join(row.body.split())[:200], sep=": ", end="\n\n")
+show_replies(missed, n=8)
 
 missed_example = ""   # paste the idstr of one reply`,
-   answer: String.raw`matches = replies["body"].str.contains(r"\bbehaviou?r\b", case=False, regex=True)
-missed = replies[~matches & (replies["marker"] == "NTA")]
+   answer: String.raw`pattern = r"\bbehaviou?r\b"
+replies["mentions"] = replies["body"].str.contains(pattern, case=False)
+missed = replies[~replies["mentions"] & (replies["marker"] == "NTA")]
 print(len(missed), "NTA replies do not match")
-for row in missed.sample(8, random_state=211).itertuples():
-    print(row.idstr, " ".join(row.body.split())[:200], sep=": ", end="\n\n")
+show_replies(missed, n=8)
 
 missed_example = "t1_ek10o1r"   # paste the idstr of one reply`,
-   check: {truths: [[String.raw`set(missed["idstr"]) == _ids(r"\bbehaviou?r\b", "NTA", matching=False)`, 'missed should hold the NTA replies that do not match. Put ~ in front of matches.'],
+   check: {truths: [[String.raw`pattern == r"\bbehaviou?r\b"`, 'The pattern should make the u optional: put ? right after the u.'],
+                    [String.raw`set(missed["idstr"]) == _ids(r"\bbehaviou?r\b", "NTA", matching=False)`, 'missed should hold the NTA replies that do not match. Put ~ in front of replies["mentions"].'],
                     ['missed_example in set(missed["idstr"])', 'missed_example should be the idstr of one of the printed replies, in quotation marks.']]},
-   hint: 'The blank is <code>~</code>, which turns True into False and False into True.',
+   hint: 'The first blank is <code>?</code>. The second is <code>~</code>.',
    after: ['t1_ek10o1r, “Shame on her for trying to guilt you”, criticizes how someone acted, and the search does not find it. When you report a count from a search, say what the pattern was, and keep an example of a reply it missed.']},
 
   {topic: 'Write down what you found', stage: 'notes', pre: GROUPS,
    intro: ['Notes like these let someone else check a claim: the pattern, the counts, and the IDs of the replies you read. You can change the pattern to a word you chose from the lists in steps 3 to 5.',
-           'To find a reply the search missed, look for a related word with <code>show_matches</code> in the scratch box. For <code>\\bwife\\b</code>, try <code>r"\\bpartner\\b"</code> with <code>"YTA"</code>.'],
+           'To find a reply the search missed, search for a related word in the scratch box, the same way as in step 7. For <code>\\bwife\\b</code>, try <code>r"\\bpartner\\b"</code> in the YTA replies.'],
    task: 'Fill in the four blanks with two matches, one reply the search missed, and one sentence. Then run the box and copy the output into your own notes.',
    starter: String.raw`pattern = r"\bwife\b"
-replies["mentions"] = replies["body"].str.contains(pattern, case=False, regex=True)
-shares = replies.groupby("marker")["mentions"].agg(n_replies="size", n_mentions="sum", share="mean")
+replies["mentions"] = replies["body"].str.contains(pattern, case=False)
+print(replies.groupby("marker")["mentions"].agg(n_replies="size", n_mentions="sum", share="mean"))
 
 notes = {
     "question": "How do YTA replies differ from NTA replies?",
     "pattern": pattern,
-    "shares": shares.round(3).to_dict("index"),
-    "example": "____",         # idstr of a match that shows what you describe
-    "counterexample": "____",  # idstr of a match that does not fit
-    "missed": "____",          # idstr of a reply that shows it without the word
+    "example": "____",         # a match that shows what you describe
+    "counterexample": "____",  # a match that does not fit
+    "missed": "____",          # a reply that shows it without the word
     "description": "____",     # one sentence
 }
-for key, value in notes.items():
-    print(f"{key}: {value}")`,
+for key in notes:
+    print(key + ":", notes[key])`,
    answer: String.raw`pattern = r"\bwife\b"
-replies["mentions"] = replies["body"].str.contains(pattern, case=False, regex=True)
-shares = replies.groupby("marker")["mentions"].agg(n_replies="size", n_mentions="sum", share="mean")
+replies["mentions"] = replies["body"].str.contains(pattern, case=False)
+print(replies.groupby("marker")["mentions"].agg(n_replies="size", n_mentions="sum", share="mean"))
 
 notes = {
     "question": "How do YTA replies differ from NTA replies?",
     "pattern": pattern,
-    "shares": shares.round(3).to_dict("index"),
     "example": "t1_eeo05h0",
     "counterexample": "t1_els53k1",
     "missed": "t1_elwdwrg",
     "description": "In YTA replies, wife is mostly the poster's wife, described as someone the poster treated badly.",
 }
-for key, value in notes.items():
-    print(f"{key}: {value}")`,
+for key in notes:
+    print(key + ":", notes[key])`,
    check: {truths: [['notes["example"] in set(replies.loc[replies["mentions"], "idstr"])', 'example should be the idstr of a reply that matches pattern.'],
                     ['notes["counterexample"] in set(replies.loc[replies["mentions"], "idstr"])', 'counterexample should be the idstr of a reply that matches pattern.'],
                     ['notes["counterexample"] != notes["example"]', 'example and counterexample should be two different replies.'],
                     ['notes["missed"] in set(replies.loc[~replies["mentions"], "idstr"])', 'missed should be the idstr of a reply that does not match pattern.'],
                     ['len(str(notes["description"]).split()) >= 6', 'Write one sentence in description.']]},
-   hint: 'Each ID is text, in quotation marks, such as <code>"t1_eeo05h0"</code>. The sentence says how the word is used, and in which group.',
+   hint: 'Each ID is text in quotation marks, such as <code>"t1_eeo05h0"</code>. The sentence says how the word is used, and in which group.',
    after: ['These notes are enough for someone else to rerun the search and read the same replies.']}
 ];
 
