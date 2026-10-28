@@ -108,6 +108,7 @@ footer{border-top:1px solid var(--line);padding:18px 0 30px;font-size:.85rem;col
 </details>
 <details id="dataBox"><summary>The data</summary>
   <p class="small">1,512 comments that reply directly to a post on r/AmItheAsshole, from 2017 to 2019. They are among the highest-scored comments, so they are not a random sample of the forum. Comments with profanity, slurs, insults, sexual content, or graphic detail were removed. Some replies discuss family conflict.</p>
+  <p class="small">This is a screened subset of the 5,000 comments used in the lecture and notebook. It keeps only direct replies to posts, so its group sizes and results differ from the notebook.</p>
   <p class="small">Some rows, with the marker from step 1:</p>
   <ul class="rows">
     <li><b>t1_ekd0ycl</b><i>NTA</i>NTA, and that last comment, as it is written, comes across as manipulative.</li>
@@ -124,6 +125,7 @@ footer{border-top:1px solid var(--line);padding:18px 0 30px;font-size:.85rem;col
 <div class="status" id="engineStatus" role="status">Loading the replies…</div>
 <div class="brief">
   <p><b>The question.</b> The data is 1,512 comments that reply to posts on r/AmItheAsshole. Many begin with a verdict: NTA (not the asshole) or YTA (you’re the asshole). How do YTA replies differ from NTA replies?</p>
+  <p class="small"><b>30–40 minutes:</b> complete the eight required steps. Step 5, on set subtraction, is optional. This continues the preprocessing examples from the lecture.</p>
   <ol class="stages" id="stages" aria-label="Where you are">
     <li data-stage="groups"><button type="button" data-stage-go="groups">Groups</button></li><li data-stage="counts"><button type="button" data-stage-go="counts">Counts</button></li><li data-stage="tfidf"><button type="button" data-stage-go="tfidf">TF-IDF</button></li><li data-stage="search"><button type="button" data-stage-go="search">Search</button></li><li data-stage="read"><button type="button" data-stage-go="read">Read</button></li><li data-stage="notes"><button type="button" data-stage-go="notes">Notes</button></li>
   </ol>
@@ -292,12 +294,12 @@ means.sort_values("difference").tail(15)`,
    errorHints: [["NameError: name '(nta|yta)'", 'Put the words in quotation marks: "nta" and "yta".']],
    hint: 'The blanks are <code>"nta"</code> and <code>"yta"</code>.',
    after: ['The top of the YTA end is now <code>not</code>, <code>time</code> and <code>just</code>: common words. Most words lean YTA. Add <code>(means["difference"] &gt; 0).mean()</code> as the last line to see the share: 0.62.',
-           'YTA replies are longer: 54 words on average, against 45 for NTA replies. A longer reply contains more of almost every word. The next step uses weights that correct for this.']},
+           'YTA replies are longer: 54 words on average, against 45 for NTA replies. Longer replies have more opportunities to repeat words. The next step uses TF-IDF and row normalization to reduce this mechanical length effect.']},
 
   {topic: 'Weight the words with TF-IDF', stage: 'tfidf', pre: GROUPS + '\n' + NO_MARKERS + '\n' + COUNTS + '\n' + MEANS,
    vars: [['means', 'table', 'the mean counts and their difference, from step 3']],
-   intro: ['<code>TfidfVectorizer</code> works the same way: make it, then fit and transform. Its table holds weights instead of counts, with two changes. A word that appears in many texts gets less weight than a word that appears in a few. And each row is scaled to the same length, so a long reply does not add more weight than a short one.',
-           'In the example, <code>wrong</code> is in all three sentences, so it has the lowest weight in each row.'],
+   intro: ['<code>TfidfVectorizer</code> works the same way: make it, then fit and transform. Its table holds weights instead of counts, with two changes. For equal counts, a word found in fewer texts gets a larger inverse-document-frequency factor. Each row of weights is then rescaled to the same numerical length. This reduces the mechanical effect of reply length; it does not remove every difference related to length.',
+           'In the example, <code>wrong</code> is in all three sentences, so it has the lowest weight among the words present in each sentence. Words absent from a sentence have zero weight.'],
    example: String.raw`from sklearn.feature_extraction.text import TfidfVectorizer
 
 examples = ["You are not wrong.", "You are wrong.", "Not wrong at all, NTA."]
@@ -326,10 +328,10 @@ tfidf_means.sort_values("difference").tail(15)`,
    check: {exprs: ['tfidf_means.sort_index()'], labels: {'tfidf_means.sort_index()': 'tfidf_means'}},
    errorHints: [["object has no attribute 'toarray'", 'fit only learns the vocabulary and returns the vectorizer. The second blank is the method that fits and transforms in one call.']],
    hint: 'The first blank is <code>5</code>. The second is <code>fit_transform</code>.',
-   after: ['Compare this list with the one from step 3. Some words are gone and some are new. The next step finds them.',
+   after: ['Compare this list with the one from step 3. Some words are gone and some are new. Optional step 5 finds them with set subtraction. Otherwise, continue to step 6 to search for one word.',
            'Fewer words lean YTA now: 427 of 773, against 483 with counts.']},
 
-  {topic: 'Find the words that moved', stage: 'tfidf', pre: GROUPS + '\n' + NO_MARKERS + '\n' + COUNTS + '\n' + MEANS + '\n' + TFIDF,
+  {topic: 'Optional: find the words that moved', optional: true, stage: 'tfidf', pre: GROUPS + '\n' + NO_MARKERS + '\n' + COUNTS + '\n' + MEANS + '\n' + TFIDF,
    vars: [['means', 'table', 'the counts compared, from step 3'], ['tfidf_means', 'table', 'the TF-IDF weights compared, from step 4'], ['word_table', 'table', 'the counts from step 3, one column per word']],
    intro: ['<code>set(...)</code> makes a set of words. Subtracting one set from another keeps the words that are only in the first.',
            '<code>word_table &gt; 0</code> is True wherever a reply contains a word. Adding it up by group counts the replies in each group that contain each word.'],
@@ -382,7 +384,7 @@ shares`,
 replies["mentions"] = replies["body"].str.contains(pattern, case=False)
 yta_matches = replies[replies["mentions"] & (replies["marker"] == "YTA")]
 show_replies(yta_matches, pattern)`,
-   task: 'Run the example. Then run the box to see the NTA matches. Record the ID of one YTA reply where the wife is the person the poster treated badly, and one NTA reply where the wife is the person behaving badly.',
+   task: 'Run the example. Then run the box to see the NTA matches. Choose one YTA reply and one NTA reply and record their IDs. For each, discuss whose wife is mentioned and what the reply says about her. Does the same word refer to the same role in both examples?',
    starter: String.raw`pattern = r"\bwife\b"
 replies["mentions"] = replies["body"].str.contains(pattern, case=False)
 nta_matches = replies[replies["mentions"] & (replies["marker"] == "NTA")]
@@ -400,8 +402,8 @@ nta_example = "t1_ecnr90g"   # paste the idstr of an NTA match`,
    check: {truths: [[String.raw`yta_example in _ids(r"\bwife\b", "YTA")`, 'yta_example should be the idstr of a YTA reply from the example output, in quotation marks.'],
                     [String.raw`nta_example in _ids(r"\bwife\b", "NTA")`, 'nta_example should be the idstr of an NTA reply from your output, in quotation marks.']]},
    hint: 'Copy each ID from the output, with its quotation marks around it, such as <code>"t1_abc1234"</code>.',
-   after: ['In the YTA replies the wife is the person the poster treated badly: t1_eeo05h0 asks “When is your wife supposed to play when she’s working multiple jobs to support you?”',
-           'The NTA replies are mixed. t1_ecnr90g says “Your wife, however, sounds unstable”, and t1_els53k1 is about the commenter’s own wife. The share in step 6 cannot show any of this.']},
+   after: ['In one YTA example, the wife is the person the poster treated badly: t1_eeo05h0 asks “When is your wife supposed to play when she’s working multiple jobs to support you?”',
+           'The selected NTA examples describe different roles. t1_ecnr90g says “Your wife, however, sounds unstable”, and t1_els53k1 is about the commenter’s own wife. The share in step 6 cannot show any of this.']},
 
   {topic: 'Find what the search missed', stage: 'read', pre: GROUPS,
    intro: ['The NTA replies that use behavior mostly criticize how someone else acted. The example shows some. Some replies spell the word behaviour. In a pattern, <code>?</code> makes the character before it optional: <code>colou?r</code> matches color and colour.',
@@ -459,7 +461,7 @@ notes = {
     "example": "t1_eeo05h0",
     "counterexample": "t1_els53k1",
     "missed": "t1_elwdwrg",
-    "description": "In YTA replies, wife is mostly the poster's wife, described as someone the poster treated badly.",
+    "description": "In the YTA example t1_eeo05h0, wife refers to the poster's wife supporting them; in the NTA example t1_els53k1, it refers to the commenter's own wife.",
 }
 for key in notes:
     print(key + ":", notes[key])`,
@@ -705,7 +707,7 @@ function renderSteps() {
       <details id="s${i}-answer" hidden><summary>One possible answer</summary><pre class="answer">${esc(s.answer)}</pre></details>
       <p class="small" id="s${i}-answer-wait">One possible answer appears here after you have checked an answer of your own.</p>`;
     return `<section class="q" id="s${i}" aria-labelledby="s${i}-title" hidden>
-      <div class="level">Step ${i + 1} of ${STEPS.length}</div>
+      <div class="level">${s.optional ? "Optional step" : "Step"} ${i + 1} of ${STEPS.length}</div>
       <h2 id="s${i}-title" tabindex="-1">${esc(s.topic)}</h2>
       ${[].concat(s.intro || []).map(text => `<p>${text}</p>`).join('')}
       ${example}
@@ -749,10 +751,23 @@ function show(i, focus = true) {
   // The strip above the step: which part of the work this step belongs to. Each name opens that part.
   const stages = [...$('stages').children], at = stages.findIndex(li => li.dataset.stage === STEPS[current].stage);
   stages.forEach((li, n) => { li.classList.toggle('done', n < at); if (n === at) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current'); });
-  $('progress').textContent = `${STEPS.filter((s, n) => solved.has(n)).length} of ${STEPS.length} checked`;
+  const required = STEPS.map((s, n) => ({s, n})).filter(({s}) => !s.optional);
+  $('progress').textContent = `${required.filter(({n}) => solved.has(n)).length} of ${required.length} required steps checked`;
   renderVariables();
   if (focus) $(`s${current}-title`).focus();
   save();
+}
+
+// The required route skips optional work; the step picker still opens it.
+function nextStep() {
+  let next = current + 1;
+  while (STEPS[next] && STEPS[next].optional) next += 1;
+  show(next);
+}
+function previousStep() {
+  let previous = current - 1;
+  while (STEPS[previous] && STEPS[previous].optional) previous -= 1;
+  show(previous);
 }
 
 // The side panel: the variables of the current step.
@@ -832,7 +847,7 @@ async function runBox(button) {
 }
 
 document.addEventListener('click', e => {
-  if (e.target.closest('[data-next]')) { show(current + 1); return; }
+  if (e.target.closest('[data-next]')) { nextStep(); return; }
   const stage = e.target.closest('[data-stage-go]');
   if (stage) { show(STEPS.findIndex(s => s.stage === stage.dataset.stageGo)); return; }
   const name = e.target.closest('[data-name]');
@@ -870,8 +885,8 @@ document.addEventListener('input', e => { if (e.target.matches('textarea')) save
 renderSteps();
 restore();
 $('picker').addEventListener('change', e => show(Number(e.target.value)));
-$('prev').addEventListener('click', () => show(current - 1));
-$('next').addEventListener('click', () => show(current + 1));
+$('prev').addEventListener('click', previousStep);
+$('next').addEventListener('click', nextStep);
 $('reset').addEventListener('click', () => {
   if (!window.confirm('Clear all your code and checks on this page?')) return;
   try { localStorage.removeItem(STORE); } catch (error) { /* nothing was saved */ }
