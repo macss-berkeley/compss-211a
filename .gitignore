@@ -34,3 +34,7 @@ wandb/
 # Week 6: replies students save from their own requests
 *_mine.json
 *_mine.pdf
+
+# Private Week 8 project samples and outputs
+/lab/lab08_*_mine.csv
+/lab/lab08_team_texts.csv
