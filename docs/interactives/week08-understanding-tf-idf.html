@@ -7,19 +7,19 @@
 </head>
 <body>
 <div class="mast"><div class="wrap"><span><span class="brand">UC Berkeley</span>COMPSS 211A · Computing I</span><a href="../index.html">All interactives</a></div></div>
-<header><div class="wrap"><h1>Words, counts, and TF-IDF</h1><p>How texts become numbers that a computer can count, compare, and search.</p></div></header>
+<header><div class="wrap"><h1>Words, counts, and TF-IDF</h1><p>How texts are turned into word counts and TF-IDF weights.</p></div></header>
 <main class="wrap">
   <section class="orientation" aria-label="About this page">
-    <p>To count, compare, or search many texts, we first turn each text into a row of numbers. This page does that one step at a time, with three short texts. Each text is called a <b>document</b>:</p>
+    <p>To count, compare, or search many texts, each text is first turned into a row of numbers. This page shows the steps with three short texts. Each text is called a <b>document</b>:</p>
     <ol class="doc-list" id="doc-list"></ol>
-    <p class="small">Go through the tabs in order. Each tab adds one step to the one before.</p>
+    <p class="small">The tabs show the steps in order.</p>
   </section>
   <div id="corpus">
     <div class="toolbar corpus-top">
-      <label for="experiment">Change the documents <select id="experiment" aria-label="Change the documents"><option value="original">Original documents</option><option value="repeat">D1 says “cat” twice</option><option value="reorder">D1 in a different word order</option><option value="fourth">Add D4, a copy of D1</option></select></label>
+      <label for="experiment">Change the documents <select id="experiment" aria-label="Change the documents"><option value="original">Original documents</option><option value="repeat">D1 with “cat” twice</option><option value="reorder">D1 with the words reordered</option><option value="fourth">Add D4, a copy of D1</option></select></label>
       <button type="button" id="reset">Reset all</button>
     </div>
-    <details class="corpus"><summary>Edit the documents yourself</summary><div class="docs" id="docs"></div></details>
+    <details class="corpus"><summary>Edit the documents</summary><div class="docs" id="docs"></div></details>
   </div>
   <nav class="steps" aria-label="Demo steps" role="tablist">
     <button type="button" id="tab-words" role="tab" aria-controls="stage" data-stage="words">1. Words</button>
