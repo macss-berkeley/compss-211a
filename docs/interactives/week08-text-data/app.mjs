@@ -15,6 +15,10 @@ function updateModel() {
   state.doc = Math.min(state.doc, model.n - 1);
 }
 
+function docList() {
+  $('#doc-list').innerHTML = state.texts.map((text, i) => `<li><b>D${i+1}</b>${esc(text)}</li>`).join('');
+}
+
 function editors() {
   $('#docs').classList.toggle('four', state.texts.length === 4);
   $('#docs').innerHTML = state.texts.map((text, i) => `<div class="doc"><label for="doc-${i}">D${i+1}</label><textarea id="doc-${i}" data-editor="${i}" rows="2" maxlength="3000" spellcheck="false">${esc(text)}</textarea></div>`).join('');
@@ -26,13 +30,13 @@ function heading(title, prompt) {
 
 function selection() {
   if (!model.vocabulary.length) return '';
-  return `<div class="selection"><label for="selected-term">Trace a term</label><select id="selected-term">${model.vocabulary.map(t => `<option ${state.term===t?'selected':''}>${esc(t)}</option>`).join('')}</select><label for="selected-doc">in</label><select id="selected-doc">${state.texts.map((_,i) => `<option value="${i}" ${state.doc===i?'selected':''}>D${i+1}</option>`).join('')}</select></div>`;
+  return `<div class="selection"><label for="selected-term">Follow the word</label><select id="selected-term">${model.vocabulary.map(t => `<option ${state.term===t?'selected':''}>${esc(t)}</option>`).join('')}</select><label for="selected-doc">in</label><select id="selected-doc">${state.texts.map((_,i) => `<option value="${i}" ${state.doc===i?'selected':''}>D${i+1}</option>`).join('')}</select></div>`;
 }
 
 function matrix(mode) {
   if (!model.vocabulary.length) return '<p class="empty">No terms remain. Edit a text or change the vocabulary choices.</p>';
   const values = mode==='weights' ? model.weights : model.counts;
-  return `<div class="table-wrap" tabindex="0" role="region" aria-label="${mode==='weights'?'TF-IDF':'Word-count'} matrix; scroll for more columns"><table><caption class="sr-only">One document per row, one term per column. Select a cell to inspect it.</caption><thead><tr><th scope="col">Text</th>${model.vocabulary.map(t => `<th scope="col" class="${t===state.term?'column':''}">${esc(t)}</th>`).join('')}</tr></thead><tbody>${values.map((row,i) => `<tr><th scope="row" class="${state.doc===i?'active-row':''}">D${i+1}</th>${row.map((v,j) => `<td class="${model.vocabulary[j]===state.term?'column':''}"><button type="button" class="cell ${v===0?'zero':''} ${state.doc===i&&model.vocabulary[j]===state.term?'active':''}" data-cell="${i}" data-term="${esc(model.vocabulary[j])}" aria-pressed="${state.doc===i&&model.vocabulary[j]===state.term}" aria-label="D${i+1}, ${esc(model.vocabulary[j])}: ${mode==='weights'?fmt(v):v}">${mode==='weights'?fmt(v):v}</button></td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  return `<div class="table-wrap" tabindex="0" role="region" aria-label="${mode==='weights'?'TF-IDF':'Word-count'} matrix; scroll for more columns"><table><caption class="sr-only">One document per row, one term per column. Select a cell to inspect it.</caption><thead><tr><th scope="col">Document</th>${model.vocabulary.map(t => `<th scope="col" class="${t===state.term?'column':''}">${esc(t)}</th>`).join('')}</tr></thead><tbody>${values.map((row,i) => `<tr><th scope="row" class="${state.doc===i?'active-row':''}">D${i+1}</th>${row.map((v,j) => `<td class="${model.vocabulary[j]===state.term?'column':''}"><button type="button" class="cell ${v===0?'zero':''} ${state.doc===i&&model.vocabulary[j]===state.term?'active':''}" data-cell="${i}" data-term="${esc(model.vocabulary[j])}" aria-pressed="${state.doc===i&&model.vocabulary[j]===state.term}" aria-label="D${i+1}, ${esc(model.vocabulary[j])}: ${mode==='weights'?fmt(v):v}">${mode==='weights'?fmt(v):v}</button></td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 
 function metric(value, label) {
@@ -58,35 +62,35 @@ function pythonPanel(kind) {
 }
 
 function words() {
-  return heading('Words in order → a bag of words', 'Keep the words and their counts. Leave out their order.')+
-    `<div class="word-heads"><span></span><span>Word order</span><span></span><span>Bag of words</span></div>`+
+  return heading('Split each document into words', 'First, each document is split into words. This is called <b>tokenization</b>, and each word is a <b>token</b>. Here every word becomes lowercase, punctuation is dropped, and one-letter words are left out. Then the order of the words is dropped. What is left is a <b>bag of words</b>: which words a document contains, and how often. What information does the bag lose?')+
+    `<div class="word-heads"><span></span><span>The words in their order</span><span></span><span>Bag of words: the same words, order dropped</span></div>`+
     model.tokens.map((row,i) => {
       const bag = [...row].sort();
       const chips = terms => terms.map(t => `<button type="button" class="token ${t===state.term?'selected':''}" data-token="${esc(t)}">${esc(t)}</button>`).join('');
       return `<div class="token-row"><span class="doc-id">D${i+1}</span><div class="tokens">${chips(row)||'<span class="small">No word tokens</span>'}</div><span class="arrow" aria-hidden="true">→</span><div class="tokens bag">${chips(bag)||'<span class="small">Empty bag</span>'}</div></div>`;
-    }).join('')+'<p class="small">Select a word to follow it. Tokenization: lowercase, at least two characters, no punctuation.</p>';
+    }).join('')+'<p class="small">Select a word to follow it through the next tabs.</p>';
 }
 
 function counts() {
   const j = model.vocabulary.indexOf(state.term);
-  return heading('One row per text. One column per term.', 'Select a cell. What does its number record?')+
+  return heading('Count each word in each document', 'Now the bags go into one table. Each row is a document. Each column is a word that appears in at least one document. Each cell is the number of times that word appears in that document. This table is called a <b>document–word matrix</b>. Select a cell: what does its number record?')+
     `<div class="stage-bar">${selection()}</div>`+matrix('counts')+
-    (j<0?'':`<div class="metrics">${metric(model.counts[state.doc][j],`${esc(state.term)} in D${state.doc+1}`)}${metric(model.totals[j],'occurrences across all texts')}${metric(`${model.df[j]} / ${model.n}`,'documents containing the term')}</div>`)+pythonPanel('counts');
+    (j<0?'':`<div class="metrics">${metric(model.counts[state.doc][j],`times “${esc(state.term)}” appears in D${state.doc+1}`)}${metric(model.totals[j],'times it appears in all documents')}${metric(`${model.df[j]} / ${model.n}`,'documents that contain it')}</div>`)+pythonPanel('counts');
 }
 
 function vocabulary() {
-  return heading('Choose the word columns', 'Change one choice. Which columns disappear or appear?')+
-    `<div class="controls"><label class="check-option"><input type="checkbox" data-option="stop" ${state.stop?'checked':''}>Remove ${STOP_WORDS.join(', ')}</label><label class="check-option"><input type="checkbox" data-option="bigrams" ${state.bigrams?'checked':''}>Add bigrams</label><label class="check-option"><input type="checkbox" data-option="fixed" ${state.fixed?'checked':''}>Keep only cat, mat, rug</label></div>`+
-    `<div class="metrics">${metric(model.n,'documents')}${metric(model.vocabulary.length,'term columns')}${metric(model.cells?`${Math.round(100*model.zeros/model.cells)}%`:'—','zero cells')}</div>`+
-    matrix('counts')+`<p class="small">Bigrams count adjacent pairs, such as <b>cat sat</b>. They are built after the selected stop words are removed.</p>`;
+  return heading('Choose which words become columns', 'The list of columns is the <b>vocabulary</b>, and you choose what goes into it. <b>Stop words</b> are very common words, such as <i>the</i> and <i>of</i>, that are often removed. <b>Bigrams</b> are pairs of neighboring words, such as <i>cat sat</i>, added as extra columns. You can also keep only a fixed list of words. Change one choice: which columns disappear or appear?')+
+    `<div class="controls"><label class="check-option"><input type="checkbox" data-option="stop" ${state.stop?'checked':''}>Remove stop words: ${STOP_WORDS.join(', ')}</label><label class="check-option"><input type="checkbox" data-option="bigrams" ${state.bigrams?'checked':''}>Add bigrams (word pairs)</label><label class="check-option"><input type="checkbox" data-option="fixed" ${state.fixed?'checked':''}>Keep only cat, mat and rug</label></div>`+
+    `<div class="metrics">${metric(model.n,'documents')}${metric(model.vocabulary.length,'word columns')}${metric(model.cells?`${Math.round(100*model.zeros/model.cells)}%`:'—','cells that are 0')}</div>`+
+    matrix('counts')+`<p class="small">Bigrams are made after the stop words are removed.</p>`;
 }
 
 function tfidf() {
   const j = model.vocabulary.indexOf(state.term), i=state.doc;
   const modes = `<div class="segmented" aria-label="Matrix values"><button type="button" data-matrix="counts" aria-pressed="${state.matrix==='counts'}">Counts</button><button type="button" data-matrix="weights" aria-pressed="${state.matrix==='weights'}">TF-IDF</button></div>`;
   let trace = '';
-  if (j>=0) trace = `<div class="calc" aria-label="Weight calculation for ${esc(state.term)} in D${i+1}"><div><span class="number">${model.counts[i][j]}</span><span class="label">TF · count in D${i+1}</span></div><span class="op" aria-hidden="true">×</span><div><span class="number">${fmt(model.idf[j])}</span><span class="label">IDF · in ${model.df[j]} of ${model.n} texts</span></div><span class="op" aria-hidden="true">=</span><div><span class="number">${fmt(model.raw[i][j])}</span><span class="label">before row rescaling</span></div><span class="op" aria-hidden="true">→</span><div class="result"><span class="number">${fmt(model.weights[i][j])}</span><span class="label">final weight</span></div></div>`;
-  return heading('Same columns. Different weights.', 'Compare cat and mat in D1. Both have count 1 in the original texts.')+
+  if (j>=0) trace = `<div class="calc" aria-label="Weight calculation for ${esc(state.term)} in D${i+1}"><div><span class="number">${model.counts[i][j]}</span><span class="label">TF: count in D${i+1}</span></div><span class="op" aria-hidden="true">×</span><div><span class="number">${fmt(model.idf[j])}</span><span class="label">IDF: in ${model.df[j]} of ${model.n} documents</span></div><span class="op" aria-hidden="true">=</span><div><span class="number">${fmt(model.raw[i][j])}</span><span class="label">TF × IDF</span></div><span class="op" aria-hidden="true">→</span><div class="result"><span class="number">${fmt(model.weights[i][j])}</span><span class="label">weight after rescaling the row</span></div></div>`;
+  return heading('Give rare words more weight', 'Counts treat every word the same. But a word that appears in every document, such as <i>the</i>, does little to tell the documents apart. <b>TF-IDF</b> gives such words less weight. <b>TF</b> (term frequency) is the count from tab 2. <b>IDF</b> (inverse document frequency) is larger for words that appear in fewer documents. The weight is TF × IDF, and then each row is rescaled so that long and short documents can be compared. In the original D1, <i>cat</i> and <i>mat</i> both appear once. Which gets the higher weight?')+
     `<div class="stage-bar">${selection()}${modes}</div>`+matrix(state.matrix)+trace+
     `<details class="formula"><summary>How these numbers are calculated</summary><p>TF is the word count. Smoothed IDF = <code>1 + ln((1 + N) / (1 + DF))</code>. Multiply TF by IDF, then divide each value by the length of its document’s row (L2 normalization).</p><p>These are the defaults used by <code>TfidfVectorizer()</code> in the notebook. A word found in every document has IDF = 1. The final weights are not percentages.</p></details>`+pythonPanel('tfidf');
 }
@@ -101,17 +105,17 @@ function similarTexts() {
   const shared=model.vocabulary.filter((_,j)=>model.counts[a][j]>0&&model.counts[b][j]>0);
   const matches=shared.map(term=>({term}));
   const emptyRows=model.counts.flatMap((row,i)=>row.some(v=>v>0)?[]:[`D${i+1}`]);
-  const table=`<div class="table-wrap similarity-table"><table><caption class="sr-only">Cosine similarity between the numeric document rows. Select two different documents.</caption><thead><tr><th scope="col">Text</th>${model.texts.map((_,i)=>`<th scope="col">D${i+1}</th>`).join('')}</tr></thead><tbody>${scores.map((row,i)=>`<tr><th scope="row">D${i+1}</th>${row.map((v,j)=>`<td style="background:rgba(253,186,18,${(v*.45).toFixed(3)})">${i===j?`<span class="self-score">${fmt(v)}</span>`:`<button type="button" class="cell ${Math.min(a,b)===Math.min(i,j)&&Math.max(a,b)===Math.max(i,j)?'active':''}" data-pair="${i},${j}" aria-label="Compare D${i+1} and D${j+1}: ${fmt(v)}">${fmt(v)}</button>`}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
-  return heading('Find similar texts', 'Which two documents have the most similar word-use patterns?')+
-    `<div class="stage-bar"><label class="check-option"><input type="checkbox" data-option="stop" ${state.stop?'checked':''}>Remove ${STOP_WORDS.join(', ')}</label><div class="segmented" aria-label="Vectors to compare"><button type="button" data-sim-mode="counts" aria-pressed="${state.simMode==='counts'}">Counts</button><button type="button" data-sim-mode="weights" aria-pressed="${state.simMode==='weights'}">TF-IDF</button></div></div>`+
-    `<div class="similarity-layout">${table}<div class="pair-detail"><h3>D${a+1} + D${b+1} <span class="pair-score">${fmt(scores[a][b])}</span></h3><p>${markedText(model.texts[a],matches)}</p><p>${markedText(model.texts[b],matches)}</p><div class="shared-terms"><span class="small">Shared terms</span>${shared.map(t=>`<span class="shared-term">${esc(t)}</span>`).join('')||'<span>None</span>'}</div></div></div>`+
-    `<div class="similarity-result"><span>${pairs[0]?.score>0?`Closest pair: <b>D${pairs[0].i+1} + D${pairs[0].j+1}</b>`:'No pair has shared retained terms.'}</span><span class="small">Cosine similarity: 0 = no shared terms; 1 = the same word-use pattern.</span></div>`+
-    (emptyRows.length?`<p class="small">${emptyRows.join(', ')} ${emptyRows.length===1?'has':'have'} no retained terms. Their similarity scores are shown as 0.</p>`:'')+
+  const table=`<div class="table-wrap similarity-table"><table><caption class="sr-only">Cosine similarity between the numeric document rows. Select two different documents.</caption><thead><tr><th scope="col">Document</th>${model.texts.map((_,i)=>`<th scope="col">D${i+1}</th>`).join('')}</tr></thead><tbody>${scores.map((row,i)=>`<tr><th scope="row">D${i+1}</th>${row.map((v,j)=>`<td style="background:rgba(253,186,18,${(v*.45).toFixed(3)})">${i===j?`<span class="self-score">${fmt(v)}</span>`:`<button type="button" class="cell ${Math.min(a,b)===Math.min(i,j)&&Math.max(a,b)===Math.max(i,j)?'active':''}" data-pair="${i},${j}" aria-label="Compare D${i+1} and D${j+1}: ${fmt(v)}">${fmt(v)}</button>`}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  return heading('Compare documents', 'Each document is now a row of numbers, so two documents can be compared number by number. <b>Cosine similarity</b> does this. It is 0 when two documents share no words, and 1 when they use the same words in the same proportions. Select a cell to see which words two documents share. Which two documents are most similar?')+
+    `<div class="stage-bar"><label class="check-option"><input type="checkbox" data-option="stop" ${state.stop?'checked':''}>Remove stop words: ${STOP_WORDS.join(', ')}</label><div class="segmented" aria-label="Vectors to compare"><button type="button" data-sim-mode="counts" aria-pressed="${state.simMode==='counts'}">Counts</button><button type="button" data-sim-mode="weights" aria-pressed="${state.simMode==='weights'}">TF-IDF</button></div></div>`+
+    `<div class="similarity-layout">${table}<div class="pair-detail"><h3>D${a+1} + D${b+1} <span class="pair-score">${fmt(scores[a][b])}</span></h3><p>${markedText(model.texts[a],matches)}</p><p>${markedText(model.texts[b],matches)}</p><div class="shared-terms"><span class="small">Shared words</span>${shared.map(t=>`<span class="shared-term">${esc(t)}</span>`).join('')||'<span>None</span>'}</div></div></div>`+
+    `<div class="similarity-result"><span>${pairs[0]?.score>0?`Most similar: <b>D${pairs[0].i+1} and D${pairs[0].j+1}</b>`:'No two documents share a word.'}</span><span class="small">Cosine similarity: 0 = no shared words; 1 = the same words in the same proportions.</span></div>`+
+    (emptyRows.length?`<p class="small">${emptyRows.join(', ')} ${emptyRows.length===1?'has':'have'} no words left. Their similarity scores are shown as 0.</p>`:'')+
     pythonPanel('similarity');
 }
 
 const questions = [
-  {id:'total', prompt:'How many times does “the” occur across all three texts?', numeric:true, answer:'5', hint:'Count each occurrence, including repetitions within a text.', why:'D1 has 2, D2 has 2, and D3 has 1: 5 occurrences.'},
+  {id:'total', prompt:'How many times does “the” occur across all three documents?', numeric:true, answer:'5', hint:'Count each occurrence, including repetitions within a text.', why:'D1 has 2, D2 has 2, and D3 has 1: 5 occurrences.'},
   {id:'documents', prompt:'How many documents contain “cat”?', numeric:true, answer:'2', hint:'Count documents, rather than occurrences.', why:'D1 and D2 contain cat: 2 of the 3 documents.'},
   {id:'order', prompt:'Rearrange D1’s words. Do its single-word counts change?', choices:[['yes','Yes'],['no','No']], answer:'no', hint:'The words are the same; only their positions change.', why:'No. A bag of words leaves out word order.'},
   {id:'weight', prompt:'In D1, “cat” and “mat” both occur once. Which has the larger TF-IDF weight?', choices:[['cat','cat'],['mat','mat'],['equal','Same weight']], answer:'mat', hint:'Compare how many documents contain each word.', why:'Mat: 0.49, compared with cat: 0.37. Mat occurs in fewer documents.'}
@@ -119,7 +123,7 @@ const questions = [
 const answers = new Map();
 
 function practice() {
-  return heading('Predict, then check', 'Use the original three texts for these questions.')+
+  return heading('Predict, then check', 'Use the original three documents for these questions.')+
     `<div class="practice-texts">${EXAMPLES.map((t,i)=>`<p><b>D${i+1}</b> ${esc(t)}</p>`).join('')}</div>`+
     questions.map((q,i) => `<form class="question" data-question="${q.id}"><fieldset><legend>${i+1}. ${q.prompt}</legend><div class="answers">${q.numeric?`<label class="sr-only" for="answer-${q.id}">Your answer</label><input type="number" id="answer-${q.id}" name="answer" min="0" step="1" inputmode="numeric" required>`:q.choices.map(([v,t])=>`<label><input type="radio" name="answer" value="${v}" required>${t}</label>`).join('')}<button type="submit" class="check-answer">Check</button></div></fieldset><div class="feedback" id="feedback-${q.id}" role="status" hidden></div></form>`).join('');
 }
@@ -132,7 +136,7 @@ function markedText(text, matches) {
 function searchView() {
   const results = search(model,state.query,state.searchMode);
   const matches = results.some(r=>r.score>0);
-  return heading('Use the vectors to search', 'Add the values for the query words. Which text comes first?')+
+  return heading('Search the documents', 'A simple search uses the same numbers. For each document, it adds up the numbers for the search words. The document with the highest total comes first. Try <i>cat mat</i> with counts, then with TF-IDF. Does the order change?')+
     `<form class="query-form" id="search-form"><label class="sr-only" for="query">Search words</label><input type="search" id="query" value="${esc(state.query)}" placeholder="Try cat mat" maxlength="200"><button type="submit" class="primary">Search</button></form>`+
     `<div class="segmented" aria-label="Search values"><button type="button" data-search="counts" aria-pressed="${state.searchMode==='counts'}">Counts</button><button type="button" data-search="weights" aria-pressed="${state.searchMode==='weights'}">TF-IDF</button></div>`+
     (matches?'':`<p class="empty">No query words occur in the current vocabulary.</p>`)+
@@ -162,6 +166,7 @@ function render() {
   updateModel();
   const views = {words, counts, vocabulary, tfidf, practice, similarity:similarTexts, search:searchView};
   $('#stage').innerHTML=views[state.stage]();
+  docList();
   $('#stage').setAttribute('aria-labelledby',`tab-${state.stage}`);
   $('#experiment').closest('label').hidden=state.stage==='practice';
   $('#corpus details').hidden=state.stage==='practice';
@@ -172,7 +177,7 @@ function render() {
   const index=steps.indexOf(state.stage);
   $('#previous').disabled=index===0;
   $('#next').disabled=index===steps.length-1;
-  $('#next').textContent=index===3?'Next: practice':index===4?'Next: similar texts':index===5?'Optional: search':'Next';
+  $('#next').textContent=index===3?'Next: practice':index===4?'Next: similar documents':index===5?'Optional: search':'Next';
   $('#progress').textContent=index<6?`${index+1} of 6`:'Optional application';
   if (state.stage==='practice') restoreAnswers();
   if ($('.table-wrap')) $('.table-wrap').scrollLeft=scrollLeft;

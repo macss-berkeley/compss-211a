@@ -7,14 +7,19 @@
 </head>
 <body>
 <div class="mast"><div class="wrap"><span><span class="brand">UC Berkeley</span>COMPSS 211A · Computing I</span><a href="../index.html">All interactives</a></div></div>
-<header><div class="wrap"><h1>Words, counts, and TF-IDF</h1><p>Trace a word from text to count to weight.</p></div></header>
+<header><div class="wrap"><h1>Words, counts, and TF-IDF</h1><p>How texts become numbers that a computer can count, compare, and search.</p></div></header>
 <main class="wrap">
+  <section class="orientation" aria-label="About this page">
+    <p>To count, compare, or search many texts, we first turn each text into a row of numbers. This page does that one step at a time, with three short texts. Each text is called a <b>document</b>:</p>
+    <ol class="doc-list" id="doc-list"></ol>
+    <p class="small">Go through the tabs in order. Each tab adds one step to the one before.</p>
+  </section>
   <div id="corpus">
     <div class="toolbar corpus-top">
-      <label for="experiment">Try a change <select id="experiment" aria-label="Try a change"><option value="original">Original texts</option><option value="repeat">Repeat “cat” in D1</option><option value="reorder">Reorder D1</option><option value="fourth">Add another mat document</option></select></label>
+      <label for="experiment">Change the documents <select id="experiment" aria-label="Change the documents"><option value="original">Original documents</option><option value="repeat">D1 says “cat” twice</option><option value="reorder">D1 in a different word order</option><option value="fourth">Add D4, a copy of D1</option></select></label>
       <button type="button" id="reset">Reset all</button>
     </div>
-    <details class="corpus"><summary>Edit texts</summary><div class="docs" id="docs"></div></details>
+    <details class="corpus"><summary>Edit the documents yourself</summary><div class="docs" id="docs"></div></details>
   </div>
   <nav class="steps" aria-label="Demo steps" role="tablist">
     <button type="button" id="tab-words" role="tab" aria-controls="stage" data-stage="words">1. Words</button>
@@ -22,7 +27,7 @@
     <button type="button" id="tab-vocabulary" role="tab" aria-controls="stage" data-stage="vocabulary">3. Vocabulary</button>
     <button type="button" id="tab-tfidf" role="tab" aria-controls="stage" data-stage="tfidf">4. TF-IDF</button>
     <button type="button" id="tab-practice" role="tab" aria-controls="stage" data-stage="practice">5. Practice</button>
-    <button type="button" id="tab-similarity" role="tab" aria-controls="stage" data-stage="similarity">6. Similar texts</button>
+    <button type="button" id="tab-similarity" role="tab" aria-controls="stage" data-stage="similarity">6. Similar documents</button>
     <button type="button" id="tab-search" role="tab" aria-controls="stage" data-stage="search">Optional: search</button>
   </nav>
   <section id="stage" class="stage" role="tabpanel" aria-labelledby="tab-words"></section>
