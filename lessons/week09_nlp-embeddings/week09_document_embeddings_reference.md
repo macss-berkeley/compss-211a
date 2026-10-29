@@ -1,6 +1,6 @@
 # Week 9: which documents are similar to each other?
 
-This week answers one question: given a set of documents, which ones use similar language? We measure that with the TF-IDF table from Week 8 and a score called cosine similarity, then read the matches to decide whether they make sense. Sorting documents into groups with KMeans is an optional last step.
+Given a set of documents, which ones use similar language? We measure that with the TF-IDF table from Week 8 and a score called cosine similarity, then read the matches to decide whether they make sense. Sorting documents into groups with KMeans is an optional last step.
 
 This is a complete method for a final project. You do not need anything beyond this page and Week 8.
 
