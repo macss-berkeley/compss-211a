@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comparing TF-IDF and embeddings · COMPSS 211A</title>
+<meta name="description" content="Compare TF-IDF rows with sentence embeddings from all-MiniLM-L6-v2 on twelve short sentences: read both rows, score pairs with cosine similarity, see where the two methods disagree, and find the nearest sentences on a map.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Inter+Tight:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --berkeley:#002676; --ink:#1A1A1A; --paper:#FFFFFF; --card:#FFFFFF;
+  --gold:#FDBA12; --gold-soft:#FFF1CC; --blue-mid:#2A4D9B; --line:#DDDDDD; --pale:#EEF3F9;
+  --ok:#1E7D4E; --err:#B3403A; --code-bg:#0E1B45; --code-ink:#E8EDF6;
+  --serif:"Inter Tight","Inter",-apple-system,"Segoe UI",sans-serif;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);color:var(--ink);background:var(--paper);line-height:1.6;font-size:16.5px}
+.wrap{max-width:940px;margin:0 auto;padding:0 22px}
+h1{font-family:var(--serif);font-size:clamp(2rem,5vw,2.9rem);line-height:1.12;margin:.35rem 0 .7rem}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin:.4rem 0 1rem}
+.chip{display:inline-flex;align-items:center;font-size:.78rem;font-weight:600;padding:4px 12px;border-radius:3px}
+.chip-gold{background:var(--gold);color:var(--berkeley)}
+.lede{max-width:680px}
+h2{font-family:var(--serif);font-weight:600;color:var(--berkeley);font-size:1.5rem;margin:0 0 .35rem}
+h2:focus{outline:none}
+h2 .step{color:var(--berkeley);margin-right:.4rem}
+.section-note{color:#3A4A63;font-size:.95rem;margin-bottom:1rem;max-width:720px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:22px 24px;box-shadow:0 1px 2px rgba(18,35,61,.05);margin-bottom:24px}
+h3.sub{font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:var(--blue-mid);margin:0 0 8px}
+.small{font-size:.85rem;color:#51607A}
+.mono{font-family:var(--mono)}
+/* orientation */
+.orientation{background:var(--pale);border-left:4px solid var(--gold);padding:12px 18px;margin:0 0 22px;border-radius:0 4px 4px 0;font-size:.95rem}
+.orientation p{margin:4px 0 8px;max-width:720px}
+.orientation summary{cursor:pointer;color:var(--berkeley);font-weight:600}
+.orientation summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.sentlist{list-style:none;margin:8px 0 4px;display:grid;gap:3px}
+.sentlist li{display:flex;gap:10px;align-items:baseline;font-size:.9rem}
+.num{font-family:var(--mono);font-size:.8rem;font-weight:500;color:var(--berkeley);min-width:1.6em;text-align:right;flex:none}
+.topic{font-size:.78rem;color:#51607A}
+.swatch{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:0}
+/* code */
+pre.code{background:var(--code-bg);color:var(--code-ink);font-family:var(--mono);font-size:.82rem;line-height:1.55;border-radius:4px;padding:12px 16px;overflow-x:auto;margin:14px 0 0}
+code.inl{font-family:var(--mono);font-size:.82em;background:#ECEFF5;border-radius:4px;padding:1px 6px;overflow-wrap:anywhere}
+/* tabs and pager */
+.steps{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:22px}
+.steps button{font-family:var(--sans);font-size:.92rem;font-weight:500;color:var(--berkeley);background:#fff;border:0;border-bottom:3px solid transparent;padding:11px 15px;cursor:pointer}
+.steps button:hover{background:var(--pale)}
+.steps button[aria-selected=true]{border-bottom-color:var(--gold);background:var(--pale);font-weight:700}
+.steps button:focus-visible{outline:2.5px solid var(--gold);outline-offset:-2px}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:6px;padding-top:18px;border-top:1px solid var(--line)}
+.pager .right{display:flex;gap:10px;align-items:center}
+.progress{color:#51607A;font-size:.85rem}
+/* form controls */
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;max-width:560px}
+.field label{font-size:.82rem;font-weight:600;color:var(--blue-mid);letter-spacing:.04em;text-transform:uppercase}
+select{font-family:var(--sans);font-size:.95rem;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:4px;padding:8px 10px;width:100%;max-width:100%}
+select:focus-visible{outline:2.5px solid var(--gold);outline-offset:1px;border-color:var(--berkeley)}
+.pairfields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* two rows side by side */
+.tworows{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+.panel{border:1px solid var(--line);border-radius:4px;padding:12px 16px;background:#FAFAFA;min-width:0}
+.bars{display:grid;grid-template-columns:max-content minmax(40px,1fr) max-content;gap:4px 10px;align-items:center;margin-top:6px}
+.bars .t{font-family:var(--mono);font-size:.84rem;color:#2B3B57}
+.bars .b{height:10px;background:#E6EBF3;border-radius:2px;overflow:hidden}
+.bars .b i{display:block;height:100%;background:var(--blue-mid)}
+.bars .v{font-family:var(--mono);font-size:.82rem;color:#3A4A63;text-align:right}
+.dims{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:8px}
+.dim{border:1px solid var(--line);border-radius:3px;background:#fff;padding:4px 6px;text-align:center}
+.dim .k{display:block;font-family:var(--mono);font-size:.72rem;color:#51607A}
+.dim .x{display:block;font-family:var(--mono);font-size:.84rem;color:var(--berkeley)}
+.more{font-family:var(--mono);font-size:.84rem;color:#51607A;margin-top:8px}
+/* scores */
+.scores{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}
+.score{border:1px solid var(--line);border-radius:4px;padding:12px 16px;background:#FAFAFA}
+.score .lab{font-size:.82rem;font-weight:600;color:var(--blue-mid);letter-spacing:.04em;text-transform:uppercase}
+.score .big{display:block;font-family:var(--mono);font-size:1.6rem;color:var(--berkeley);line-height:1.3}
+.score .b{height:8px;background:#E6EBF3;border-radius:2px;overflow:hidden;margin-top:4px}
+.score .b i{display:block;height:100%;background:var(--blue-mid)}
+.shared{margin-top:12px;font-size:.92rem}
+.term{display:inline-block;font-family:var(--mono);font-size:.82rem;background:var(--pale);border:1px solid #CBD4E1;border-radius:3px;padding:1px 8px;margin:2px 4px 2px 0}
+.pairtexts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:4px 0 12px}
+.pairtexts p{font-size:.95rem;border-left:3px solid #2D6AA3;padding-left:10px}
+.pairtexts p+p{border-left-color:#C4820E}
+.pairblock{border-top:1px solid var(--line);padding-top:16px;margin-top:18px}
+.pairblock:first-of-type{border-top:0;padding-top:0;margin-top:0}
+/* buttons */
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+button.btn{font-family:var(--sans);font-weight:600;font-size:.9rem;color:#fff;background:var(--berkeley);border:1.5px solid var(--berkeley);border-radius:4px;padding:9px 18px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+button.btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,38,118,.22)}
+button.btn:focus-visible{outline:2.5px solid var(--gold);outline-offset:2px}
+button.btn-ghost{background:#fff;color:var(--berkeley)}
+button.btn-sm{padding:6px 12px;font-size:.84rem}
+button.btn-ghost[aria-pressed=true]{background:var(--berkeley);color:#fff}
+button.btn:disabled{opacity:.4;cursor:default;transform:none;box-shadow:none}
+/* questions */
+.qcard{border:1px solid var(--line);border-radius:4px;padding:18px 20px;margin:18px 0 0;background:#FAFAFA}
+.qcard fieldset{border:0}
+.qcard legend{font-family:var(--serif);font-size:1.12rem;font-weight:600;color:var(--berkeley);margin-bottom:6px}
+.qcard p{font-size:.93rem;margin-bottom:6px}
+.qcard .opts{display:flex;flex-direction:column;gap:8px;margin:10px 0 4px}
+.qcard label{display:flex;gap:10px;align-items:flex-start;font-size:.93rem;cursor:pointer}
+.qcard input[type=radio]{margin-top:5px;accent-color:var(--berkeley);flex:none}
+.qcard input[type=radio]:focus-visible{outline:2.5px solid var(--gold);outline-offset:2px}
+.verdict{border-radius:4px;padding:10px 14px;font-size:.92rem;margin-top:12px}
+.verdict.good{background:#E8F4EC;color:#17643C;border:1px solid #BFE0CB}
+.verdict.bad{background:#F9E9E7;color:#9B2F29;border:1px solid #EAC7C3}
+/* map */
+.maplayout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px;align-items:start}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.84rem;color:#3A4A63;margin-bottom:6px}
+svg.map{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:4px;background:#FCFCFD}
+svg.map .pt{cursor:pointer}
+svg.map .pt:focus{outline:none}
+svg.map .pt .ring{fill:none;stroke:transparent;stroke-width:3}
+svg.map .pt:focus-visible .ring{stroke:var(--gold)}
+svg.map .pt[aria-pressed=true] .ring{stroke:var(--berkeley)}
+svg.map .pt .lbl{font-family:var(--mono);font-size:20px;font-weight:500;fill:var(--ink);paint-order:stroke;stroke:#fff;stroke-width:5px}
+svg.map .pt[aria-pressed=true] .lbl{font-weight:700;fill:var(--berkeley)}
+svg.map .link{stroke:var(--berkeley);stroke-width:1.5;stroke-dasharray:4 4;opacity:.7}
+ol.ranked{list-style:none;display:flex;flex-direction:column;gap:6px;margin:6px 0 16px}
+ol.ranked li{display:grid;grid-template-columns:3.4em 1fr;gap:10px;align-items:baseline;font-size:.9rem;line-height:1.45;background:#fff;border:1px solid var(--line);border-radius:4px;padding:7px 12px}
+ol.ranked .sc{font-family:var(--mono);color:var(--berkeley);font-weight:500}
+.selected-text{font-size:1rem;margin:0 0 14px;padding-left:10px;border-left:3px solid var(--berkeley)}
+/* summary */
+.recap{background:linear-gradient(0deg,rgba(0,38,118,.045),rgba(0,38,118,.045)),var(--card)}
+.recap ul{margin:4px 0 0 20px}
+.recap li{margin-bottom:7px;font-size:.95rem}
+.recap li::marker{color:var(--gold)}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media (max-width:760px){
+  .tworows,.pairtexts,.pairfields,.maplayout{grid-template-columns:1fr}
+  .scores{gap:10px}.score{padding:10px 12px}
+  .card{padding:18px 16px}
+}
+@media (max-width:480px){
+  .wrap{padding:0 16px}
+  .steps button{padding:9px 10px;font-size:.86rem}
+  .progress{display:none}
+  .qcard{padding:14px 14px}
+}
+
+/* MaCSS skin, aligned with macss.berkeley.edu */
+html,body{overflow-x:clip}
+.mast{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:12px calc(50vw - 50%);display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.14)}
+.mast .brand{color:#fff;font-family:var(--sans);font-size:.9rem;font-weight:600;letter-spacing:.01em}
+.mast .brand .uc{font-family:Georgia,"Times New Roman",serif;color:var(--gold);font-size:1.04rem;font-weight:700;margin-right:7px}
+.mast a{color:#fff;font-family:var(--sans);font-weight:600;font-size:.83rem;text-decoration:none;border-bottom:1.5px solid rgba(255,255,255,.35)}
+.mast a:hover{border-bottom-color:var(--gold)}
+.mast a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap>header{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:30px calc(50vw - 50%) 28px;border-bottom:5px solid var(--gold);margin-bottom:30px}
+.wrap>header h1{color:#fff;font-weight:800;letter-spacing:-.015em}
+.wrap>header .lede{color:rgba(255,255,255,.9)}
+footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(50% - 50vw) 0;padding:20px calc(50vw - 50%) 26px;font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="mast"><span class="brand"><span class="uc">UC Berkeley</span>COMPSS 211A · Computing I</span><a href="../index.html">← All interactives</a></div>
+
+<header>
+  <h1>Comparing TF-IDF and embeddings</h1>
+  <div class="chips"><span class="chip chip-gold">Week 9</span></div>
+  <p class="lede">
+    TF-IDF and sentence embeddings both turn a sentence into a row of numbers. This page compares
+    the two methods on twelve short sentences.
+  </p>
+</header>
+
+<main>
+<section class="orientation" aria-label="About this page">
+  <p>
+    The embeddings come from the model <code class="inl">all-MiniLM-L6-v2</code>, which gives each
+    sentence 384 numbers. The TF-IDF rows use <code class="inl">TfidfVectorizer(stop_words="english")</code>.
+    All scores were computed in Python and are rounded to 2 decimals.
+  </p>
+  <details>
+    <summary>The twelve sentences</summary>
+    <ol class="sentlist" id="sentlist"></ol>
+  </details>
+</section>
+
+<nav class="steps" role="tablist" aria-label="Steps">
+  <button type="button" role="tab" id="tab-1" aria-controls="panel-1" data-step="1">1. Two kinds of row</button>
+  <button type="button" role="tab" id="tab-2" aria-controls="panel-2" data-step="2">2. Score a pair</button>
+  <button type="button" role="tab" id="tab-3" aria-controls="panel-3" data-step="3">3. Opposite verdicts</button>
+  <button type="button" role="tab" id="tab-4" aria-controls="panel-4" data-step="4">4. Nearest sentences</button>
+  <button type="button" role="tab" id="tab-5" aria-controls="panel-5" data-step="5">Summary</button>
+</nav>
+
+<!-- Step 1 -->
+<section class="stage" id="panel-1" role="tabpanel" aria-labelledby="tab-1">
+  <h2 tabindex="-1"><span class="step">1.</span>A sentence as two kinds of row</h2>
+  <p class="section-note">
+    TF-IDF gives a sentence one number for each word in the vocabulary. The embedding model gives
+    it 384 numbers. Choose a sentence to see both rows.
+  </p>
+  <div class="card">
+    <div class="field">
+      <label for="s1-sel">Sentence</label>
+      <select id="s1-sel"></select>
+    </div>
+    <div class="tworows" aria-live="polite">
+      <div class="panel">
+        <h3 class="sub">TF-IDF row</h3>
+        <p class="small" id="s1-tfnote"></p>
+        <div class="bars" id="s1-bars"></div>
+      </div>
+      <div class="panel">
+        <h3 class="sub">Embedding</h3>
+        <p class="small">The first 8 of 384 numbers. The columns are numbered 0 to 383.</p>
+        <div class="dims" id="s1-dims"></div>
+        <p class="more">… 376 more</p>
+      </div>
+    </div>
+    <pre class="code">tfidf = TfidfVectorizer(stop_words="english")
+tfidf_rows = tfidf.fit_transform(sentences)
+tfidf_rows.shape    # (12, 26): one column for each word
+
+model = SentenceTransformer("all-MiniLM-L6-v2")
+embeddings = model.encode(sentences)
+embeddings.shape    # (12, 384): 384 columns for every sentence</pre>
+
+    <form class="qcard" data-q="q1">
+      <fieldset>
+        <legend>Which row can you read word by word?</legend>
+        <div class="opts">
+          <label><input type="radio" name="q1" value="tfidf"> The TF-IDF row</label>
+          <label><input type="radio" name="q1" value="emb"> The embedding</label>
+          <label><input type="radio" name="q1" value="both"> Both rows</label>
+        </div>
+      </fieldset>
+      <div class="btnrow"><button type="submit" class="btn">Check</button></div>
+      <div class="verdict" id="v-q1" role="status" hidden></div>
+    </form>
+  </div>
+</section>
+
+<!-- Step 2 -->
+<section class="stage" id="panel-2" role="tabpanel" aria-labelledby="tab-2" hidden>
+  <h2 tabindex="-1"><span class="step">2.</span>Score a pair</h2>
+  <p class="section-note">
+    <code class="inl">cosine_similarity</code> scores two rows of either kind. Identical rows score 1.
+    A TF-IDF score is 0 when two sentences share no words. Embedding scores can be a little below 0.
+  </p>
+  <div class="card">
+    <div class="pairfields">
+      <div class="field"><label for="s2-a">Sentence A</label><select id="s2-a"></select></div>
+      <div class="field"><label for="s2-b">Sentence B</label><select id="s2-b"></select></div>
+    </div>
+    <div aria-live="polite">
+      <div class="scores">
+        <div class="score"><span class="lab">Embeddings</span><span class="big" id="s2-emb"></span><div class="b"><i id="s2-embbar"></i></div></div>
+        <div class="score"><span class="lab">TF-IDF</span><span class="big" id="s2-tf"></span><div class="b"><i id="s2-tfbar"></i></div></div>
+      </div>
+      <p class="shared" id="s2-shared"></p>
+    </div>
+    <pre class="code" id="s2-code"></pre>
+
+    <form class="qcard" data-q="q2">
+      <fieldset>
+        <legend>Why is the TF-IDF score 0.00?</legend>
+        <p>The pair starts at sentence 0, “The cat sat on the mat.”, and sentence 2, “A kitten rested on the carpet.”</p>
+        <div class="opts">
+          <label><input type="radio" name="q2" value="a"> The two TF-IDF rows have no word in common</label>
+          <label><input type="radio" name="q2" value="b"> The sentences are too short for TF-IDF</label>
+          <label><input type="radio" name="q2" value="c"> TF-IDF found that the sentences mean different things</label>
+        </div>
+      </fieldset>
+      <div class="btnrow"><button type="submit" class="btn">Check</button></div>
+      <div class="verdict" id="v-q2" role="status" hidden></div>
+      <div class="btnrow" id="s2-nextwrap" hidden><button type="button" class="btn" id="s2-next">Next pair</button></div>
+    </form>
+
+    <form class="qcard" data-q="q3" id="q3card" hidden>
+      <fieldset>
+        <legend>Which words give the TF-IDF score of <span id="q3-score"></span>?</legend>
+        <p>The pair is now sentence 3, “The capital of France is Paris.”, and sentence 4, “Paris is the largest city in France.”</p>
+        <div class="opts">
+          <label><input type="radio" name="q3" value="a"> <span><code class="inl">france</code> and <code class="inl">paris</code></span></label>
+          <label><input type="radio" name="q3" value="b"> <span><code class="inl">capital</code> and <code class="inl">city</code></span></label>
+          <label><input type="radio" name="q3" value="c"> <span><code class="inl">is</code> and <code class="inl">the</code></span></label>
+        </div>
+      </fieldset>
+      <div class="btnrow"><button type="submit" class="btn">Check</button></div>
+      <div class="verdict" id="v-q3" role="status" hidden></div>
+    </form>
+  </div>
+</section>
+
+<!-- Step 3 -->
+<section class="stage" id="panel-3" role="tabpanel" aria-labelledby="tab-3" hidden>
+  <h2 tabindex="-1"><span class="step">3.</span>Opposite verdicts</h2>
+  <p class="section-note">
+    The two sentences below give opposite verdicts. The English stop-word list in scikit-learn
+    includes <code class="inl">not</code>, so TF-IDF removes it. Both TF-IDF rows are left with one
+    word, <code class="inl">wrong</code>.
+  </p>
+  <div class="card">
+    <div class="pairblock" id="s3-pair1"></div>
+    <pre class="code" id="s3-code"></pre>
+    <div class="btnrow" id="s3-revealwrap"><button type="button" class="btn" id="s3-reveal">Compare a pair with the same meaning</button></div>
+    <div class="pairblock" id="s3-pair2" hidden></div>
+
+    <form class="qcard" data-q="q4" id="q4card" hidden>
+      <fieldset>
+        <legend>What does a high score tell you about two sentences?</legend>
+        <div class="opts">
+          <label><input type="radio" name="q4" value="a"> They use similar words or are about the same topic</label>
+          <label><input type="radio" name="q4" value="b"> They say the same thing</label>
+          <label><input type="radio" name="q4" value="c"> With embeddings, it means they agree, because the model reads words such as “not”</label>
+        </div>
+      </fieldset>
+      <div class="btnrow"><button type="submit" class="btn">Check</button></div>
+      <div class="verdict" id="v-q4" role="status" hidden></div>
+    </form>
+  </div>
+</section>
+
+<!-- Step 4 -->
+<section class="stage" id="panel-4" role="tabpanel" aria-labelledby="tab-4" hidden>
+  <h2 tabindex="-1"><span class="step">4.</span>Nearest sentences on a map</h2>
+  <p class="section-note">
+    PCA flattens the 384 embedding numbers of each sentence into 2, so the sentences can be drawn on
+    a map. Distances on the map are approximate. The scores are the reference. Click a point or
+    choose a sentence to list its three nearest sentences under each method.
+  </p>
+  <div class="card">
+    <div class="maplayout">
+      <div>
+        <div class="btnrow" role="group" aria-label="Map view" style="margin:0 0 10px">
+          <button type="button" class="btn btn-ghost btn-sm" id="zoom-all" aria-pressed="true">All sentences</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="zoom-in" aria-pressed="false">Zoom in on sentences 5 to 11</button>
+        </div>
+        <div class="legend" id="legend"></div>
+        <svg class="map" id="map" role="group" aria-label="Map of the twelve sentence embeddings. Each point is a button."></svg>
+        <p class="small" style="margin-top:6px" id="mapnote"></p>
+      </div>
+      <div aria-live="polite">
+        <div class="field"><label for="s4-sel">Sentence</label><select id="s4-sel"></select></div>
+        <h3 class="sub">Nearest with embeddings</h3>
+        <ol class="ranked" id="s4-emb"></ol>
+        <h3 class="sub">Nearest with TF-IDF</h3>
+        <ol class="ranked" id="s4-tf"></ol>
+        <p class="small" id="s4-tfnote"></p>
+      </div>
+    </div>
+    <pre class="code" id="s4-code"></pre>
+
+    <form class="qcard" data-q="q5">
+      <fieldset>
+        <legend>Which sentence scores higher?</legend>
+        <p>Choose sentence 7, “You did nothing wrong.” On the map, sentence 6, “You are wrong.”, and
+          sentence 9, “Don't wear white to someone else's wedding.”, are about the same distance from it.
+          Which one has the higher embedding score with sentence 7?</p>
+        <div class="opts">
+          <label><input type="radio" name="q5" value="6"> Sentence 6</label>
+          <label><input type="radio" name="q5" value="9"> Sentence 9</label>
+          <label><input type="radio" name="q5" value="same"> They score the same</label>
+        </div>
+      </fieldset>
+      <div class="btnrow"><button type="submit" class="btn">Check</button></div>
+      <div class="verdict" id="v-q5" role="status" hidden></div>
+    </form>
+  </div>
+</section>
+
+<!-- Summary -->
+<section class="stage" id="panel-5" role="tabpanel" aria-labelledby="tab-5" hidden>
+  <h2 tabindex="-1">Summary</h2>
+  <div class="card recap">
+    <ul>
+      <li>A TF-IDF row has one column for each word in the vocabulary, so you can read which words a sentence contains.</li>
+      <li>An embedding has 384 columns with no names. Sentences with related meanings get similar numbers, even when they share no words.</li>
+      <li><code class="inl">cosine_similarity</code> scores both kinds of row in the same way.</li>
+      <li>The stop-word list removes words such as <code class="inl">not</code> and <code class="inl">nothing</code>. This can change what a TF-IDF row says about a sentence.</li>
+      <li>A high score from either method means similar words or a similar topic. It does not show that two sentences agree.</li>
+      <li>The map is approximate. Use the scores to decide which sentences are nearest.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="pager">
+  <button type="button" class="btn btn-ghost" id="prev">Previous</button>
+  <div class="right"><span class="progress" id="progress"></span><button type="button" class="btn" id="next">Next</button></div>
+</div>
+</main>
+
+<footer>COMPSS 211A, UC Berkeley. CC BY 4.0. Twelve example sentences. Embeddings from all-MiniLM-L6-v2. TF-IDF rows and cosine similarity from scikit-learn.</footer>
+</div>
+
+<script type="application/json" id="data">
+{
+ "model": "all-MiniLM-L6-v2",
+ "dimensions": 384,
+ "tfidf_settings": "TfidfVectorizer(stop_words=\"english\")",
+ "sentences": [
+  {
+   "text": "The cat sat on the mat.",
+   "topic": "pets",
+   "embedding_first8": [
+    0.13,
+    -0.016,
+    -0.037,
+    0.058,
+    -0.06,
+    0.033,
+    0.03,
+    0.029
+   ],
+   "tfidf_terms": {
+    "cat": 0.55,
+    "sat": 0.55,
+    "mat": 0.64
+   },
+   "map": [
+    0.754,
+    -0.059
+   ]
+  },
+  {
+   "text": "The cat sat on the rug.",
+   "topic": "pets",
+   "embedding_first8": [
+    0.118,
+    0.013,
+    0.003,
+    0.071,
+    -0.066,
+    0.044,
+    0.006,
+    0.045
+   ],
+   "tfidf_terms": {
+    "cat": 0.55,
+    "sat": 0.55,
+    "rug": 0.64
+   },
+   "map": [
+    0.789,
+    -0.038
+   ]
+  },
+  {
+   "text": "A kitten rested on the carpet.",
+   "topic": "pets",
+   "embedding_first8": [
+    0.098,
+    -0.006,
+    0.019,
+    0.084,
+    -0.013,
+    0.055,
+    -0.041,
+    -0.018
+   ],
+   "tfidf_terms": {
+    "kitten": 0.58,
+    "rested": 0.58,
+    "carpet": 0.58
+   },
+   "map": [
+    0.747,
+    0.025
+   ]
+  },
+  {
+   "text": "The capital of France is Paris.",
+   "topic": "places",
+   "embedding_first8": [
+    0.103,
+    0.03,
+    0.029,
+    -0.037,
+    0.079,
+    -0.055,
+    0.003,
+    -0.009
+   ],
+   "tfidf_terms": {
+    "capital": 0.64,
+    "france": 0.55,
+    "paris": 0.55
+   },
+   "map": [
+    -0.299,
+    -0.847
+   ]
+  },
+  {
+   "text": "Paris is the largest city in France.",
+   "topic": "places",
+   "embedding_first8": [
+    0.103,
+    -0.005,
+    0.024,
+    -0.081,
+    0.061,
+    -0.014,
+    -0.039,
+    0.014
+   ],
+   "tfidf_terms": {
+    "france": 0.46,
+    "paris": 0.46,
+    "largest": 0.54,
+    "city": 0.54
+   },
+   "map": [
+    -0.293,
+    -0.848
+   ]
+  },
+  {
+   "text": "You are not wrong.",
+   "topic": "verdicts",
+   "embedding_first8": [
+    0.053,
+    0.022,
+    -0.048,
+    -0.099,
+    -0.099,
+    -0.037,
+    -0.03,
+    -0.087
+   ],
+   "tfidf_terms": {
+    "wrong": 1.0
+   },
+   "map": [
+    -0.356,
+    0.329
+   ]
+  },
+  {
+   "text": "You are wrong.",
+   "topic": "verdicts",
+   "embedding_first8": [
+    -0.004,
+    0.032,
+    -0.023,
+    -0.094,
+    -0.091,
+    -0.014,
+    -0.016,
+    -0.038
+   ],
+   "tfidf_terms": {
+    "wrong": 1.0
+   },
+   "map": [
+    -0.331,
+    0.306
+   ]
+  },
+  {
+   "text": "You did nothing wrong.",
+   "topic": "verdicts",
+   "embedding_first8": [
+    0.04,
+    0.028,
+    -0.023,
+    -0.061,
+    -0.031,
+    -0.019,
+    -0.084,
+    -0.035
+   ],
+   "tfidf_terms": {
+    "wrong": 0.6,
+    "did": 0.8
+   },
+   "map": [
+    -0.189,
+    0.345
+   ]
+  },
+  {
+   "text": "The wedding is her day, not yours.",
+   "topic": "weddings",
+   "embedding_first8": [
+    0.022,
+    0.069,
+    0.09,
+    -0.02,
+    -0.026,
+    -0.053,
+    0.037,
+    -0.045
+   ],
+   "tfidf_terms": {
+    "wedding": 0.65,
+    "day": 0.76
+   },
+   "map": [
+    -0.261,
+    0.172
+   ]
+  },
+  {
+   "text": "Don't wear white to someone else's wedding.",
+   "topic": "weddings",
+   "embedding_first8": [
+    0.009,
+    0.121,
+    0.049,
+    0.012,
+    -0.001,
+    0.023,
+    0.022,
+    -0.073
+   ],
+   "tfidf_terms": {
+    "wedding": 0.44,
+    "don": 0.52,
+    "wear": 0.52,
+    "white": 0.52
+   },
+   "map": [
+    -0.283,
+    0.23
+   ]
+  },
+  {
+   "text": "Your sister should pay for the dress she ruined.",
+   "topic": "money",
+   "embedding_first8": [
+    0.012,
+    0.162,
+    0.023,
+    -0.043,
+    -0.043,
+    -0.045,
+    0.01,
+    -0.02
+   ],
+   "tfidf_terms": {
+    "sister": 0.5,
+    "pay": 0.5,
+    "dress": 0.5,
+    "ruined": 0.5
+   },
+   "map": [
+    -0.173,
+    0.177
+   ]
+  },
+  {
+   "text": "She owes you money for the damage.",
+   "topic": "money",
+   "embedding_first8": [
+    -0.029,
+    0.105,
+    0.119,
+    0.009,
+    -0.039,
+    -0.022,
+    0.009,
+    0.048
+   ],
+   "tfidf_terms": {
+    "owes": 0.58,
+    "money": 0.58,
+    "damage": 0.58
+   },
+   "map": [
+    -0.103,
+    0.209
+   ]
+  }
+ ],
+ "embedding_scores": [
+  [
+   1.0,
+   0.7900000214576721,
+   0.6100000143051147,
+   -0.009999999776482582,
+   -0.009999999776482582,
+   0.03999999910593033,
+   0.009999999776482582,
+   0.07000000029802322,
+   0.05999999865889549,
+   -0.05000000074505806,
+   0.07000000029802322,
+   0.07999999821186066
+  ],
+  [
+   0.7900000214576721,
+   1.0,
+   0.6700000166893005,
+   -0.05000000074505806,
+   -0.029999999329447746,
+   0.019999999552965164,
+   0.009999999776482582,
+   0.029999999329447746,
+   0.019999999552965164,
+   -0.009999999776482582,
+   0.10000000149011612,
+   0.05999999865889549
+  ],
+  [
+   0.6100000143051147,
+   0.6700000166893005,
+   1.0,
+   -0.10000000149011612,
+   -0.10000000149011612,
+   -0.0,
+   -0.0,
+   0.05999999865889549,
+   0.019999999552965164,
+   -0.03999999910593033,
+   0.07999999821186066,
+   0.05999999865889549
+  ],
+  [
+   -0.009999999776482582,
+   -0.05000000074505806,
+   -0.10000000149011612,
+   1.0,
+   0.8299999833106995,
+   0.07000000029802322,
+   0.05999999865889549,
+   -0.029999999329447746,
+   0.07999999821186066,
+   -0.019999999552965164,
+   0.07999999821186066,
+   -0.019999999552965164
+  ],
+  [
+   -0.009999999776482582,
+   -0.029999999329447746,
+   -0.10000000149011612,
+   0.8299999833106995,
+   1.0,
+   0.05999999865889549,
+   0.03999999910593033,
+   -0.029999999329447746,
+   0.07999999821186066,
+   -0.009999999776482582,
+   0.07000000029802322,
+   0.0
+  ],
+  [
+   0.03999999910593033,
+   0.019999999552965164,
+   -0.0,
+   0.07000000029802322,
+   0.05999999865889549,
+   1.0,
+   0.8299999833106995,
+   0.4399999976158142,
+   0.2199999988079071,
+   0.17000000178813934,
+   0.1899999976158142,
+   0.12999999523162842
+  ],
+  [
+   0.009999999776482582,
+   0.009999999776482582,
+   -0.0,
+   0.05999999865889549,
+   0.03999999910593033,
+   0.8299999833106995,
+   1.0,
+   0.38999998569488525,
+   0.11999999731779099,
+   0.07999999821186066,
+   0.14000000059604645,
+   0.10000000149011612
+  ],
+  [
+   0.07000000029802322,
+   0.029999999329447746,
+   0.05999999865889549,
+   -0.029999999329447746,
+   -0.029999999329447746,
+   0.4399999976158142,
+   0.38999998569488525,
+   1.0,
+   0.1599999964237213,
+   0.11999999731779099,
+   0.20000000298023224,
+   0.20999999344348907
+  ],
+  [
+   0.05999999865889549,
+   0.019999999552965164,
+   0.019999999552965164,
+   0.07999999821186066,
+   0.07999999821186066,
+   0.2199999988079071,
+   0.11999999731779099,
+   0.1599999964237213,
+   1.0,
+   0.5600000023841858,
+   0.38999998569488525,
+   0.30000001192092896
+  ],
+  [
+   -0.05000000074505806,
+   -0.009999999776482582,
+   -0.03999999910593033,
+   -0.019999999552965164,
+   -0.009999999776482582,
+   0.17000000178813934,
+   0.07999999821186066,
+   0.11999999731779099,
+   0.5600000023841858,
+   1.0,
+   0.3700000047683716,
+   0.12999999523162842
+  ],
+  [
+   0.07000000029802322,
+   0.10000000149011612,
+   0.07999999821186066,
+   0.07999999821186066,
+   0.07000000029802322,
+   0.1899999976158142,
+   0.14000000059604645,
+   0.20000000298023224,
+   0.38999998569488525,
+   0.3700000047683716,
+   1.0,
+   0.44999998807907104
+  ],
+  [
+   0.07999999821186066,
+   0.05999999865889549,
+   0.05999999865889549,
+   -0.019999999552965164,
+   0.0,
+   0.12999999523162842,
+   0.10000000149011612,
+   0.20999999344348907,
+   0.30000001192092896,
+   0.12999999523162842,
+   0.44999998807907104,
+   1.0
+  ]
+ ],
+ "tfidf_scores": [
+  [
+   1.0,
+   0.6,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   0.6,
+   1.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   0.0,
+   0.0,
+   1.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   0.0,
+   0.0,
+   0.0,
+   1.0,
+   0.5,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   0.0,
+   0.0,
+   0.0,
+   0.5,
+   1.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   1.0,
+   1.0,
+   0.6,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   1.0,
+   1.0,
+   0.6,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.6,
+   0.6,
+   1.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   1.0,
+   0.29,
+   0.0,
+   0.0
+  ],
+  [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.29,
+   1.0,
+   0.0,
+   0.0
+  ],
+  [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   1.0,
+   0.0
+  ],
+  [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ]
+ ]
+}
+</script>
+<script>
+"use strict";
+const D = JSON.parse(document.getElementById("data").textContent);
+const S = D.sentences, N = S.length, EMB = D.embedding_scores, TF = D.tfidf_scores;
+const VOCAB = [...new Set(S.flatMap(s => Object.keys(s.tfidf_terms)))];
+const TOPICS = {pets:"#2D6AA3", places:"#C4820E", verdicts:"#6B4FA0", weddings:"#1E7D4E", money:"#B04A6F"};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const f2 = v => (Math.round(v * 100) / 100 + 0).toFixed(2);   // +0 turns -0 into 0
+const f3 = v => v.toFixed(3);
+const quote = i => `“${esc(S[i].text)}”`;
+const terms = i => Object.entries(S[i].tfidf_terms).sort((a, b) => b[1] - a[1]);
+const sharedTerms = (i, j) => Object.keys(S[i].tfidf_terms).filter(t => t in S[j].tfidf_terms);
+const termChips = list => list.map(t => `<span class="term">${esc(t)}</span>`).join("");
+
+function fillSelect(sel, value) {
+  sel.innerHTML = S.map((s, i) => `<option value="${i}">${i}  ${esc(s.text)}</option>`).join("");
+  sel.value = value;
+}
+function barsHTML(i) {
+  return terms(i).map(([t, v]) =>
+    `<span class="t">${esc(t)}</span><span class="b"><i style="width:${(100 * v).toFixed(0)}%"></i></span><span class="v">${f2(v)}</span>`).join("");
+}
+function showVerdict(id, good, text) {
+  const v = $(id);
+  v.hidden = false;
+  v.className = "verdict " + (good ? "good" : "bad");
+  v.textContent = text;
+}
+
+/* sentence list */
+$("sentlist").innerHTML = S.map((s, i) =>
+  `<li><span class="num">${i}</span><span>${esc(s.text)} <span class="topic"><span class="swatch" style="background:${TOPICS[s.topic]}"></span>${s.topic}</span></span></li>`).join("");
+
+/* ---------- tabs ---------- */
+const STEPS = [1, 2, 3, 4, 5];
+let step = 1;
+function go(n, focusHeading) {
+  step = n;
+  STEPS.forEach(k => {
+    const on = k === n;
+    $("panel-" + k).hidden = !on;
+    const t = $("tab-" + k);
+    t.setAttribute("aria-selected", on);
+    t.tabIndex = on ? 0 : -1;
+  });
+  $("prev").disabled = n === 1;
+  $("next").disabled = n === STEPS.length;
+  $("next").textContent = n === 4 ? "Summary" : "Next";
+  $("progress").textContent = n <= 4 ? `Step ${n} of 4` : "";
+  if (focusHeading) $("panel-" + n).querySelector("h2").focus({preventScroll: true});
+}
+document.querySelector(".steps").addEventListener("click", e => {
+  const b = e.target.closest("[data-step]"); if (b) go(+b.dataset.step, true);
+});
+document.querySelector(".steps").addEventListener("keydown", e => {
+  const b = e.target.closest("[data-step]"); if (!b) return;
+  const i = STEPS.indexOf(+b.dataset.step); let n;
+  if (e.key === "ArrowRight") n = (i + 1) % STEPS.length;
+  if (e.key === "ArrowLeft") n = (i + STEPS.length - 1) % STEPS.length;
+  if (e.key === "Home") n = 0;
+  if (e.key === "End") n = STEPS.length - 1;
+  if (n !== undefined) { e.preventDefault(); go(STEPS[n], false); $("tab-" + STEPS[n]).focus(); }
+});
+$("prev").addEventListener("click", () => { go(step - 1, true); window.scrollTo({top: document.querySelector(".steps").offsetTop - 10}); });
+$("next").addEventListener("click", () => { go(step + 1, true); window.scrollTo({top: document.querySelector(".steps").offsetTop - 10}); });
+
+/* ---------- step 1 ---------- */
+function renderS1() {
+  const i = +$("s1-sel").value, t = terms(i);
+  $("s1-tfnote").textContent = `${t.length} of ${VOCAB.length} columns are not zero. The other ${VOCAB.length - t.length} are 0.`;
+  $("s1-bars").innerHTML = barsHTML(i);
+  $("s1-dims").innerHTML = S[i].embedding_first8.map((v, k) =>
+    `<span class="dim"><span class="k">${k}</span><span class="x">${f3(v)}</span></span>`).join("");
+}
+fillSelect($("s1-sel"), 0);
+$("s1-sel").addEventListener("change", renderS1);
+renderS1();
+
+/* ---------- step 2 ---------- */
+function setPair(a, b) { $("s2-a").value = a; $("s2-b").value = b; renderS2(); }
+function renderS2() {
+  const a = +$("s2-a").value, b = +$("s2-b").value;
+  const e = EMB[a][b], t = TF[a][b], sh = sharedTerms(a, b);
+  $("s2-emb").textContent = f2(e);
+  $("s2-tf").textContent = f2(t);
+  $("s2-embbar").style.width = Math.max(0, e) * 100 + "%";
+  $("s2-tfbar").style.width = Math.max(0, t) * 100 + "%";
+  $("s2-shared").innerHTML = a === b
+    ? `<span class="small">A sentence compared with itself scores 1.00 with both methods.</span>`
+    : `<span class="small">Words in both TF-IDF rows:</span> ` + (sh.length ? termChips(sh) : "none");
+  $("s2-code").textContent =
+`embedding_scores = cosine_similarity(embeddings)
+tfidf_scores = cosine_similarity(tfidf_rows)
+
+embedding_scores[${a}, ${b}]   # ${f2(e)}
+tfidf_scores[${a}, ${b}]       # ${f2(t)}`;
+}
+fillSelect($("s2-a"), 0); fillSelect($("s2-b"), 2);
+$("s2-a").addEventListener("change", renderS2);
+$("s2-b").addEventListener("change", renderS2);
+renderS2();
+$("q3-score").textContent = f2(TF[3][4]);
+$("s2-next").addEventListener("click", () => {
+  setPair(3, 4);
+  $("s2-nextwrap").hidden = true;
+  $("q3card").hidden = false;
+  $("q3card").querySelector("input").focus();
+});
+
+/* ---------- step 3 ---------- */
+function pairHTML(a, b, label) {
+  const rows = [a, b].map(i => `<div class="panel"><h3 class="sub">TF-IDF row of ${i}</h3><div class="bars">${barsHTML(i)}</div></div>`).join("");
+  return `<h3 class="sub">${label}</h3>` +
+    `<div class="pairtexts"><p><span class="num">${a}</span> ${esc(S[a].text)}</p><p><span class="num">${b}</span> ${esc(S[b].text)}</p></div>` +
+    `<div class="scores"><div class="score"><span class="lab">Embeddings</span><span class="big">${f2(EMB[a][b])}</span><div class="b"><i style="width:${Math.max(0, EMB[a][b]) * 100}%"></i></div></div>` +
+    `<div class="score"><span class="lab">TF-IDF</span><span class="big">${f2(TF[a][b])}</span><div class="b"><i style="width:${Math.max(0, TF[a][b]) * 100}%"></i></div></div></div>` +
+    `<div class="tworows" style="margin-top:12px">${rows}</div>`;
+}
+$("s3-pair1").innerHTML = pairHTML(5, 6, "Opposite meaning");
+$("s3-pair2").innerHTML = pairHTML(5, 7, "Same meaning") +
+  `<p class="small" style="margin-top:10px"><code class="inl">nothing</code> is also on the stop-word list. Both TF-IDF rows keep <code class="inl">wrong</code>.</p>`;
+$("s3-code").textContent =
+`from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+"not" in ENGLISH_STOP_WORDS    # True
+
+embedding_scores[5, 6]   # ${f2(EMB[5][6])}
+tfidf_scores[5, 6]       # ${f2(TF[5][6])}`;
+$("s3-reveal").addEventListener("click", () => {
+  $("s3-pair2").hidden = false;
+  $("q4card").hidden = false;
+  $("s3-revealwrap").hidden = true;
+  $("s3-pair2").setAttribute("tabindex", "-1");
+  $("s3-pair2").focus();
+});
+
+/* ---------- step 4 ---------- */
+const ZOOM_IDS = [5, 6, 7, 8, 9, 10, 11];
+const W = 600, PAD = 56;
+/* label offsets [dx, dy, anchor] for the full map, chosen so the numbers in the crowded groups do not overlap */
+const LBL = [[0,30,"middle"],[15,7,"start"],[0,-15,"middle"],[-15,7,"end"],[15,7,"start"],[-11,-11,"end"],
+             [-12,25,"end"],[0,-15,"middle"],[0,30,"middle"],[-15,7,"end"],[0,30,"middle"],[15,7,"start"]];
+let zoomed = false, sel4 = 7, px, py;
+
+function nearest(scores, i) {
+  return [...Array(N).keys()].filter(j => j !== i)
+    .sort((a, b) => Math.round(scores[i][b] * 100) - Math.round(scores[i][a] * 100) || a - b);
+}
+function renderMap() {
+  const ids = zoomed ? ZOOM_IDS : [...Array(N).keys()];
+  const xs = ids.map(i => S[i].map[0]), ys = ids.map(i => S[i].map[1]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const s = (W - 2 * PAD) / (x1 - x0), H = Math.round(2 * PAD + (y1 - y0) * s);
+  px = i => PAD + (S[i].map[0] - x0) * s;
+  py = i => PAD + (y1 - S[i].map[1]) * s;
+  const svg = $("map");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  let h = `<g id="links"></g>`;
+  ids.forEach(i => {
+    const [dx, dy, anc] = zoomed ? [0, -17, "middle"] : LBL[i];
+    const x = px(i).toFixed(1), y = py(i).toFixed(1);
+    h += `<g class="pt" data-i="${i}" tabindex="0" role="button" aria-pressed="${i === sel4}" aria-label="Sentence ${i}: ${esc(S[i].text)} Topic: ${S[i].topic}.">` +
+      `<circle cx="${x}" cy="${y}" r="15" fill="transparent"/>` +
+      `<circle class="ring" cx="${x}" cy="${y}" r="12"/>` +
+      `<circle cx="${x}" cy="${y}" r="8" fill="${TOPICS[S[i].topic]}" stroke="#fff" stroke-width="1.5"/>` +
+      `<text class="lbl" x="${(px(i) + dx).toFixed(1)}" y="${(py(i) + dy).toFixed(1)}" text-anchor="${anc}" aria-hidden="true">${i}</text></g>`;
+  });
+  svg.innerHTML = h;
+  $("mapnote").textContent = zoomed ? "Sentences 0 to 4 are outside this view. The axes have no units." : "Sentences 3 and 4 sit almost on top of each other. The axes have no units.";
+  $("zoom-all").setAttribute("aria-pressed", !zoomed);
+  $("zoom-in").setAttribute("aria-pressed", zoomed);
+}
+$("map").addEventListener("click", e => { const g = e.target.closest(".pt"); if (g) pick4(+g.dataset.i); });
+$("map").addEventListener("keydown", e => {
+  const g = e.target.closest(".pt");
+  if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); pick4(+g.dataset.i); }
+});
+$("zoom-all").addEventListener("click", () => { zoomed = false; renderMap(); pick4(sel4); });
+$("zoom-in").addEventListener("click", () => {
+  zoomed = true;
+  if (!ZOOM_IDS.includes(sel4)) sel4 = 7;
+  renderMap(); pick4(sel4);
+});
+$("legend").innerHTML = Object.entries(TOPICS).map(([t, c]) => `<span><span class="swatch" style="background:${c}"></span>${t}</span>`).join("");
+function rankedHTML(scores, ids) {
+  return ids.map(j => `<li><span class="sc">${f2(scores[sel4][j])}</span><span><span class="num" style="margin-right:6px">${j}</span>${esc(S[j].text)}</span></li>`).join("");
+}
+function pick4(i) {
+  sel4 = i;
+  if (zoomed && !ZOOM_IDS.includes(i)) { zoomed = false; renderMap(); }
+  $("s4-sel").value = i;
+  document.querySelectorAll("#map .pt").forEach(g => g.setAttribute("aria-pressed", +g.dataset.i === i));
+  const embIds = nearest(EMB, i).slice(0, 3);
+  const tfIds = nearest(TF, i).filter(j => f2(TF[i][j]) !== "0.00").slice(0, 3);
+  $("s4-emb").innerHTML = rankedHTML(EMB, embIds);
+  $("s4-tf").innerHTML = rankedHTML(TF, tfIds);
+  const zeros = N - 1 - nearest(TF, i).filter(j => f2(TF[i][j]) !== "0.00").length;
+  $("s4-tfnote").textContent = tfIds.length === 0
+    ? `Every other sentence scores 0.00 with TF-IDF. None of them shares a word with sentence ${i}.`
+    : tfIds.length < 3 ? `The other ${zeros} sentences score 0.00 with TF-IDF. They share no words with sentence ${i}.` : "";
+  $("s4-tf").hidden = tfIds.length === 0;
+  $("links").innerHTML = embIds.map(j =>
+    `<line class="link" x1="${px(i).toFixed(1)}" y1="${py(i).toFixed(1)}" x2="${px(j).toFixed(1)}" y2="${py(j).toFixed(1)}"/>`).join("");
+  $("s4-code").textContent =
+`from sklearn.decomposition import PCA
+map_xy = PCA(n_components=2).fit_transform(embeddings)
+
+scores = embedding_scores[${i}]
+nearest_ids = scores.argsort()[::-1][1:4]`;
+}
+renderMap();
+fillSelect($("s4-sel"), sel4);
+$("s4-sel").addEventListener("change", () => pick4(+$("s4-sel").value));
+pick4(sel4);
+
+/* ---------- questions ---------- */
+const QUESTIONS = {
+  q1: v => v === "tfidf"
+    ? [true, "Correct. Each TF-IDF column is a word, so the row shows which words the sentence contains and their weights. The embedding columns are numbered 0 to 383 and have no names."]
+    : [false, "Not quite. The embedding columns are numbered 0 to 383 and have no names. No single embedding number stands for a word. Each TF-IDF column is a word."],
+  q2: v => { setPair(0, 2); $("s2-nextwrap").hidden = false; return v === "a"
+    ? [true, `Correct. The TF-IDF rows are ${terms(0).map(x => x[0]).join(", ")} and ${terms(2).map(x => x[0]).join(", ")}. No word is in both rows, so the score is 0. The embedding score is ${f2(EMB[0][2])}. The model gives sentences with related meanings similar numbers, even when the words differ.`]
+    : v === "b"
+      ? [false, `Not quite. TF-IDF can score short sentences. Sentences 0 and 1 are just as short and score ${f2(TF[0][1])}. Look at the words in each TF-IDF row.`]
+      : [false, "Not quite. TF-IDF only counts words. It has no information about meaning. Look at the words in each TF-IDF row."]; },
+  q3: v => { setPair(3, 4); return v === "a"
+    ? [true, `Correct. Both rows contain france and paris. The stop-word list removes is and the, and capital and city each appear in only one of the two sentences. The embedding score is ${f2(EMB[3][4])}. Both sentences are about Paris and France.`]
+    : v === "b"
+      ? [false, "Not quite. capital is only in sentence 3 and city is only in sentence 4. A word adds to the score only when it is in both rows."]
+      : [false, "Not quite. is and the are on the stop-word list, so they have no TF-IDF column."]; },
+  q4: v => v === "a"
+    ? [true, `Correct. Both methods score the opposite pair (${f2(EMB[5][6])} and ${f2(TF[5][6])}) higher than the pair with the same meaning (${f2(EMB[5][7])} and ${f2(TF[5][7])}). A high score means similar words or a similar topic. It does not tell you whether two sentences agree. To check that, read the sentences.`]
+    : v === "b"
+      ? [false, `Not quite. “You are not wrong.” and “You are wrong.” say opposite things and score ${f2(EMB[5][6])} with embeddings and ${f2(TF[5][6])} with TF-IDF.`]
+      : [false, `Not quite. The embedding score for the opposite pair is ${f2(EMB[5][6])}, higher than the ${f2(EMB[5][7])} for the pair with the same meaning. Here the embedding score does not separate “not wrong” from “wrong”.`],
+  q5: v => { zoomed = true; renderMap(); pick4(7); return v === "6"
+    ? [true, `Correct. Sentence 6 scores ${f2(EMB[7][6])} and sentence 9 scores ${f2(EMB[7][9])}. The map loses information when it flattens 384 numbers into 2, so use the scores to decide which sentences are nearest.`]
+    : [false, `Not quite. Sentence 6 scores ${f2(EMB[7][6])} and sentence 9 scores ${f2(EMB[7][9])}. They look about equally close on the map because the map flattens 384 numbers into 2.`]; }
+};
+document.querySelectorAll("form.qcard").forEach(form => {
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const q = form.dataset.q, pick = form.querySelector(`input[name=${q}]:checked`);
+    if (!pick) { showVerdict("v-" + q, false, "Pick an answer first."); return; }
+    const [good, text] = QUESTIONS[q](pick.value);
+    showVerdict("v-" + q, good, text);
+  });
+});
+
+go(1, false);
+</script>
+</body>
+</html>
