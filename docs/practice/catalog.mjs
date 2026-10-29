@@ -600,12 +600,12 @@ export const skills = [
   {
     "id": "similarity-and-clustering",
     "category": "Text analysis (NLP)",
-    "title": "Similarity & clustering",
-    "description": "Find similar documents and group them (for example, with KMeans), then read examples before trusting or naming a group.",
+    "title": "Embeddings & similarity search",
+    "description": "Turn texts into embeddings with a trained model, search them with a sentence, and read the results before counting them as matches.",
     "weeks": "Week 9",
     "releaseWeek": 9,
     "activity": null,
-    "practice": "Lab 9 §§3–4 — Find the nearest abstracts, list their shared terms, and read them to judge the match. §5 (optional) groups the abstracts with KMeans.",
+    "practice": "Lab 9 — Search your texts with a sentence and with a word search, compare what each finds, and rephrase the query.",
     "url": "https://github.com/macss-berkeley/compss-211a/blob/main/lab/lab09_openalex_embeddings.ipynb"
   },
   {
