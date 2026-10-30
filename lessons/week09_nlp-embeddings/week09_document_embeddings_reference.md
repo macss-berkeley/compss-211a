@@ -2,31 +2,78 @@
 
 Which texts are about similar things, even when they use different words? In Week 8 each text became a row of TF-IDF weights. This week each text also becomes an embedding: a row of numbers made by a trained language model. We score pairs of rows with cosine similarity, search the texts with a sentence, and read the results to decide whether they make sense.
 
-Monday's notebook compares embeddings with TF-IDF on the AITA replies. Lab 9 uses embeddings to search the replies or your project texts. This page collects the code and the results from both.
+Monday's notebook compares sentence embeddings with TF-IDF on the AITA replies. Lab 9 searches the replies or your project texts four ways: a word search, TF-IDF, word embeddings, and sentence embeddings. This page collects the code and the results from both.
 
 ## Install the packages
 
-The embedding model comes from the `sentence-transformers` library, which is in the course's optional NLP group. Both Week 9 notebooks start with this cell. Run it once on your own computer. Colab already has the packages.
+The models come from the `gensim` and `sentence-transformers` libraries, which are in the course's optional NLP group. Both Week 9 notebooks start with this cell. Run it once on your own computer. Colab already has the packages.
 
 ```python
 !uv sync --frozen --group optional-nlp
 ```
 
-The first time you load the model, it downloads about 90 MB.
+The first time you load them, the GloVe word embeddings download about 66 MB and the sentence model about 90 MB.
 
-## Two kinds of row
+## Three kinds of row
 
-| | TF-IDF row | Embedding row |
-|---|---|---|
-| Columns | One per word in the vocabulary (773 for the AITA replies with `min_df=5`) | 384 numbers, with no names |
-| Made by | Counting words in your own texts | A model trained on other text |
-| Two texts with no words in common | Score 0 | Can score high |
-| Can you read one column? | Yes: it is a word | No |
-| Changes if you add texts | Yes: the vocabulary and weights are refit | No: each text gets the same row every time |
+| | TF-IDF row | Average word embedding | Sentence embedding |
+|---|---|---|---|
+| Columns | One per word in the vocabulary (773 for the AITA replies with `min_df=5`) | 50 numbers, with no names | 384 numbers, with no names |
+| Made by | Counting words in your own texts | Averaging the GloVe rows of a text's words | A model that reads the whole text |
+| Two texts with no words in common | Score 0 | Can score high | Can score high |
+| Can you read one column? | Yes: it is a word | No | No |
+| Changes if you add texts | Yes: the vocabulary and weights are refit | No | No |
 
-Both kinds of row work with the same tools: `cosine_similarity`, sorting, and reading the texts.
+All three work with the same tools: `cosine_similarity`, sorting, and reading the texts.
 
-## The model
+## Word embeddings
+
+A word embedding is a row of numbers for one word. A model learns the rows from a large amount of text, and words that appear in similar contexts get similar rows. Lab 9 uses GloVe, trained on Wikipedia and news articles, with rows for 400,000 words and 50 numbers per word.
+
+```python
+import gensim.downloader
+
+glove = gensim.downloader.load("glove-wiki-gigaword-50")
+glove.most_similar("therapist")  # psychologist 0.80, pediatrician 0.80, psychotherapist 0.79, ...
+glove.similarity("therapist", "counselor")  # 0.74
+glove.similarity("therapist", "guitar")  # 0.31
+glove.similarity("right", "wrong")  # 0.76
+```
+
+*Right* and *wrong* are close because they are used in the same places ("you are ___", "that's not ___"). A word embedding records where a word is used, so opposites can get similar rows.
+
+### Pretrained or trained on your texts
+
+Learning good rows takes far more text than one project has. In the AITA replies, *therapist* appears 9 times. A word2vec model trained on the 1,512 replies gives it nearest words such as *small*, *standard*, *costs*, and *pepper*, and the list changes each time you train it. *Wife* appears 110 times, and its nearest words (*son*, *girlfriend*, *sister*, *husband*) make more sense. Use pretrained embeddings unless you have millions of words of your own text.
+
+### From words to texts
+
+To get one row per text, average the rows of its words:
+
+```python
+import re
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+
+def average_word_vector(text):
+    words = re.findall(r"[a-z]+", text.lower())
+    words = [w for w in words if w in glove and w not in ENGLISH_STOP_WORDS]
+    return sum(glove[w] for w in words) / len(words)
+```
+
+The average loses most of what a text is about. Lab 9 scores the query "You should talk to a therapist." against four sentences with each method:
+
+| Sentence | TF-IDF | Average word embedding | Sentence embedding |
+|---|---|---|---|
+| Please seek counseling. | 0.00 | 0.67 | 0.75 |
+| You need new friends. | 0.00 | 0.72 | 0.41 |
+| Don't talk during the movie. | 0.41 | 0.68 | 0.16 |
+| A therapist will keep it confidential. | 0.50 | 0.76 | 0.59 |
+
+TF-IDF scores only shared words. Average word embeddings give all four sentences similar scores and put "You need new friends." above "Please seek counseling." The sentence model puts counseling first and the movie last.
+
+Word embeddings are more useful one word at a time. `glove.most_similar` can suggest words to add to a word search.
+
+## The sentence model
 
 The class uses `all-MiniLM-L6-v2`. It was trained on over a billion pairs of related sentences, including Reddit comments from 2015 to 2018, to give similar rows to sentences with similar meanings. Words that appear in similar contexts in that training text end up with similar rows.
 
@@ -79,7 +126,8 @@ texts.sort_values("query_score", ascending=False).head(10)
 On the 1,512 AITA replies:
 
 - The top result is "SHP. If not, please seek counseling. ASAP." (0.64). It does not contain the word *therapist*.
-- A word search for `\btherap` finds 20 replies. It finds 7 of the top 10.
+- A word search for `\btherap` finds 20 replies. It finds 7 of the sentence search's top 10, 6 of the TF-IDF top 10, and 1 of the top 10 by average word embedding.
+- The TF-IDF results that are not about therapy share *talk* with the query ("Sit down and talk to each other"). The top 10 by average word embedding all score between 0.78 and 0.85 and are mostly about family, partners, and friends.
 - Two of the top 10 are "You need new friends." and a similar reply. They are short advice addressed to *you*, like the query, but they are not about therapy.
 - The word match with the lowest score (0.04) is a long reply about guitar pedals that suggests therapy in one sentence. An embedding describes the whole text, so a single mention barely changes it.
 - Rephrasing the query as "Have you thought about getting professional help?" keeps only 4 of the 10. The new results share *help* but are about disability, money, and a lawsuit.
@@ -91,6 +139,7 @@ A search always returns its nearest texts, even when none are about your topic. 
 | A word search | The exact term matters, or a single mention should count |
 | A sentence search | The topic can be written in many ways, and you want texts that are mostly about it |
 | TF-IDF | You want to know which words a comparison rests on |
+| Word embeddings | You want related words to add to a word search |
 
 ## Check what the scores match on
 
@@ -136,7 +185,7 @@ In your write-up, report:
 
 - Groups of texts: KMeans (`sklearn.cluster.KMeans`) works on embeddings in the same way as on TF-IDF rows. Fix `random_state`, read several texts in each group before you describe it, and check whether the groups hold together with a different `n_clusters`.
 - Other models: larger sentence-transformers models and embedding APIs often give longer rows and read longer texts. Report the model you used, because scores from different models cannot be compared.
-- Word embeddings: libraries such as `gensim` give one row per word instead of one per text. They are used to study how words relate to each other in a corpus. This course uses one row per text because projects compare texts.
+- Other word embeddings: GloVe also comes with 100, 200, or 300 numbers per word (`glove-wiki-gigaword-300`). Researchers train word2vec on large corpora, such as decades of newspapers, to study how word meanings and associations change.
 
 ## About the course data
 
@@ -144,6 +193,8 @@ The AITA file has 1,512 historical replies to r/AmItheAsshole posts. 1,035 of th
 
 ## Documentation
 
+- [GloVe](https://nlp.stanford.edu/projects/glove/)
+- [gensim word vectors](https://radimrehurek.com/gensim/models/keyedvectors.html)
 - [Sentence Transformers](https://sbert.net/)
 - [all-MiniLM-L6-v2 model card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
 - [Cosine similarity](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise.cosine_similarity.html)

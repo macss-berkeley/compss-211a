@@ -605,7 +605,7 @@ export const skills = [
     "weeks": "Week 9",
     "releaseWeek": 9,
     "activity": null,
-    "practice": "Lab 9 — Search your texts with a sentence and with a word search, compare what each finds, and rephrase the query.",
+    "practice": "Lab 9 — Search your texts with a word search, TF-IDF, word embeddings, and a sentence, and compare what each finds.",
     "url": "https://github.com/macss-berkeley/compss-211a/blob/main/lab/lab09_openalex_embeddings.ipynb"
   },
   {
