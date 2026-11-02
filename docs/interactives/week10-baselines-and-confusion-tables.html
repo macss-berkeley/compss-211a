@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baselines and confusion tables · COMPSS 211A</title>
+<meta name="description" content="Score two methods that predict the verdict of twenty short AITA-style replies: compare them with always guessing NTA, read their confusion tables, check accuracy for each verdict, and compare them on the same texts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Inter+Tight:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --berkeley:#002676; --ink:#1A1A1A; --paper:#FFFFFF; --card:#FFFFFF;
+  --gold:#FDBA12; --gold-soft:#FFF1CC; --blue-mid:#2A4D9B; --line:#DDDDDD; --pale:#EEF3F9;
+  --ok:#1E7D4E; --err:#B3403A; --code-bg:#0E1B45; --code-ink:#E8EDF6;
+  --serif:"Inter Tight","Inter",-apple-system,"Segoe UI",sans-serif;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);color:var(--ink);background:var(--paper);line-height:1.6;font-size:16.5px}
+.wrap{max-width:940px;margin:0 auto;padding:0 22px}
+h1{font-family:var(--serif);font-size:clamp(2rem,5vw,2.9rem);line-height:1.12;margin:.35rem 0 .7rem}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin:.4rem 0 1rem}
+.chip{display:inline-flex;align-items:center;font-size:.78rem;font-weight:600;padding:4px 12px;border-radius:3px}
+.chip-gold{background:var(--gold);color:var(--berkeley)}
+.lede{max-width:680px}
+h2{font-family:var(--serif);font-weight:600;color:var(--berkeley);font-size:1.5rem;margin:0 0 .35rem}
+h2:focus{outline:none}
+h2 .step{color:var(--berkeley);margin-right:.4rem}
+.section-note{color:#3A4A63;font-size:.95rem;margin-bottom:1rem;max-width:720px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:22px 24px;box-shadow:0 1px 2px rgba(18,35,61,.05);margin-bottom:24px}
+h3.sub{font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:var(--blue-mid);margin:0 0 8px}
+.small{font-size:.85rem;color:#51607A}
+.mono{font-family:var(--mono)}
+/* orientation */
+.orientation{background:var(--pale);border-left:4px solid var(--gold);padding:12px 18px;margin:0 0 22px;border-radius:0 4px 4px 0;font-size:.95rem}
+.orientation p{margin:4px 0 8px;max-width:720px}
+.orientation summary{cursor:pointer;color:var(--berkeley);font-weight:600}
+.orientation summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.sentlist{list-style:none;margin:8px 0 4px;display:grid;gap:3px}
+.sentlist li{display:flex;gap:10px;align-items:baseline;font-size:.9rem}
+.num{font-family:var(--mono);font-size:.8rem;font-weight:500;color:var(--berkeley);min-width:1.6em;text-align:right;flex:none}
+.topic{font-size:.78rem;color:#51607A}
+.swatch{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:0}
+/* code */
+pre.code{background:var(--code-bg);color:var(--code-ink);font-family:var(--mono);font-size:.82rem;line-height:1.55;border-radius:4px;padding:12px 16px;overflow-x:auto;margin:14px 0 0}
+code.inl{font-family:var(--mono);font-size:.82em;background:#ECEFF5;border-radius:4px;padding:1px 6px;overflow-wrap:anywhere}
+/* tabs and pager */
+.steps{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:22px}
+.steps button{font-family:var(--sans);font-size:.92rem;font-weight:500;color:var(--berkeley);background:#fff;border:0;border-bottom:3px solid transparent;padding:11px 15px;cursor:pointer}
+.steps button:hover{background:var(--pale)}
+.steps button[aria-selected=true]{border-bottom-color:var(--gold);background:var(--pale);font-weight:700}
+.steps button:focus-visible{outline:2.5px solid var(--gold);outline-offset:-2px}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:6px;padding-top:18px;border-top:1px solid var(--line)}
+.pager .right{display:flex;gap:10px;align-items:center}
+.progress{color:#51607A;font-size:.85rem}
+/* form controls */
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;max-width:560px}
+.field label{font-size:.82rem;font-weight:600;color:var(--blue-mid);letter-spacing:.04em;text-transform:uppercase}
+select{font-family:var(--sans);font-size:.95rem;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:4px;padding:8px 10px;width:100%;max-width:100%}
+select:focus-visible{outline:2.5px solid var(--gold);outline-offset:1px;border-color:var(--berkeley)}
+.pairfields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* two rows side by side */
+.tworows{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+.panel{border:1px solid var(--line);border-radius:4px;padding:12px 16px;background:#FAFAFA;min-width:0}
+.bars{display:grid;grid-template-columns:max-content minmax(40px,1fr) max-content;gap:4px 10px;align-items:center;margin-top:6px}
+.bars .t{font-family:var(--mono);font-size:.84rem;color:#2B3B57}
+.bars .b{height:10px;background:#E6EBF3;border-radius:2px;overflow:hidden}
+.bars .b i{display:block;height:100%;background:var(--blue-mid)}
+.bars .v{font-family:var(--mono);font-size:.82rem;color:#3A4A63;text-align:right}
+.dims{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:8px}
+.dim{border:1px solid var(--line);border-radius:3px;background:#fff;padding:4px 6px;text-align:center}
+.dim .k{display:block;font-family:var(--mono);font-size:.72rem;color:#51607A}
+.dim .x{display:block;font-family:var(--mono);font-size:.84rem;color:var(--berkeley)}
+.more{font-family:var(--mono);font-size:.84rem;color:#51607A;margin-top:8px}
+/* scores */
+.scores{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}
+.score{border:1px solid var(--line);border-radius:4px;padding:12px 16px;background:#FAFAFA}
+.score .lab{font-size:.82rem;font-weight:600;color:var(--blue-mid);letter-spacing:.04em;text-transform:uppercase}
+.score .big{display:block;font-family:var(--mono);font-size:1.6rem;color:var(--berkeley);line-height:1.3}
+.score .b{height:8px;background:#E6EBF3;border-radius:2px;overflow:hidden;margin-top:4px}
+.score .b i{display:block;height:100%;background:var(--blue-mid)}
+.shared{margin-top:12px;font-size:.92rem}
+.term{display:inline-block;font-family:var(--mono);font-size:.82rem;background:var(--pale);border:1px solid #CBD4E1;border-radius:3px;padding:1px 8px;margin:2px 4px 2px 0}
+.pairtexts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:4px 0 12px}
+.pairtexts p{font-size:.95rem;border-left:3px solid #2D6AA3;padding-left:10px}
+.pairtexts p+p{border-left-color:#C4820E}
+.pairblock{border-top:1px solid var(--line);padding-top:16px;margin-top:18px}
+.pairblock:first-of-type{border-top:0;padding-top:0;margin-top:0}
+/* buttons */
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+button.btn{font-family:var(--sans);font-weight:600;font-size:.9rem;color:#fff;background:var(--berkeley);border:1.5px solid var(--berkeley);border-radius:4px;padding:9px 18px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+button.btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,38,118,.22)}
+button.btn:focus-visible{outline:2.5px solid var(--gold);outline-offset:2px}
+button.btn-ghost{background:#fff;color:var(--berkeley)}
+button.btn-sm{padding:6px 12px;font-size:.84rem}
+button.btn-ghost[aria-pressed=true]{background:var(--berkeley);color:#fff}
+button.btn:disabled{opacity:.4;cursor:default;transform:none;box-shadow:none}
+/* questions */
+.qcard{border:1px solid var(--line);border-radius:4px;padding:18px 20px;margin:18px 0 0;background:#FAFAFA}
+.qcard fieldset{border:0}
+.qcard legend{font-family:var(--serif);font-size:1.12rem;font-weight:600;color:var(--berkeley);margin-bottom:6px}
+.qcard p{font-size:.93rem;margin-bottom:6px}
+.qcard .opts{display:flex;flex-direction:column;gap:8px;margin:10px 0 4px}
+.qcard label{display:flex;gap:10px;align-items:flex-start;font-size:.93rem;cursor:pointer}
+.qcard input[type=radio]{margin-top:5px;accent-color:var(--berkeley);flex:none}
+.qcard input[type=radio]:focus-visible{outline:2.5px solid var(--gold);outline-offset:2px}
+.verdict{border-radius:4px;padding:10px 14px;font-size:.92rem;margin-top:12px}
+.verdict.good{background:#E8F4EC;color:#17643C;border:1px solid #BFE0CB}
+.verdict.bad{background:#F9E9E7;color:#9B2F29;border:1px solid #EAC7C3}
+/* map */
+.maplayout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px;align-items:start}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.84rem;color:#3A4A63;margin-bottom:6px}
+svg.map{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:4px;background:#FCFCFD}
+svg.map .pt{cursor:pointer}
+svg.map .pt:focus{outline:none}
+svg.map .pt .ring{fill:none;stroke:transparent;stroke-width:3}
+svg.map .pt:focus-visible .ring{stroke:var(--gold)}
+svg.map .pt[aria-pressed=true] .ring{stroke:var(--berkeley)}
+svg.map .pt .lbl{font-family:var(--mono);font-size:20px;font-weight:500;fill:var(--ink);paint-order:stroke;stroke:#fff;stroke-width:5px}
+svg.map .pt[aria-pressed=true] .lbl{font-weight:700;fill:var(--berkeley)}
+svg.map .link{stroke:var(--berkeley);stroke-width:1.5;stroke-dasharray:4 4;opacity:.7}
+ol.ranked{list-style:none;display:flex;flex-direction:column;gap:6px;margin:6px 0 16px}
+ol.ranked li{display:grid;grid-template-columns:3.4em 1fr;gap:10px;align-items:baseline;font-size:.9rem;line-height:1.45;background:#fff;border:1px solid var(--line);border-radius:4px;padding:7px 12px}
+ol.ranked .sc{font-family:var(--mono);color:var(--berkeley);font-weight:500}
+.selected-text{font-size:1rem;margin:0 0 14px;padding-left:10px;border-left:3px solid var(--berkeley)}
+/* summary */
+.recap{background:linear-gradient(0deg,rgba(0,38,118,.045),rgba(0,38,118,.045)),var(--card)}
+.recap ul{margin:4px 0 0 20px}
+.recap li{margin-bottom:7px;font-size:.95rem}
+.recap li::marker{color:var(--gold)}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media (max-width:760px){
+  .tworows,.pairtexts,.pairfields,.maplayout{grid-template-columns:1fr}
+  .scores{gap:10px}.score{padding:10px 12px}
+  .card{padding:18px 16px}
+}
+@media (max-width:480px){
+  .wrap{padding:0 16px}
+  .steps button{padding:9px 10px;font-size:.86rem}
+  .progress{display:none}
+  .qcard{padding:14px 14px}
+}
+
+/* MaCSS skin, aligned with macss.berkeley.edu */
+html,body{overflow-x:clip}
+.mast{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:12px calc(50vw - 50%);display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.14)}
+.mast .brand{color:#fff;font-family:var(--sans);font-size:.9rem;font-weight:600;letter-spacing:.01em}
+.mast .brand .uc{font-family:Georgia,"Times New Roman",serif;color:var(--gold);font-size:1.04rem;font-weight:700;margin-right:7px}
+.mast a{color:#fff;font-family:var(--sans);font-weight:600;font-size:.83rem;text-decoration:none;border-bottom:1.5px solid rgba(255,255,255,.35)}
+.mast a:hover{border-bottom-color:var(--gold)}
+.mast a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap>header{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:30px calc(50vw - 50%) 28px;border-bottom:5px solid var(--gold);margin-bottom:30px}
+.wrap>header h1{color:#fff;font-weight:800;letter-spacing:-.015em}
+.wrap>header .lede{color:rgba(255,255,255,.9)}
+footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(50% - 50vw) 0;padding:20px calc(50vw - 50%) 26px;font-size:.85rem}
+
+/* week 10: reply rows and tables */
+ol.rows{list-style:none;display:flex;flex-direction:column;gap:5px;margin:12px 0 4px}
+ol.rows li{display:grid;grid-template-columns:2em 1fr auto;gap:10px;align-items:baseline;font-size:.9rem;line-height:1.45;background:#fff;border:1px solid var(--line);border-radius:4px;padding:6px 12px}
+ol.rows li.empty{display:block;color:#51607A}
+ol.rows .reason{display:block;font-size:.8rem;color:#51607A;margin-top:2px}
+.lbls{display:flex;gap:6px}
+.tag{font-family:var(--mono);font-size:.78rem;font-weight:500;border:1px solid #CBD4E1;background:var(--pale);color:var(--berkeley);border-radius:3px;padding:0 6px}
+.tag.ok{background:#E8F4EC;border-color:#BFE0CB;color:#17643C}
+.tag.no{background:#F9E9E7;border-color:#EAC7C3;color:#9B2F29}
+.rowkey{margin-top:14px}
+.cmlayout{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:22px;align-items:start}
+table.cm,table.acc{border-collapse:collapse;font-size:.92rem;margin-bottom:6px}
+table.cm caption{caption-side:top;text-align:left;font-size:.82rem;font-weight:600;color:var(--blue-mid);letter-spacing:.04em;text-transform:uppercase;padding-bottom:6px}
+table.cm th,table.cm td,table.acc th,table.acc td{border:1px solid var(--line);padding:6px 12px;text-align:center}
+table.cm th,table.acc th{background:var(--pale);color:var(--berkeley);font-weight:600}
+table.acc{width:100%}
+table.acc td{font-family:var(--mono)}
+table.acc th:first-child{text-align:left}
+table.cm td{padding:0}
+.cellbtn{font-family:var(--mono);font-size:1.25rem;color:var(--ink);background:#fff;border:0;width:100%;min-width:64px;padding:10px 14px;cursor:pointer}
+.cellbtn.diag{background:#F2F8F4}
+.cellbtn:hover{background:var(--gold-soft)}
+.cellbtn[aria-pressed=true]{outline:3px solid var(--berkeley);outline-offset:-3px;font-weight:700}
+.cellbtn:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
+@media (max-width:760px){.cmlayout{grid-template-columns:1fr}ol.rows li{grid-template-columns:1.6em 1fr}ol.rows .lbls{grid-column:2}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="mast"><span class="brand"><span class="uc">UC Berkeley</span>COMPSS 211A · Computing I</span><a href="../index.html">← All interactives</a></div>
+
+<header>
+  <h1>Baselines and confusion tables</h1>
+  <div class="chips"><span class="chip chip-gold">Week 10</span></div>
+  <p class="lede">
+    Two methods predict the verdict of twenty short replies. This page scores them against a
+    baseline, counts their mistakes in a confusion table, and compares them fairly.
+  </p>
+</header>
+
+<main>
+<section class="orientation" aria-label="About this page">
+  <p>
+    The twenty replies were written for this page in the style of replies on r/AmItheAsshole. Each
+    reply gave a verdict: NTA (the poster was not in the wrong) or YTA (the poster was in the wrong).
+    The verdict word has been removed, so a method has to work it out from the rest of the reply.
+  </p>
+  <p>
+    The <b>classifier</b> is TF-IDF with logistic regression, trained on 1,035 real AITA replies with
+    the verdict word removed. <b>Gemini</b> is <code class="inl">gemini-3.5-flash-lite</code>, given the
+    instruction below. Its labels are from one run.
+  </p>
+  <details>
+    <summary>Gemini's system instruction</summary>
+    <pre class="code">You read replies to posts on the Reddit forum r/AmItheAsshole, where people describe a
+conflict and ask whether they were in the wrong. The verdict at the start of each reply
+has been removed.
+
+Predict the verdict the reply gave:
+- NTA: the reply says the poster was not in the wrong.
+- YTA: the reply says the poster was in the wrong.
+
+Also give a reason of one short sentence.</pre>
+  </details>
+</section>
+
+<nav class="steps" role="tablist" aria-label="Steps">
+  <button type="button" role="tab" id="tab-1" aria-controls="panel-1" data-step="1">1. Baseline</button>
+  <button type="button" role="tab" id="tab-2" aria-controls="panel-2" data-step="2">2. Confusion table</button>
+  <button type="button" role="tab" id="tab-3" aria-controls="panel-3" data-step="3">3. Accuracy by verdict</button>
+  <button type="button" role="tab" id="tab-4" aria-controls="panel-4" data-step="4">4. The same texts</button>
+  <button type="button" role="tab" id="tab-5" aria-controls="panel-5" data-step="5">Summary</button>
+</nav>
+
+<!-- Step 1 -->
+<section class="stage" id="panel-1" role="tabpanel" aria-labelledby="tab-1">
+  <h2 tabindex="-1"><span class="step">1.</span>Start with a baseline</h2>
+  <p class="section-note">
+    The simplest baseline ignores the text and always guesses the same verdict. Its accuracy is the
+    share of replies with that verdict. Choose a guess.
+  </p>
+  <div class="card">
+    <div class="btnrow" role="group" aria-label="Baseline guess" style="margin:0 0 14px">
+      <button type="button" class="btn btn-ghost btn-sm" data-guess="NTA" aria-pressed="true">Always guess NTA</button>
+      <button type="button" class="btn btn-ghost btn-sm" data-guess="YTA" aria-pressed="false">Always guess YTA</button>
+    </div>
+    <div class="scores" aria-live="polite">
+      <div class="score"><span class="lab">Correct</span><span class="big" id="s1-n"></span></div>
+      <div class="score"><span class="lab">Accuracy</span><span class="big" id="s1-acc"></span><div class="b"><i id="s1-bar"></i></div></div>
+    </div>
+    <ol class="rows" id="s1-rows"></ol>
+    <pre class="code">(replies["verdict"] == "NTA").mean()   # 0.6</pre>
+
+    <form class="qcard" data-q="q1">
+      <fieldset>
+        <legend>A method scores 0.60 on these replies. What does that show?</legend>
+        <div class="opts">
+          <label><input type="radio" name="q1" value="a"> It learned something from the text, because 0.60 is more than half.</label>
+          <label><input type="radio" name="q1" value="b"> Nothing yet. Always guessing NTA also scores 0.60.</label>
+          <label><input type="radio" name="q1" value="c"> It is wrong on 60% of the replies.</label>
+        </div>
+      </fieldset>
+      <div class="btnrow"><button type="submit" class="btn">Check</button></div>
+      <div class="verdict" id="v-q1" role="status" hidden></div>
+    </form>
+  </div>
+</section>
+
+<!-- Step 2 -->
+<section class="stage" id="panel-2" role="tabpanel" aria-labelledby="tab-2" hidden>
+  <h2 tabindex="-1"><span class="step">2.</span>Count the mistakes in a confusion table</h2>
+  <p class="section-note">
+    A confusion table counts each pair of true verdict (rows) and predicted verdict (columns).
+    Correct predictions are on the diagonal. Choose a method, then click a cell to see its replies.
+  </p>
+  <div class="card">
+    <div class="btnrow" role="group" aria-label="Method" style="margin:0 0 14px" id="s2-methods"></div>
+    <div class="cmlayout">
+      <div aria-live="polite">
+        <table class="cm" id="s2-cm"></table>
+        <p class="small" id="s2-acc"></p>
+      </div>
+      <div>
+        <h3 class="sub" id="s2-cellhead"></h3>
+        <ol class="rows" id="s2-rows"></ol>
+      </div>
+    </div>
+    <pre class="code">pd.crosstab(replies["verdict"], replies["classifier"])</pre>
+
+    <form class="qcard" data-q="q2">
+      <fieldset>
+        <legend>How many YTA replies did the classifier call NTA?</legend>
+        <div class="opts">
+          <label><input type="radio" name="q2" value="3"> 3</label>
+          <label><input type="radio" name="q2" value="4"> 4</label>
+          <label><input type="radio" name="q2" value="5"> 5</label>
+        </div>
+      </fieldset>
+      <div class="btnrow"><button type="submit" class="btn">Check</button></div>
+      <div class="verdict" id="v-q2" role="status" hidden></div>
+    </form>
+  </div>
+</section>
+
+<!-- Step 3 -->
+<section class="stage" id="panel-3" role="tabpanel" aria-labelledby="tab-3" hidden>
+  <h2 tabindex="-1"><span class="step">3.</span>Accuracy for each verdict</h2>
+  <p class="section-note">
+    One accuracy number can hide a method that never predicts a verdict. Divide each row of the
+    confusion table by its total to get the accuracy for each verdict.
+  </p>
+  <div class="card">
+    <table class="acc" id="s3-table"></table>
+    <pre class="code">replies["correct"] = replies["classifier"] == replies["verdict"]
+replies.groupby("verdict")["correct"].mean()</pre>
+
+    <form class="qcard" data-q="q3">
+      <fieldset>
+        <legend>You want to find the YTA replies. Which is more useful: always guessing NTA or the classifier?</legend>
+        <div class="opts">
+          <label><input type="radio" name="q3" value="a"> Always guessing NTA, because it is perfect on NTA replies.</label>
+          <label><input type="radio" name="q3" value="b"> The classifier, because it finds some YTA replies and always guessing NTA finds none.</label>
+          <label><input type="radio" name="q3" value="c"> Neither, because their total accuracies are almost the same.</label>
+        </div>
+      </fieldset>
+      <div class="btnrow"><button type="submit" class="btn">Check</button></div>
+      <div class="verdict" id="v-q3" role="status" hidden></div>
+    </form>
+  </div>
+</section>
+
+<!-- Step 4 -->
+<section class="stage" id="panel-4" role="tabpanel" aria-labelledby="tab-4" hidden>
+  <h2 tabindex="-1"><span class="step">4.</span>Compare on the same texts</h2>
+  <p class="section-note">
+    Gemini got every reply on this page right. These replies were written to be clear. The same
+    instruction was also run on 20 real AITA replies with the verdict word removed, 10 NTA and 10 YTA.
+  </p>
+  <div class="card">
+    <table class="acc" id="s4-table"></table>
+    <p class="small" style="margin-top:8px">Real replies: one Gemini run. Gemini can give a different label to the same reply on another run.</p>
+
+    <form class="qcard" data-q="q4">
+      <fieldset>
+        <legend>A report says: “Gemini scored 1.00 and the classifier 0.35.” What is wrong with it?</legend>
+        <div class="opts">
+          <label><input type="radio" name="q4" value="a"> Nothing. Gemini is much better.</label>
+          <label><input type="radio" name="q4" value="b"> The two numbers come from different replies. On the same real replies, Gemini scored 0.85 and the classifier 0.35.</label>
+          <label><input type="radio" name="q4" value="c"> Accuracy cannot be compared between methods.</label>
+        </div>
+      </fieldset>
+      <div class="btnrow"><button type="submit" class="btn">Check</button></div>
+      <div class="verdict" id="v-q4" role="status" hidden></div>
+    </form>
+
+    <form class="qcard" data-q="q5">
+      <fieldset>
+        <legend>Why does always guessing NTA score 0.50 on the real replies but 0.60 here?</legend>
+        <div class="opts">
+          <label><input type="radio" name="q5" value="a"> The real replies are harder to read.</label>
+          <label><input type="radio" name="q5" value="b"> The real sample has 10 NTA and 10 YTA replies; this page has 12 NTA and 8 YTA.</label>
+          <label><input type="radio" name="q5" value="c"> Real replies use the word NTA less often.</label>
+        </div>
+      </fieldset>
+      <div class="btnrow"><button type="submit" class="btn">Check</button></div>
+      <div class="verdict" id="v-q5" role="status" hidden></div>
+    </form>
+  </div>
+</section>
+
+<!-- Summary -->
+<section class="stage" id="panel-5" role="tabpanel" aria-labelledby="tab-5" hidden>
+  <h2 tabindex="-1">Summary</h2>
+  <div class="card recap">
+    <ul>
+      <li>Always guessing the most common label is the baseline. A method has to beat it to show that it learned something from the text.</li>
+      <li>The baseline depends on the texts: 0.60 on these replies, 0.50 on a sample with as many YTA as NTA replies.</li>
+      <li>A confusion table shows which labels a method mixes up. Correct predictions are on the diagonal.</li>
+      <li>Report accuracy for each label as well as the total, so a method that never predicts a label cannot hide.</li>
+      <li>Compare methods on the same texts. Texts written to be clear can make any method look better than it is on real data.</li>
+      <li>Read the texts a method got wrong before you trust its labels.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="pager">
+  <button type="button" class="btn btn-ghost" id="prev">Previous</button>
+  <div class="right"><span class="progress" id="progress"></span><button type="button" class="btn" id="next">Next</button></div>
+</div>
+</main>
+
+<footer>COMPSS 211A, UC Berkeley. CC BY 4.0. Twenty example replies written for this page. Classifier from scikit-learn, trained on AITA replies. Labels from gemini-3.5-flash-lite.</footer>
+</div>
+
+<script type="application/json" id="data">
+{
+ "rows": [
+  {
+   "text": "Your sister knew the rules and broke them anyway. Her party, her problem.",
+   "verdict": "NTA",
+   "classifier": "NTA",
+   "gemini": "NTA",
+   "reason": "The poster is not at fault because the sister ignored established rules and faced the consequences."
+  },
+  {
+   "text": "You paid for the tickets. You get to decide who comes.",
+   "verdict": "NTA",
+   "classifier": "NTA",
+   "gemini": "NTA",
+   "reason": "Purchasing the tickets gives you the right to choose your guest."
+  },
+  {
+   "text": "Asking your roommate to clean up after herself is not a crime.",
+   "verdict": "NTA",
+   "classifier": "YTA",
+   "gemini": "NTA",
+   "reason": "It is completely reasonable to ask a roommate to clean up their own mess."
+  },
+  {
+   "text": "He was rude to the waiter first. You just said what everyone was thinking.",
+   "verdict": "NTA",
+   "classifier": "NTA",
+   "gemini": "NTA",
+   "reason": "You merely pointed out his own rude behavior to the waiter."
+  },
+  {
+   "text": "You don't owe your coworkers your lunch.",
+   "verdict": "NTA",
+   "classifier": "NTA",
+   "gemini": "NTA",
+   "reason": "You are not obligated to share your personal food with coworkers."
+  },
+  {
+   "text": "Your mom should have asked before inviting him.",
+   "verdict": "NTA",
+   "classifier": "NTA",
+   "gemini": "NTA",
+   "reason": "Your mother overstepped boundaries by inviting someone without your permission."
+  },
+  {
+   "text": "Honestly I'd be furious too. You handled it better than most people would.",
+   "verdict": "NTA",
+   "classifier": "NTA",
+   "gemini": "NTA",
+   "reason": "The commenter validates the poster's anger and praises their handling of the situation."
+  },
+  {
+   "text": "You weren't wrong, but text her tomorrow before this gets any bigger.",
+   "verdict": "NTA",
+   "classifier": "NTA",
+   "gemini": "NTA",
+   "reason": "You did nothing wrong in the situation."
+  },
+  {
+   "text": "Setting a bedtime for a ten-year-old is just parenting.",
+   "verdict": "NTA",
+   "classifier": "YTA",
+   "gemini": "NTA",
+   "reason": "Establishing a bedtime for a ten-year-old child is a normal and responsible parenting decision."
+  },
+  {
+   "text": "It's your wedding. Guests who can't follow a dress code can stay home.",
+   "verdict": "NTA",
+   "classifier": "NTA",
+   "gemini": "NTA",
+   "reason": "Couples have the right to enforce their own wedding dress code."
+  },
+  {
+   "text": "You read your daughter's diary. That's a huge breach of trust.",
+   "verdict": "YTA",
+   "classifier": "YTA",
+   "gemini": "YTA",
+   "reason": "Reading a diary is a severe breach of privacy and trust."
+  },
+  {
+   "text": "Laughing at his haircut in front of everyone was cruel.",
+   "verdict": "YTA",
+   "classifier": "NTA",
+   "gemini": "YTA",
+   "reason": "Humiliating someone publicly by laughing at their appearance makes the poster the asshole."
+  },
+  {
+   "text": "You can't promise someone a ride and then leave without telling them.",
+   "verdict": "YTA",
+   "classifier": "YTA",
+   "gemini": "YTA",
+   "reason": "Leaving someone stranded after promising them a ride makes you the asshole."
+  },
+  {
+   "text": "Your friend just lost her job and you sent her a bill for dinner?",
+   "verdict": "YTA",
+   "classifier": "NTA",
+   "gemini": "YTA",
+   "reason": "Sending a bill for dinner to a friend who just lost her job lacks basic empathy and kindness."
+  },
+  {
+   "text": "I feel really bad for your brother here.",
+   "verdict": "YTA",
+   "classifier": "YTA",
+   "gemini": "YTA",
+   "reason": "The commenter sympathizes with the brother, indicating the poster was in the wrong."
+  },
+  {
+   "text": "You keep calling it a joke, but nobody else was laughing.",
+   "verdict": "YTA",
+   "classifier": "YTA",
+   "gemini": "YTA",
+   "reason": "The reply points out that the behavior was harmful and not actually a joke to anyone else."
+  },
+  {
+   "text": "You're fine. Maybe don't bring up her ex at Thanksgiving again, though.",
+   "verdict": "NTA",
+   "classifier": "YTA",
+   "gemini": "NTA",
+   "reason": "The responder tells the poster they are fine despite a minor blunder."
+  },
+  {
+   "text": "Oh no, you asked a grown man to pay for his own meal. The horror.",
+   "verdict": "NTA",
+   "classifier": "YTA",
+   "gemini": "NTA",
+   "reason": "The commenter sarcastically supports the poster for expecting an adult to pay for themselves."
+  },
+  {
+   "text": "Wow, what a great way to celebrate your best friend's promotion.",
+   "verdict": "YTA",
+   "classifier": "NTA",
+   "gemini": "YTA",
+   "reason": "The sarcastic remark implies the poster ruined their best friend's celebration."
+  },
+  {
+   "text": "She was out of line, but you made it so much worse by posting about it.",
+   "verdict": "YTA",
+   "classifier": "YTA",
+   "gemini": "YTA",
+   "reason": "The reply indicates that the poster escalated the situation and made it worse by posting online."
+  }
+ ],
+ "real": {
+  "nta": 0.5,
+  "classifier": 0.35,
+  "gemini": 0.85
+ }
+}
+</script>
+<script>
+const D = JSON.parse(document.getElementById("data").textContent);
+const R = D.rows, N = R.length;
+const REAL = D.real;
+const METHODS = {nta: "Always NTA", classifier: "Classifier", gemini: "Gemini"};
+const LABELS = ["NTA", "YTA"];
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const f2 = v => v.toFixed(2);
+const pred = (r, m) => m === "nta" ? "NTA" : r[m];
+const acc = (m, rows = R) => rows.filter(r => pred(r, m) === r.verdict).length / rows.length;
+const accBy = (m, v) => acc(m, R.filter(r => r.verdict === v));
+function showVerdict(id, good, text) {
+  const v = $(id); v.hidden = false; v.className = "verdict " + (good ? "good" : "bad"); v.textContent = text;
+}
+function rowHTML(r, i, m) {
+  const p = pred(r, m), ok = p === r.verdict;
+  const reason = m === "gemini" ? `<span class="reason">Gemini: ${esc(r.reason)}</span>` : "";
+  return `<li><span class="num">${i + 1}</span><span class="txt">${esc(r.text)}${reason}</span>` +
+    `<span class="lbls"><span class="tag">${r.verdict}</span>${m ? `<span class="tag ${ok ? "ok" : "no"}">${p}</span>` : ""}</span></li>`;
+}
+
+/* ---------- tabs ---------- */
+const STEPS = [1, 2, 3, 4, 5];
+let step = 1;
+function go(n, focusHeading) {
+  step = n;
+  STEPS.forEach(k => {
+    const on = k === n;
+    $("panel-" + k).hidden = !on;
+    const t = $("tab-" + k);
+    t.setAttribute("aria-selected", on);
+    t.tabIndex = on ? 0 : -1;
+  });
+  $("prev").disabled = n === 1;
+  $("next").disabled = n === STEPS.length;
+  $("next").textContent = n === 4 ? "Summary" : "Next";
+  $("progress").textContent = n <= 4 ? `Step ${n} of 4` : "";
+  if (focusHeading) $("panel-" + n).querySelector("h2").focus({preventScroll: true});
+}
+document.querySelector(".steps").addEventListener("click", e => {
+  const b = e.target.closest("[data-step]"); if (b) go(+b.dataset.step, true);
+});
+document.querySelector(".steps").addEventListener("keydown", e => {
+  const b = e.target.closest("[data-step]"); if (!b) return;
+  const i = STEPS.indexOf(+b.dataset.step); let n;
+  if (e.key === "ArrowRight") n = (i + 1) % STEPS.length;
+  if (e.key === "ArrowLeft") n = (i + STEPS.length - 1) % STEPS.length;
+  if (e.key === "Home") n = 0;
+  if (e.key === "End") n = STEPS.length - 1;
+  if (n !== undefined) { e.preventDefault(); go(STEPS[n], false); $("tab-" + STEPS[n]).focus(); }
+});
+$("prev").addEventListener("click", () => { go(step - 1, true); window.scrollTo({top: document.querySelector(".steps").offsetTop - 10}); });
+$("next").addEventListener("click", () => { go(step + 1, true); window.scrollTo({top: document.querySelector(".steps").offsetTop - 10}); });
+
+/* ---------- step 1 ---------- */
+function renderS1(guess) {
+  document.querySelectorAll("[data-guess]").forEach(b => b.setAttribute("aria-pressed", b.dataset.guess === guess));
+  const n = R.filter(r => r.verdict === guess).length;
+  $("s1-n").textContent = `${n} of ${N}`;
+  $("s1-acc").textContent = f2(n / N);
+  $("s1-bar").style.width = (100 * n / N) + "%";
+  $("s1-rows").innerHTML = R.map((r, i) => {
+    const ok = r.verdict === guess;
+    return `<li><span class="num">${i + 1}</span><span class="txt">${esc(r.text)}</span>` +
+      `<span class="lbls"><span class="tag">${r.verdict}</span><span class="tag ${ok ? "ok" : "no"}">${guess}</span></span></li>`;
+  }).join("");
+}
+document.querySelectorAll("[data-guess]").forEach(b => b.addEventListener("click", () => renderS1(b.dataset.guess)));
+$("s1-rows").insertAdjacentHTML("beforebegin", `<p class="small rowkey">Each reply shows its true verdict, then the guess.</p>`);
+renderS1("NTA");
+
+/* ---------- step 2 ---------- */
+let m2 = "classifier", cell = ["YTA", "NTA"];
+$("s2-methods").innerHTML = Object.entries(METHODS).map(([k, v]) =>
+  `<button type="button" class="btn btn-ghost btn-sm" data-method="${k}" aria-pressed="false">${v}</button>`).join("");
+function renderS2() {
+  document.querySelectorAll("[data-method]").forEach(b => b.setAttribute("aria-pressed", b.dataset.method === m2));
+  const count = (t, p) => R.filter(r => r.verdict === t && pred(r, m2) === p).length;
+  let html = `<caption>${METHODS[m2]}</caption><tr><th>true \\ predicted</th>${LABELS.map(l => `<th>${l}</th>`).join("")}</tr>`;
+  LABELS.forEach(t => {
+    html += `<tr><th>${t}</th>` + LABELS.map(p => {
+      const on = cell[0] === t && cell[1] === p;
+      return `<td><button type="button" class="cellbtn ${t === p ? "diag" : ""}" data-cell="${t},${p}" aria-pressed="${on}" ` +
+        `aria-label="${count(t, p)} replies with true verdict ${t} predicted ${p}">${count(t, p)}</button></td>`;
+    }).join("") + "</tr>";
+  });
+  $("s2-cm").innerHTML = html;
+  const right = R.filter(r => pred(r, m2) === r.verdict).length;
+  $("s2-acc").textContent = `Diagonal: ${right} of ${N} correct, accuracy ${f2(right / N)}.`;
+  const rows = R.map((r, i) => [r, i]).filter(([r]) => r.verdict === cell[0] && pred(r, m2) === cell[1]);
+  $("s2-cellhead").textContent = `True ${cell[0]}, predicted ${cell[1]}: ${rows.length} ${rows.length === 1 ? "reply" : "replies"}`;
+  $("s2-rows").innerHTML = rows.length ? rows.map(([r, i]) => rowHTML(r, i, m2)).join("") : `<li class="empty">None.</li>`;
+}
+$("s2-methods").addEventListener("click", e => { const b = e.target.closest("[data-method]"); if (b) { m2 = b.dataset.method; renderS2(); } });
+$("s2-cm").addEventListener("click", e => { const b = e.target.closest("[data-cell]"); if (b) { cell = b.dataset.cell.split(","); renderS2(); } });
+renderS2();
+
+/* ---------- step 3 ---------- */
+$("s3-table").innerHTML = `<tr><th>Method</th><th>All ${N}</th><th>NTA (${R.filter(r => r.verdict === "NTA").length})</th><th>YTA (${R.filter(r => r.verdict === "YTA").length})</th></tr>` +
+  Object.entries(METHODS).map(([k, v]) => `<tr><th>${v}</th><td>${f2(acc(k))}</td><td>${f2(accBy(k, "NTA"))}</td><td>${f2(accBy(k, "YTA"))}</td></tr>`).join("");
+
+/* ---------- step 4 ---------- */
+$("s4-table").innerHTML = `<tr><th>Method</th><th>20 replies on this page</th><th>20 real replies</th></tr>` +
+  Object.entries(METHODS).map(([k, v]) => `<tr><th>${v}</th><td>${f2(acc(k))}</td><td>${f2(REAL[k])}</td></tr>`).join("");
+
+/* ---------- questions ---------- */
+const QUESTIONS = {
+  q1: v => v === "b"
+    ? [true, "Correct. Twelve of the twenty replies are NTA, so a method that never reads a reply and always says NTA is right 12 times. A method has to beat 0.60 to show that it learned something from the text."]
+    : v === "a"
+      ? [false, "Not quite. Half is not the floor here. Always guessing NTA is right on 12 of the 20 replies, which is already 0.60."]
+      : [false, "Not quite. Accuracy is the share of correct predictions, so 0.60 means right on 12 of 20. Always guessing NTA gets the same."],
+  q2: v => { m2 = "classifier"; cell = ["YTA", "NTA"]; renderS2(); return v === "3"
+    ? [true, "Correct. The cell in the YTA row and the NTA column holds 3 replies. One is sarcastic (“Wow, what a great way to celebrate...”). The classifier only sees words such as great and celebrate."]
+    : [false, "Not quite. Choose the classifier and click the cell in the YTA row and the NTA column."]; },
+  q3: v => v === "b"
+    ? [true, `Correct. Always guessing NTA is right on every NTA reply but finds none of the YTA replies. The classifier finds ${Math.round(accBy("classifier", "YTA") * 8)} of the 8. The two totals (${f2(acc("nta"))} and ${f2(acc("classifier"))}) hide this difference.`]
+    : v === "a"
+      ? [false, "Not quite. It is perfect on NTA replies only because it calls everything NTA. It finds none of the YTA replies."]
+      : [false, "Not quite. The totals are close, but the accuracy for YTA replies is 0.00 for one method and not for the other. Look at the YTA column."],
+  q4: v => v === "b"
+    ? [true, "Correct. 1.00 is Gemini's score on the clear replies on this page; 0.35 is the classifier's score on the real replies. On the same real replies Gemini scored 0.85. Score every method on the same texts, and choose texts like the ones you want to label."]
+    : v === "a"
+      ? [false, "Not quite. Look at where each number comes from. 1.00 is from the replies on this page and 0.35 from the real replies."]
+      : [false, "Not quite. Accuracy can be compared, as long as both methods are scored on the same texts."],
+  q5: v => v === "b"
+    ? [true, "Correct. The baseline is the share of the most common label in the texts you score. The real sample was picked with 10 of each verdict, so always NTA is right on half of them."]
+    : [false, "Not quite. Always guessing NTA never reads the replies. Its accuracy only depends on how many replies are NTA."]
+};
+document.querySelectorAll("form.qcard").forEach(form => {
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const q = form.dataset.q, pick = form.querySelector(`input[name=${q}]:checked`);
+    if (!pick) { showVerdict("v-" + q, false, "Pick an answer first."); return; }
+    const [good, text] = QUESTIONS[q](pick.value);
+    showVerdict("v-" + q, good, text);
+  });
+});
+
+go(1, false);
+</script>
+</body>
+</html>
