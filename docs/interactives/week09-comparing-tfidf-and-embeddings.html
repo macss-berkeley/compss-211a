@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Comparing TF-IDF and embeddings · COMPSS 211A</title>
-<meta name="description" content="Compare TF-IDF rows with sentence embeddings from all-MiniLM-L6-v2 on twelve short sentences: read both rows, score pairs with cosine similarity, see where the two methods disagree, and find the nearest sentences on a map.">
+<meta name="description" content="Compare TF-IDF vectors with sentence embeddings from all-MiniLM-L6-v2 on twelve short sentences: read both vectors, score pairs with cosine similarity, see where the two methods disagree, and find the nearest sentences on a map.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Inter+Tight:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -77,6 +77,12 @@ select:focus-visible{outline:2.5px solid var(--gold);outline-offset:1px;border-c
 .stackrows{display:grid;grid-template-columns:1fr;gap:14px;margin-top:6px}
 .strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px;margin-top:8px}
 .dim.on{background:var(--pale);border-color:var(--blue-mid)}
+.vec{position:relative;padding:8px 18px;margin-top:8px}
+.vec::before,.vec::after{content:"";position:absolute;top:0;bottom:0;width:9px;border:2px solid #51607A}
+.vec::before{left:0;border-right:none}
+.vec::after{right:0;border-left:none}
+.vec .strip{margin-top:0}
+.vec .more{margin:6px 0 0}
 .dim.off{background:#F4F5F7;border-color:#E6E8EC}
 .dim.off .k,.dim.off .x{color:#9AA3B2}
 .rowwrap{overflow-x:auto;margin-top:12px}
@@ -178,7 +184,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
   <h1>Comparing TF-IDF and embeddings</h1>
   <div class="chips"><span class="chip chip-gold">Week 9</span></div>
   <p class="lede">
-    TF-IDF and sentence embeddings both turn a sentence into a row of numbers. This page compares
+    TF-IDF and sentence embeddings both turn a sentence into a vector: a list of numbers. This page compares
     the two methods on twelve short sentences.
   </p>
 </header>
@@ -187,7 +193,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 <section class="orientation" aria-label="About this page">
   <p>
     The embeddings come from the model <code class="inl">all-MiniLM-L6-v2</code>, which gives each
-    sentence 384 numbers. The TF-IDF rows use <code class="inl">TfidfVectorizer(stop_words="english")</code>.
+    sentence 384 numbers. The TF-IDF vectors use <code class="inl">TfidfVectorizer(stop_words="english")</code>.
     All scores were computed in Python and are rounded to 2 decimals.
   </p>
   <details>
@@ -197,7 +203,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 </section>
 
 <nav class="steps" role="tablist" aria-label="Steps">
-  <button type="button" role="tab" id="tab-1" aria-controls="panel-1" data-step="1">1. Two kinds of row</button>
+  <button type="button" role="tab" id="tab-1" aria-controls="panel-1" data-step="1">1. Two kinds of vector</button>
   <button type="button" role="tab" id="tab-2" aria-controls="panel-2" data-step="2">2. Score a pair</button>
   <button type="button" role="tab" id="tab-3" aria-controls="panel-3" data-step="3">3. Opposite verdicts</button>
   <button type="button" role="tab" id="tab-4" aria-controls="panel-4" data-step="4">4. Nearest sentences</button>
@@ -206,10 +212,10 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
 <!-- Step 1 -->
 <section class="stage" id="panel-1" role="tabpanel" aria-labelledby="tab-1">
-  <h2 tabindex="-1"><span class="step">1.</span>A sentence as a row of numbers</h2>
+  <h2 tabindex="-1"><span class="step">1.</span>A sentence as a vector of numbers</h2>
   <p class="section-note">
-    To compare sentences, Python first turns each one into a row of numbers. TF-IDF and embeddings
-    are two ways to make that row. Choose a sentence to see both.
+    To compare sentences, Python first turns each one into a vector: one list of numbers. TF-IDF and
+    embeddings are two ways to make that list. Choose a sentence to see both.
   </p>
   <div class="card">
     <div class="field">
@@ -218,18 +224,17 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
     </div>
     <div class="stackrows" aria-live="polite">
       <div class="panel">
-        <h3 class="sub">TF-IDF row</h3>
-        <p class="small">One box for each of the 26 words in the twelve sentences, after stop words are removed. A word the sentence does not use gets 0.</p>
-        <div class="strip" id="s1-tfrow"></div>
+        <h3 class="sub">TF-IDF vector</h3>
+        <p class="small">26 numbers, one for each word in the twelve sentences after stop words are removed. A word the sentence does not use gets 0. The brackets hold one list, which wraps onto several lines to fit the page.</p>
+        <div class="vec"><div class="strip" id="s1-tfrow"></div></div>
       </div>
       <div class="panel">
-        <h3 class="sub">Embedding</h3>
-        <p class="small">384 boxes, numbered 0 to 383. A trained model sets the numbers. No box stands for one word.</p>
-        <div class="strip" id="s1-dims"></div>
-        <p class="more">… 376 more</p>
+        <h3 class="sub">Embedding vector</h3>
+        <p class="small">384 numbers, numbered 0 to 383. A trained model sets them. No number stands for one word.</p>
+        <div class="vec"><div class="strip" id="s1-dims"></div><p class="more">… 376 more</p></div>
       </div>
     </div>
-    <p style="margin-top:14px">Both are rows of numbers, so Python can score how alike two sentences are with either one. The next step does that.</p>
+    <p style="margin-top:14px">Both are vectors, so Python can score how alike two sentences are with either one. The next step does that. In code, the vectors for all twelve sentences are stacked into a table with one row per sentence, so they are also called rows.</p>
     <pre class="code">tfidf = TfidfVectorizer(stop_words="english")
 tfidf_rows = tfidf.fit_transform(sentences)
 tfidf_rows.shape    # (12, 26): one row per sentence, one column per word
@@ -240,11 +245,11 @@ embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre
 
     <form class="qcard" data-q="q1">
       <fieldset>
-        <legend>Which row can you read word by word?</legend>
+        <legend>Which vector can you read word by word?</legend>
         <div class="opts">
-          <label><input type="radio" name="q1" value="tfidf"> The TF-IDF row</label>
-          <label><input type="radio" name="q1" value="emb"> The embedding</label>
-          <label><input type="radio" name="q1" value="both"> Both rows</label>
+          <label><input type="radio" name="q1" value="tfidf"> The TF-IDF vector</label>
+          <label><input type="radio" name="q1" value="emb"> The embedding vector</label>
+          <label><input type="radio" name="q1" value="both"> Both vectors</label>
         </div>
       </fieldset>
       <div class="btnrow"><button type="submit" class="btn">Check</button></div>
@@ -257,8 +262,8 @@ embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre
 <section class="stage" id="panel-2" role="tabpanel" aria-labelledby="tab-2" hidden>
   <h2 tabindex="-1"><span class="step">2.</span>Score a pair</h2>
   <p class="section-note">
-    <code class="inl">cosine_similarity</code> scores two rows of either kind. Identical rows score 1.
-    For TF-IDF, only the words that are not 0 in both rows add to the score, so it is 0 when two
+    <code class="inl">cosine_similarity</code> scores two vectors of either kind. Identical vectors score 1.
+    For TF-IDF, only the words that are not 0 in both vectors add to the score, so it is 0 when two
     sentences share no words. Embedding scores can be a little below 0.
   </p>
   <div class="card">
@@ -280,7 +285,7 @@ embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre
         <legend>Why is the TF-IDF score 0.00?</legend>
         <p>The pair starts at sentence 0, “The cat sat on the mat.”, and sentence 2, “A kitten rested on the carpet.”</p>
         <div class="opts">
-          <label><input type="radio" name="q2" value="a"> The two TF-IDF rows have no word in common</label>
+          <label><input type="radio" name="q2" value="a"> The two TF-IDF vectors have no word in common</label>
           <label><input type="radio" name="q2" value="b"> The sentences are too short for TF-IDF</label>
           <label><input type="radio" name="q2" value="c"> TF-IDF found that the sentences mean different things</label>
         </div>
@@ -311,7 +316,7 @@ embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre
   <h2 tabindex="-1"><span class="step">3.</span>Opposite verdicts</h2>
   <p class="section-note">
     The two sentences below give opposite verdicts. The English stop-word list in scikit-learn
-    includes <code class="inl">not</code>, so TF-IDF removes it. Both TF-IDF rows are left with one
+    includes <code class="inl">not</code>, so TF-IDF removes it. Both TF-IDF vectors are left with one
     word, <code class="inl">wrong</code>.
   </p>
   <div class="card">
@@ -388,10 +393,10 @@ embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre
   <h2 tabindex="-1">Summary</h2>
   <div class="card recap">
     <ul>
-      <li>A TF-IDF row has one column for each word in the vocabulary, so you can read which words a sentence contains.</li>
+      <li>A TF-IDF vector has one number for each word in the vocabulary, so you can read which words a sentence contains.</li>
       <li>An embedding has 384 columns with no names. Sentences with related meanings get similar numbers, even when they share no words.</li>
-      <li><code class="inl">cosine_similarity</code> scores both kinds of row in the same way.</li>
-      <li>The stop-word list removes words such as <code class="inl">not</code> and <code class="inl">nothing</code>. This can change what a TF-IDF row says about a sentence.</li>
+      <li><code class="inl">cosine_similarity</code> scores both kinds of vector in the same way.</li>
+      <li>The stop-word list removes words such as <code class="inl">not</code> and <code class="inl">nothing</code>. This can change what a TF-IDF vector says about a sentence.</li>
       <li>A high score from either method means similar words or a similar topic. It does not show that two sentences agree.</li>
       <li>The map is approximate. Use the scores to decide which sentences are nearest.</li>
     </ul>
@@ -404,7 +409,7 @@ embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre
 </div>
 </main>
 
-<footer>COMPSS 211A, UC Berkeley. CC BY 4.0. Twelve example sentences. Embeddings from all-MiniLM-L6-v2. TF-IDF rows and cosine similarity from scikit-learn.</footer>
+<footer>COMPSS 211A, UC Berkeley. CC BY 4.0. Twelve example sentences. Embeddings from all-MiniLM-L6-v2. TF-IDF vectors and cosine similarity from scikit-learn.</footer>
 </div>
 
 <script type="application/json" id="data">
@@ -1062,11 +1067,11 @@ function pairTableHTML(a, b) {
     const v = S[i].tfidf_terms[w], both = w in S[a].tfidf_terms && w in S[b].tfidf_terms;
     return `<td class="${both ? "both" : ""}${v ? "" : " zero"}">${v ? f2(v) : "0"}</td>`;
   };
-  const head = `<tr><th class="rowlab">Row</th>${cols.map(w => `<th class="${w in S[a].tfidf_terms && w in S[b].tfidf_terms ? "both" : ""}">${esc(w)}</th>`).join("")}</tr>`;
+  const head = `<tr><th class="rowlab">Sentence</th>${cols.map(w => `<th class="${w in S[a].tfidf_terms && w in S[b].tfidf_terms ? "both" : ""}">${esc(w)}</th>`).join("")}</tr>`;
   const body = [a, b].map(i => `<tr><th class="rowlab">${i}</th>${cols.map(w => cell(i, w)).join("")}</tr>`).join("");
   const rest = WORDS.length - cols.length;
   return `<div class="rowwrap"><table class="rowtable">${head}${body}</table></div>` +
-    `<p class="small" style="margin-top:6px">The TF-IDF rows. Highlighted: words in both rows. The other ${rest} words are 0 in both rows.</p>`;
+    `<p class="small" style="margin-top:6px">The two TF-IDF vectors, one row each. Highlighted: words in both. The other ${rest} words are 0 in both.</p>`;
 }
 function showVerdict(id, good, text) {
   const v = $(id);
@@ -1164,7 +1169,7 @@ function pairHTML(a, b, label) {
 }
 $("s3-pair1").innerHTML = pairHTML(5, 6, "Opposite meaning");
 $("s3-pair2").innerHTML = pairHTML(5, 7, "Same meaning") +
-  `<p class="small" style="margin-top:10px"><code class="inl">nothing</code> is also on the stop-word list. Both TF-IDF rows keep <code class="inl">wrong</code>.</p>`;
+  `<p class="small" style="margin-top:10px"><code class="inl">nothing</code> is also on the stop-word list. Both TF-IDF vectors keep <code class="inl">wrong</code>.</p>`;
 $("s3-code").textContent =
 `from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 "not" in ENGLISH_STOP_WORDS    # True
@@ -1261,17 +1266,17 @@ pick4(sel4);
 /* ---------- questions ---------- */
 const QUESTIONS = {
   q1: v => v === "tfidf"
-    ? [true, "Correct. Each TF-IDF column is a word, so the row shows which words the sentence contains and their weights. The embedding columns are numbered 0 to 383 and have no names."]
+    ? [true, "Correct. Each number in the TF-IDF vector belongs to a word, so the vector shows which words the sentence contains and their weights. The embedding's numbers are numbered 0 to 383 and have no names."]
     : [false, "Not quite. The embedding columns are numbered 0 to 383 and have no names. No single embedding number stands for a word. Each TF-IDF column is a word."],
   q2: v => { setPair(0, 2); $("s2-nextwrap").hidden = false; return v === "a"
-    ? [true, `Correct. The TF-IDF rows are ${terms(0).map(x => x[0]).join(", ")} and ${terms(2).map(x => x[0]).join(", ")}. No word is in both rows, so the score is 0. The embedding score is ${f2(EMB[0][2])}. The model gives sentences with related meanings similar numbers, even when the words differ.`]
+    ? [true, `Correct. The TF-IDF vectors contain ${terms(0).map(x => x[0]).join(", ")} and ${terms(2).map(x => x[0]).join(", ")}. No word is in both vectors, so the score is 0. The embedding score is ${f2(EMB[0][2])}. The model gives sentences with related meanings similar numbers, even when the words differ.`]
     : v === "b"
-      ? [false, `Not quite. TF-IDF can score short sentences. Sentences 0 and 1 are just as short and score ${f2(TF[0][1])}. Look at the words in each TF-IDF row.`]
-      : [false, "Not quite. TF-IDF only counts words. It has no information about meaning. Look at the words in each TF-IDF row."]; },
+      ? [false, `Not quite. TF-IDF can score short sentences. Sentences 0 and 1 are just as short and score ${f2(TF[0][1])}. Look at the words in each TF-IDF vector.`]
+      : [false, "Not quite. TF-IDF only counts words. It has no information about meaning. Look at the words in each TF-IDF vector."]; },
   q3: v => { setPair(3, 4); return v === "a"
-    ? [true, `Correct. Both rows contain france and paris. The stop-word list removes is and the, and capital and city each appear in only one of the two sentences. The embedding score is ${f2(EMB[3][4])}. Both sentences are about Paris and France.`]
+    ? [true, `Correct. Both vectors contain france and paris. The stop-word list removes is and the, and capital and city each appear in only one of the two sentences. The embedding score is ${f2(EMB[3][4])}. Both sentences are about Paris and France.`]
     : v === "b"
-      ? [false, "Not quite. capital is only in sentence 3 and city is only in sentence 4. A word adds to the score only when it is in both rows."]
+      ? [false, "Not quite. capital is only in sentence 3 and city is only in sentence 4. A word adds to the score only when it is in both vectors."]
       : [false, "Not quite. is and the are on the stop-word list, so they have no TF-IDF column."]; },
   q4: v => v === "a"
     ? [true, `Correct. Both methods score the opposite pair (${f2(EMB[5][6])} and ${f2(TF[5][6])}) higher than the pair with the same meaning (${f2(EMB[5][7])} and ${f2(TF[5][7])}). A high score means similar words or a similar topic. It does not tell you whether two sentences agree. To check that, read the sentences.`]
