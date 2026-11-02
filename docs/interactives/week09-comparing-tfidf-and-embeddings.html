@@ -192,10 +192,9 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 <main>
 <section class="orientation" aria-label="About this page">
   <p>
-    The sentence embeddings come from the model <code class="inl">all-MiniLM-L6-v2</code>, which reads a
-    whole sentence and gives it 384 numbers. These are not word embeddings: the model makes one vector for
-    the sentence, not one for each word. The TF-IDF vectors use <code class="inl">TfidfVectorizer(stop_words="english")</code>.
-    All scores were computed in Python and are rounded to 2 decimals.
+    The TF-IDF vectors use <code class="inl">TfidfVectorizer(stop_words="english")</code>. The sentence
+    embeddings use the model <code class="inl">all-MiniLM-L6-v2</code>: one vector per sentence, not per word.
+    All scores are rounded to 2 decimals.
   </p>
   <details>
     <summary>The twelve sentences</summary>
@@ -231,7 +230,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
       </div>
       <div class="panel">
         <h3 class="sub">Sentence embedding</h3>
-        <p class="small">384 numbers for the whole sentence, numbered 0 to 383. The model reads the sentence and sets them. It does not give each word its own vector, and no number stands for one word.</p>
+        <p class="small">384 numbers for the whole sentence. No number stands for one word.</p>
         <div class="vec"><div class="strip" id="s1-dims"></div><p class="more">… 376 more</p></div>
       </div>
     </div>
@@ -395,7 +394,7 @@ embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre
   <div class="card recap">
     <ul>
       <li>A TF-IDF vector has one number for each word in the vocabulary, so you can read which words a sentence contains.</li>
-      <li>A sentence embedding is one vector of 384 numbers for the whole sentence, not one per word. Its columns have no names. Sentences with related meanings get similar numbers, even when they share no words.</li>
+      <li>A sentence embedding is one vector of 384 unnamed numbers per sentence. Sentences with related meanings get similar numbers, even when they share no words.</li>
       <li><code class="inl">cosine_similarity</code> scores both kinds of vector in the same way.</li>
       <li>The stop-word list removes words such as <code class="inl">not</code> and <code class="inl">nothing</code>. This can change what a TF-IDF vector says about a sentence.</li>
       <li>A high score from either method means similar words or a similar topic. It does not show that two sentences agree.</li>
