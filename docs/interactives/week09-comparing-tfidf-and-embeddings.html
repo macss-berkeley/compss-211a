@@ -74,6 +74,18 @@ select:focus-visible{outline:2.5px solid var(--gold);outline-offset:1px;border-c
 .dim .k{display:block;font-family:var(--mono);font-size:.72rem;color:#51607A}
 .dim .x{display:block;font-family:var(--mono);font-size:.84rem;color:var(--berkeley)}
 .more{font-family:var(--mono);font-size:.84rem;color:#51607A;margin-top:8px}
+.stackrows{display:grid;grid-template-columns:1fr;gap:14px;margin-top:6px}
+.strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px;margin-top:8px}
+.dim.on{background:var(--pale);border-color:var(--blue-mid)}
+.dim.off{background:#F4F5F7;border-color:#E6E8EC}
+.dim.off .k,.dim.off .x{color:#9AA3B2}
+.rowwrap{overflow-x:auto;margin-top:12px}
+table.rowtable{border-collapse:collapse;font-family:var(--mono);font-size:.84rem}
+table.rowtable th,table.rowtable td{border:1px solid var(--line);padding:5px 10px;text-align:center;background:#fff}
+table.rowtable th{color:#51607A;font-weight:600}
+table.rowtable th.rowlab{text-align:left}
+table.rowtable .zero{color:#9AA3B2}
+table.rowtable .both{background:var(--gold-soft)}
 /* scores */
 .scores{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}
 .score{border:1px solid var(--line);border-radius:4px;padding:12px 16px;background:#FAFAFA}
@@ -194,36 +206,37 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 
 <!-- Step 1 -->
 <section class="stage" id="panel-1" role="tabpanel" aria-labelledby="tab-1">
-  <h2 tabindex="-1"><span class="step">1.</span>A sentence as two kinds of row</h2>
+  <h2 tabindex="-1"><span class="step">1.</span>A sentence as a row of numbers</h2>
   <p class="section-note">
-    TF-IDF gives a sentence one number for each word in the vocabulary. The embedding model gives
-    it 384 numbers. Choose a sentence to see both rows.
+    To compare sentences, Python first turns each one into a row of numbers. TF-IDF and embeddings
+    are two ways to make that row. Choose a sentence to see both.
   </p>
   <div class="card">
     <div class="field">
       <label for="s1-sel">Sentence</label>
       <select id="s1-sel"></select>
     </div>
-    <div class="tworows" aria-live="polite">
+    <div class="stackrows" aria-live="polite">
       <div class="panel">
         <h3 class="sub">TF-IDF row</h3>
-        <p class="small" id="s1-tfnote"></p>
-        <div class="bars" id="s1-bars"></div>
+        <p class="small">One box for each of the 26 words in the twelve sentences, after stop words are removed. A word the sentence does not use gets 0.</p>
+        <div class="strip" id="s1-tfrow"></div>
       </div>
       <div class="panel">
         <h3 class="sub">Embedding</h3>
-        <p class="small">The first 8 of 384 numbers. The columns are numbered 0 to 383.</p>
-        <div class="dims" id="s1-dims"></div>
+        <p class="small">384 boxes, numbered 0 to 383. A trained model sets the numbers. No box stands for one word.</p>
+        <div class="strip" id="s1-dims"></div>
         <p class="more">… 376 more</p>
       </div>
     </div>
+    <p style="margin-top:14px">Both are rows of numbers, so Python can score how alike two sentences are with either one. The next step does that.</p>
     <pre class="code">tfidf = TfidfVectorizer(stop_words="english")
 tfidf_rows = tfidf.fit_transform(sentences)
-tfidf_rows.shape    # (12, 26): one column for each word
+tfidf_rows.shape    # (12, 26): one row per sentence, one column per word
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 embeddings = model.encode(sentences)
-embeddings.shape    # (12, 384): 384 columns for every sentence</pre>
+embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre>
 
     <form class="qcard" data-q="q1">
       <fieldset>
@@ -245,7 +258,8 @@ embeddings.shape    # (12, 384): 384 columns for every sentence</pre>
   <h2 tabindex="-1"><span class="step">2.</span>Score a pair</h2>
   <p class="section-note">
     <code class="inl">cosine_similarity</code> scores two rows of either kind. Identical rows score 1.
-    A TF-IDF score is 0 when two sentences share no words. Embedding scores can be a little below 0.
+    For TF-IDF, only the words that are not 0 in both rows add to the score, so it is 0 when two
+    sentences share no words. Embedding scores can be a little below 0.
   </p>
   <div class="card">
     <div class="pairfields">
@@ -1035,9 +1049,24 @@ function fillSelect(sel, value) {
   sel.innerHTML = S.map((s, i) => `<option value="${i}">${i}  ${esc(s.text)}</option>`).join("");
   sel.value = value;
 }
-function barsHTML(i) {
-  return terms(i).map(([t, v]) =>
-    `<span class="t">${esc(t)}</span><span class="b"><i style="width:${(100 * v).toFixed(0)}%"></i></span><span class="v">${f2(v)}</span>`).join("");
+const WORDS = [...VOCAB].sort();   // the TF-IDF columns, in scikit-learn's order
+function rowStripHTML(i) {
+  return WORDS.map(w => {
+    const v = S[i].tfidf_terms[w];
+    return `<span class="dim ${v ? "on" : "off"}"><span class="k">${esc(w)}</span><span class="x">${v ? f2(v) : "0"}</span></span>`;
+  }).join("");
+}
+function pairTableHTML(a, b) {
+  const cols = WORDS.filter(w => w in S[a].tfidf_terms || w in S[b].tfidf_terms);
+  const cell = (i, w) => {
+    const v = S[i].tfidf_terms[w], both = w in S[a].tfidf_terms && w in S[b].tfidf_terms;
+    return `<td class="${both ? "both" : ""}${v ? "" : " zero"}">${v ? f2(v) : "0"}</td>`;
+  };
+  const head = `<tr><th class="rowlab">Row</th>${cols.map(w => `<th class="${w in S[a].tfidf_terms && w in S[b].tfidf_terms ? "both" : ""}">${esc(w)}</th>`).join("")}</tr>`;
+  const body = [a, b].map(i => `<tr><th class="rowlab">${i}</th>${cols.map(w => cell(i, w)).join("")}</tr>`).join("");
+  const rest = WORDS.length - cols.length;
+  return `<div class="rowwrap"><table class="rowtable">${head}${body}</table></div>` +
+    `<p class="small" style="margin-top:6px">The TF-IDF rows. Highlighted: words in both rows. The other ${rest} words are 0 in both rows.</p>`;
 }
 function showVerdict(id, good, text) {
   const v = $(id);
@@ -1085,9 +1114,8 @@ $("next").addEventListener("click", () => { go(step + 1, true); window.scrollTo(
 
 /* ---------- step 1 ---------- */
 function renderS1() {
-  const i = +$("s1-sel").value, t = terms(i);
-  $("s1-tfnote").textContent = `${t.length} of ${VOCAB.length} columns are not zero. The other ${VOCAB.length - t.length} are 0.`;
-  $("s1-bars").innerHTML = barsHTML(i);
+  const i = +$("s1-sel").value;
+  $("s1-tfrow").innerHTML = rowStripHTML(i);
   $("s1-dims").innerHTML = S[i].embedding_first8.map((v, k) =>
     `<span class="dim"><span class="k">${k}</span><span class="x">${f3(v)}</span></span>`).join("");
 }
@@ -1099,14 +1127,14 @@ renderS1();
 function setPair(a, b) { $("s2-a").value = a; $("s2-b").value = b; renderS2(); }
 function renderS2() {
   const a = +$("s2-a").value, b = +$("s2-b").value;
-  const e = EMB[a][b], t = TF[a][b], sh = sharedTerms(a, b);
+  const e = EMB[a][b], t = TF[a][b];
   $("s2-emb").textContent = f2(e);
   $("s2-tf").textContent = f2(t);
   $("s2-embbar").style.width = Math.max(0, e) * 100 + "%";
   $("s2-tfbar").style.width = Math.max(0, t) * 100 + "%";
   $("s2-shared").innerHTML = a === b
     ? `<span class="small">A sentence compared with itself scores 1.00 with both methods.</span>`
-    : `<span class="small">Words in both TF-IDF rows:</span> ` + (sh.length ? termChips(sh) : "none");
+    : pairTableHTML(a, b);
   $("s2-code").textContent =
 `embedding_scores = cosine_similarity(embeddings)
 tfidf_scores = cosine_similarity(tfidf_rows)
@@ -1128,12 +1156,11 @@ $("s2-next").addEventListener("click", () => {
 
 /* ---------- step 3 ---------- */
 function pairHTML(a, b, label) {
-  const rows = [a, b].map(i => `<div class="panel"><h3 class="sub">TF-IDF row of ${i}</h3><div class="bars">${barsHTML(i)}</div></div>`).join("");
   return `<h3 class="sub">${label}</h3>` +
     `<div class="pairtexts"><p><span class="num">${a}</span> ${esc(S[a].text)}</p><p><span class="num">${b}</span> ${esc(S[b].text)}</p></div>` +
     `<div class="scores"><div class="score"><span class="lab">Embeddings</span><span class="big">${f2(EMB[a][b])}</span><div class="b"><i style="width:${Math.max(0, EMB[a][b]) * 100}%"></i></div></div>` +
     `<div class="score"><span class="lab">TF-IDF</span><span class="big">${f2(TF[a][b])}</span><div class="b"><i style="width:${Math.max(0, TF[a][b]) * 100}%"></i></div></div></div>` +
-    `<div class="tworows" style="margin-top:12px">${rows}</div>`;
+    pairTableHTML(a, b);
 }
 $("s3-pair1").innerHTML = pairHTML(5, 6, "Opposite meaning");
 $("s3-pair2").innerHTML = pairHTML(5, 7, "Same meaning") +
