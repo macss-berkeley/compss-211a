@@ -2,7 +2,7 @@
 
 Which texts are about similar things, even when they use different words? This week each text becomes a row of numbers in two ways: a row of TF-IDF weights, one for each word, and an embedding, a row of numbers made by a trained language model. We score pairs of rows with cosine similarity, search the texts with a sentence, and read the results to decide whether they make sense.
 
-Monday's notebook compares TF-IDF rows, average word embeddings, and sentence embeddings on four sentences, then searches and plots the AITA replies with TF-IDF and the sentence model. Lab 9 searches the replies or your project texts four ways: a word search, TF-IDF, word embeddings, and sentence embeddings. This page collects the code and the results from both.
+Monday's notebook compares TF-IDF rows and sentence embeddings on four sentences, then searches the AITA replies with both and plots the sentence embeddings. Lab 9 searches the replies or your project texts four ways: a word search, TF-IDF, word embeddings, and sentence embeddings. This page collects the code and the results from both.
 
 ## Install the packages
 
@@ -78,7 +78,7 @@ def average_word_vector(text):
     return sum(glove[w] for w in words) / len(words)
 ```
 
-The average loses most of what a text is about. Monday scores the query "You are wrong." against four sentences:
+The average loses most of what a text is about. Here is the query "You are wrong." scored against four sentences:
 
 | Sentence | TF-IDF | Average word embedding | Sentence embedding |
 |---|---|---|---|
@@ -180,7 +180,7 @@ A search always returns its nearest texts, even when none are about your topic. 
 
 ## Check what the scores match on
 
-Embeddings respond to everything in a text, including parts you may not care about. The plots in Monday's notebook show this. PCA turns each reply's row into two numbers, so each reply can be drawn as a point:
+Embeddings respond to everything in a text, including parts you may not care about. The plot in Monday's notebook shows this. PCA turns each reply's row into two numbers, so each reply can be drawn as a point:
 
 ```python
 from sklearn.decomposition import PCA
@@ -188,7 +188,7 @@ from sklearn.decomposition import PCA
 points = PCA(n_components=2).fit_transform(reply_sentence_rows)  # two numbers per reply
 ```
 
-With NTA and YTA in the text, most YTA replies sit on one side of the sentence-embedding plot. With the markers removed, the two groups overlap. The TF-IDF plot splits even more sharply: *nta* and *yta* are TF-IDF columns, and the plot's two directions depend mostly on them. The two numbers keep about a tenth of the variation in the 384, so the plot is a rough picture.
+With NTA and YTA in the text, most YTA replies sit on one side of the sentence-embedding plot. With the markers removed, the two groups overlap. The two numbers keep about a tenth of the variation in the 384, so the plot is a rough picture.
 
 Matching each reply with its nearest other reply gives the same result:
 
