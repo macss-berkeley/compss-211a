@@ -2,7 +2,7 @@
 
 Which texts are about similar things, even when they use different words? In Week 8 each text became a row of TF-IDF weights. This week each text also becomes an embedding: a row of numbers made by a trained language model. We score pairs of rows with cosine similarity, search the texts with a sentence, and read the results to decide whether they make sense.
 
-Monday's notebook compares sentence embeddings with TF-IDF on the AITA replies. Lab 9 searches the replies or your project texts four ways: a word search, TF-IDF, word embeddings, and sentence embeddings. This page collects the code and the results from both.
+Monday's notebook starts with word embeddings, averages them into one row per sentence, and compares the averages with a sentence model, first on four sentences and then in a search of the AITA replies. Lab 9 searches the replies or your project texts four ways: a word search, TF-IDF, word embeddings, and sentence embeddings. This page collects the code and the results from both.
 
 ## Install the packages
 
@@ -28,19 +28,21 @@ All three work with the same tools: `cosine_similarity`, sorting, and reading th
 
 ## Word embeddings
 
-A word embedding is a row of numbers for one word. A model learns the rows from a large amount of text, and words that appear in similar contexts get similar rows. Lab 9 uses GloVe, trained on Wikipedia and news articles, with rows for 400,000 words and 50 numbers per word.
+A word embedding is a row of numbers for one word. A model learns the rows from a large amount of text, and words that appear in similar contexts get similar rows. Both notebooks use GloVe, trained on Wikipedia and news articles, with rows for 400,000 words and 50 numbers per word.
 
 ```python
 import gensim.downloader
 
 glove = gensim.downloader.load("glove-wiki-gigaword-50")
+glove.most_similar("wife")  # daughter 0.96, husband 0.95, mother 0.94, ...
+glove.most_similar("housework")  # chores 0.79, menial 0.73, schoolwork 0.72, ...
 glove.most_similar("therapist")  # psychologist 0.80, pediatrician 0.80, psychotherapist 0.79, ...
 glove.similarity("therapist", "counselor")  # 0.74
 glove.similarity("therapist", "guitar")  # 0.31
 glove.similarity("right", "wrong")  # 0.76
 ```
 
-*Right* and *wrong* are close because they are used in the same places ("you are ___", "that's not ___"). A word embedding records where a word is used, so opposites can get similar rows.
+*Right* and *wrong* are close because they are used in the same places ("you are ___", "that's not ___"). A word embedding records where a word is used, so opposites can get similar rows. In the same way, the closest words to *wife* are other family words, not synonyms.
 
 ### Pretrained or trained on your texts
 
@@ -60,7 +62,18 @@ def average_word_vector(text):
     return sum(glove[w] for w in words) / len(words)
 ```
 
-The average loses most of what a text is about. Lab 9 scores the query "You should talk to a therapist." against four sentences with each method:
+The average loses most of what a text is about. Monday scores the query "You are wrong." against four sentences:
+
+| Sentence | Average word embedding | Sentence embedding |
+|---|---|---|
+| You are not wrong. | 1.00 | 0.83 |
+| You did nothing wrong. | 0.95 | 0.39 |
+| You are mistaken. | 0.71 | 0.69 |
+| The cat sat on the mat. | 0.43 | 0.01 |
+
+*Not* and *nothing* are stop words, so the average for "You are not wrong." is the row for *wrong* alone, the same as for the query. The average also gives the unrelated cat sentence 0.43. The sentence model puts "You are mistaken." above "You did nothing wrong.", but it still scores "You are not wrong." at 0.83.
+
+Lab 9 scores the query "You should talk to a therapist." against four sentences with each method:
 
 | Sentence | TF-IDF | Average word embedding | Sentence embedding |
 |---|---|---|---|
@@ -91,7 +104,7 @@ embeddings.shape  # (number of texts, 384)
 
 Row `i` of `embeddings` belongs to row `i` of `texts`. Run `texts.reset_index(drop=True)` after any filtering so the row numbers match.
 
-On Monday's four sentences, "The cat sat on the mat." and "A kitten rested on the carpet." score 0.61 with embeddings and 0.0 with TF-IDF. Once stop words are removed, the two sentences share no words, but the model places cat and kitten, sat and rested, and mat and carpet close together.
+For example, "The cat sat on the mat." and "A kitten rested on the carpet." score 0.61 with embeddings and 0.0 with TF-IDF. Once stop words are removed, the two sentences share no words, but the model places cat and kitten, sat and rested, and mat and carpet close together.
 
 ## Cosine similarity
 
@@ -99,19 +112,18 @@ On Monday's four sentences, "The cat sat on the mat." and "A kitten rested on th
 
 The two methods give scores on different scales. Among the 1,035 AITA replies with an NTA or YTA marker, the median pair scores 0.16 with embeddings and 0.01 with TF-IDF. A third of the TF-IDF pairs score exactly 0, because they share no words in the vocabulary. Embedding scores can be negative (6% of the AITA pairs), but they are rarely far below 0. Compare scores within one method and one set of texts. A score of 0.5 does not mean the same thing for TF-IDF and embeddings, or for two different corpora.
 
-A high score means two texts use similar words in similar ways and are about similar things. It does not mean they agree. "You are not wrong." and "You are wrong." score 0.83. "You did nothing wrong." means the same as the first sentence but scores 0.44 against it.
+A high score means two texts use similar words in similar ways and are about similar things. It does not mean they agree. In Monday's example, "You are not wrong." scores 0.83 against "You are wrong."
 
 ## Find the nearest texts
 
-To find the texts closest to one anchor text:
+To find the texts closest to one text, score its row against every row and sort:
 
 ```python
-nearest = emb_scores[anchor].argsort()[::-1][1:4]
+texts["score"] = cosine_similarity([embeddings[92]], embeddings)[0]
+texts.sort_values("score", ascending=False).head(4)  # the first row is text 92 itself, with a score of 1
 ```
 
-`argsort()` lists row numbers from the lowest score to the highest, and `[::-1]` reverses that order. The first entry is the anchor itself, with a score of 1, so `[1:4]` skips it and keeps the next three.
-
-For anchor 92 on Monday ("your wife's accomplishments aren't a slight against your struggles"), the three nearest replies by embedding are YTA replies about wives, housework, and parenting, with scores of 0.58, 0.54, and 0.52. The nearest reply by TF-IDF is about a smoker who laughs at a comment. It shares only *make* and *feel* with the anchor.
+Among the 1,035 replies with a marker, reply 92 says "your wife's accomplishments aren't a slight against your struggles". The three nearest replies by embedding are YTA replies about wives, housework, and parenting, with scores of 0.58, 0.54, and 0.52. The nearest reply by TF-IDF is about a smoker who laughs at a comment. It shares only *make* and *feel* with reply 92.
 
 ## Search with a sentence
 
@@ -123,7 +135,12 @@ texts["query_score"] = cosine_similarity(query_embedding, embeddings)[0]
 texts.sort_values("query_score", ascending=False).head(10)
 ```
 
-On the 1,512 AITA replies:
+On Monday the query is "You should break up with him." and the texts are the 1,035 replies with a marker:
+
+- All five top replies by sentence embedding are about breaking up. The first is "Nta. Honeatly break up with him. You can do better" (0.75).
+- Every word in the query except *break* is a stop word, so the average word embedding of the query is the row for *break*. Its top five score between 0.81 and 0.86 and are about a video game, a laundry cycle, and free time.
+
+In Lab 9, on the 1,512 AITA replies:
 
 - The top result is "SHP. If not, please seek counseling. ASAP." (0.64). It does not contain the word *therapist*.
 - A word search for `\btherap` finds 20 replies. It finds 7 of the sentence search's top 10, 6 of the TF-IDF top 10, and 1 of the top 10 by average word embedding.
@@ -132,7 +149,7 @@ On the 1,512 AITA replies:
 - The word match with the lowest score (0.04) is a long reply about guitar pedals that suggests therapy in one sentence. An embedding describes the whole text, so a single mention barely changes it.
 - Rephrasing the query as "Have you thought about getting professional help?" keeps only 4 of the 10. The new results share *help* but are about disability, money, and a lawsuit.
 
-A search always returns its nearest texts, even when none are about your topic. On Monday, "My roommate keeps eating my food." returns replies about food and eating with a partner or a mother, none about roommates. Read the results and count how many are about your topic before you report them. Try more than one wording.
+A search always returns its nearest texts, even when none are about your topic. For example, "My roommate keeps eating my food." returns replies about food and eating with a partner or a mother, none about roommates. Read the results and count how many are about your topic before you report them. Try more than one wording.
 
 | Use | When |
 |---|---|
@@ -143,7 +160,17 @@ A search always returns its nearest texts, even when none are about your topic. 
 
 ## Check what the scores match on
 
-Embeddings respond to everything in a text, including parts you may not care about. On Monday, for each reply, we found its nearest other reply and checked whether the two had the same marker:
+Embeddings respond to everything in a text, including parts you may not care about. The optional plot at the end of Monday's notebook shows this. PCA turns each reply's 384 numbers into two, so each reply can be drawn as a point:
+
+```python
+from sklearn.decomposition import PCA
+
+points = PCA(n_components=2).fit_transform(reply_sentence_rows)  # two numbers per reply
+```
+
+With NTA and YTA in the text, most YTA replies sit on one side of the plot. With the markers removed, the two groups overlap. The two numbers keep about a tenth of the variation in the 384, so the plot is a rough picture.
+
+Matching each reply with its nearest other reply gives the same result:
 
 | Rows | Share of nearest pairs with the same marker |
 |---|---|
