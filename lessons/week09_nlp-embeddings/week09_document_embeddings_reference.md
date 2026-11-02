@@ -2,7 +2,7 @@
 
 Which texts are about similar things, even when they use different words? In Week 8 each text became a row of TF-IDF weights. This week each text also becomes an embedding: a row of numbers made by a trained language model. We score pairs of rows with cosine similarity, search the texts with a sentence, and read the results to decide whether they make sense.
 
-Monday's notebook starts with word embeddings, averages them into one row per sentence, and compares the averages with a sentence model, first on four sentences and then in a search of the AITA replies. Lab 9 searches the replies or your project texts four ways: a word search, TF-IDF, word embeddings, and sentence embeddings. This page collects the code and the results from both.
+Monday's notebook compares TF-IDF rows, average word embeddings, and sentence embeddings on four sentences, then searches and plots the AITA replies with TF-IDF and the sentence model. Lab 9 searches the replies or your project texts four ways: a word search, TF-IDF, word embeddings, and sentence embeddings. This page collects the code and the results from both.
 
 ## Install the packages
 
@@ -64,14 +64,14 @@ def average_word_vector(text):
 
 The average loses most of what a text is about. Monday scores the query "You are wrong." against four sentences:
 
-| Sentence | Average word embedding | Sentence embedding |
-|---|---|---|
-| You are not wrong. | 1.00 | 0.83 |
-| You did nothing wrong. | 0.95 | 0.39 |
-| You are mistaken. | 0.71 | 0.69 |
-| The cat sat on the mat. | 0.43 | 0.01 |
+| Sentence | TF-IDF | Average word embedding | Sentence embedding |
+|---|---|---|---|
+| You are not wrong. | 1.00 | 1.00 | 0.83 |
+| You did nothing wrong. | 0.62 | 0.95 | 0.39 |
+| You are mistaken. | 0.00 | 0.71 | 0.69 |
+| The cat sat on the mat. | 0.00 | 0.43 | 0.01 |
 
-*Not* and *nothing* are stop words, so the average for "You are not wrong." is the row for *wrong* alone, the same as for the query. The average also gives the unrelated cat sentence 0.43. The sentence model puts "You are mistaken." above "You did nothing wrong.", but it still scores "You are not wrong." at 0.83.
+"You are mistaken." shares no word with the query, so TF-IDF scores it 0. *Not* and *nothing* are stop words, so for both TF-IDF and the word average "You are not wrong." comes down to *wrong* alone, the same as the query. The average also gives the unrelated cat sentence 0.43. The sentence model puts "You are mistaken." above "You did nothing wrong.", but it still scores "You are not wrong." at 0.83.
 
 Lab 9 scores the query "You should talk to a therapist." against four sentences with each method:
 
@@ -90,7 +90,7 @@ Word embeddings are more useful one word at a time. `glove.most_similar` can sug
 
 The class uses `all-MiniLM-L6-v2`. It was trained on over a billion pairs of related sentences, including Reddit comments from 2015 to 2018, to give similar rows to sentences with similar meanings. Words that appear in similar contexts in that training text end up with similar rows.
 
-The model reads only the first 256 word pieces of a text, roughly 200 words, and ignores the rest. In the AITA file, 22 of the 1,512 replies are longer than 200 words. With longer project texts, decide whether to embed the opening, or to split each text into paragraphs and embed those.
+The model reads only the first 256 word pieces of a text, roughly 200 words, and ignores the rest. In the AITA file, 22 of the 1,512 replies are longer than 200 words. A 10,000-word report would be cut to its first 200 words, about 2% of it. With longer project texts, decide whether to embed the opening, or to split each text into paragraphs and embed those.
 
 ## Make embeddings
 
@@ -139,8 +139,10 @@ texts.sort_values("query_score", ascending=False).head(10)
 
 On Monday the query is "You should break up with him." and the texts are the 1,035 replies with a marker:
 
-- All five top replies by sentence embedding are about breaking up. The first is "Nta. Honeatly break up with him. You can do better" (0.75).
-- Every word in the query except *break* is a stop word, so the average word embedding of the query is the row for *break*. Its top five score between 0.81 and 0.86 and are about a video game, a laundry cycle, and free time.
+- All five top replies by sentence embedding are about breaking up. The first is "Nta. Honeatly break up with him. You can do better" (0.75). Three of the five do not contain *break*, including "NTA. You need a new boyfriend." and "NTA. Dump him."
+- Every word in the query except *break* is a stop word, so the query's TF-IDF row has one column. TF-IDF can find only the 18 replies that use *break*. Three of its top five are about breaking up, and two use *break* in another sense ("5 hours without a break").
+- With "He expects his wife to do all the housework.", *housework* and *expects* appear in fewer than five replies, so `min_df=5` leaves them out of the columns. The TF-IDF search becomes a search for *wife*. Check which query words are in `tfidf.get_feature_names_out()`.
+- With "They should pay you back the money.", TF-IDF does at least as well: all five of its results use *pay* and are about who pays for what. When a topic has a clear word, TF-IDF works.
 
 In Lab 9, on the 1,512 AITA replies:
 
@@ -170,7 +172,7 @@ from sklearn.decomposition import PCA
 points = PCA(n_components=2).fit_transform(reply_sentence_rows)  # two numbers per reply
 ```
 
-With NTA and YTA in the text, most YTA replies sit on one side of the sentence-embedding plot. With the markers removed, the two groups overlap. In the plot of average word embeddings the groups overlap more, but the marker still matters there: GloVe has a row for *nta* and none for *yta*, so only the NTA replies get a marker row in their average. The two numbers keep about a tenth of the variation in the 384, so the plot is a rough picture.
+With NTA and YTA in the text, most YTA replies sit on one side of the sentence-embedding plot. With the markers removed, the two groups overlap. The TF-IDF plot splits even more sharply: *nta* and *yta* are TF-IDF columns, and the plot's two directions depend mostly on them. The two numbers keep about a tenth of the variation in the 384, so the plot is a rough picture.
 
 Matching each reply with its nearest other reply gives the same result:
 
@@ -198,6 +200,23 @@ cosine_similarity(model.encode(["king", "queen"]), [gender_axis])  # -0.08 and 0
 An axis from "justified" words to "unjustified" words did not separate the replies: NTA replies average -0.048 and YTA replies -0.049. A reply's embedding reflects its whole topic, and ten words describe only a small part of it. Test an axis against texts with known labels before you use it as a measure.
 
 ## Using this in your final project
+
+### Which kind of row to use
+
+| Your texts | Use |
+|---|---|
+| Long, such as speeches, reports, or filings | TF-IDF rows, or sentence embeddings of each paragraph. The sentence model reads only about the first 200 words of a text. |
+| Short, and people say the same thing in many ways, such as reviews, comments, or prompts | Sentence embeddings |
+| The exact term matters | A word search, or TF-IDF |
+
+To compare whole texts with each other, score every row against every row:
+
+```python
+text_scores = cosine_similarity(text_tfidf_rows)  # one row and one column per text
+pd.DataFrame(text_scores, index=texts["id"], columns=texts["id"]).round(2)
+```
+
+For example, compare each company's report with its report from the year before, or the speeches from one period with those from the next. Read the shared words behind a high score before you describe it.
 
 A small, complete project could be: pick one question, embed one set of texts, search them with a few queries you chose for a reason, and report what you found when you read the results. You can also compare groups among the texts closest to a query, as in the last step of Lab 9.
 
