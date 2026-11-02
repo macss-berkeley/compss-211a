@@ -116,7 +116,7 @@ A high score means two texts use similar words in similar ways and are about sim
 
 ## Find the nearest texts
 
-To find the texts closest to one text, score its row against every row and sort:
+The row of any text can be the query. In a project, this finds more texts like one you want to quote or label. Score its row against every row and sort:
 
 ```python
 texts["score"] = cosine_similarity([embeddings[92]], embeddings)[0]
@@ -124,6 +124,8 @@ texts.sort_values("score", ascending=False).head(4)  # the first row is text 92 
 ```
 
 Among the 1,035 replies with a marker, reply 92 says "your wife's accomplishments aren't a slight against your struggles". The three nearest replies by embedding are YTA replies about wives, housework, and parenting, with scores of 0.58, 0.54, and 0.52. The nearest reply by TF-IDF is about a smoker who laughs at a comment. It shares only *make* and *feel* with reply 92.
+
+On Monday, the closest replies to reply 280 ("Nta. Honeatly break up with him. You can do better") are "NTA. You need a new boyfriend." (0.78), "NTA. Dump him." (0.74), and a reply saying you can break up with anyone for any reason (0.64).
 
 ## Search with a sentence
 
@@ -160,7 +162,7 @@ A search always returns its nearest texts, even when none are about your topic. 
 
 ## Check what the scores match on
 
-Embeddings respond to everything in a text, including parts you may not care about. The optional plot at the end of Monday's notebook shows this. PCA turns each reply's 384 numbers into two, so each reply can be drawn as a point:
+Embeddings respond to everything in a text, including parts you may not care about. The plots in Monday's notebook show this. PCA turns each reply's row into two numbers, so each reply can be drawn as a point:
 
 ```python
 from sklearn.decomposition import PCA
@@ -168,7 +170,7 @@ from sklearn.decomposition import PCA
 points = PCA(n_components=2).fit_transform(reply_sentence_rows)  # two numbers per reply
 ```
 
-With NTA and YTA in the text, most YTA replies sit on one side of the plot. With the markers removed, the two groups overlap. The two numbers keep about a tenth of the variation in the 384, so the plot is a rough picture.
+With NTA and YTA in the text, most YTA replies sit on one side of the sentence-embedding plot. With the markers removed, the two groups overlap. In the plot of average word embeddings the groups overlap more, but the marker still matters there: GloVe has a row for *nta* and none for *yta*, so only the NTA replies get a marker row in their average. The two numbers keep about a tenth of the variation in the 384, so the plot is a rough picture.
 
 Matching each reply with its nearest other reply gives the same result:
 
