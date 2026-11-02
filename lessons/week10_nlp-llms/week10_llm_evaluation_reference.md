@@ -1,119 +1,139 @@
-# Week 10 reference: structured LLM inference and fair evaluation
+# Week 10: evaluating predictions
 
-This week puts an LLM inside a research workflow. We will give it one defined task, validate the response, compare it with a baseline on the same records, inspect the errors, and decide whether the result is good enough to continue.
+How do you know whether a model's labels are good enough to use? This week you predict the verdicts of r/AmItheAsshole posts and replies with three methods: always guessing the most common verdict, a TF-IDF classifier, and Gemini. You score each on the same texts and read the mistakes.
 
-> defined task → structured response → semantic validation → same-data comparison → inspected errors → provenance and cost → claim that fits the evidence, or stop
+Monday's notebook uses the posts from HW4. Lab 10 uses the replies from Weeks 8 and 9. HW5 asks Gemini about 40 posts and about your project texts. This page collects the code and the results from Monday and the lab.
 
-## From Week 8 to Week 10
+## Start with a baseline
 
-Earlier text pipelines often depended on token counts, lexicons, rules, and aggressive normalization. Those methods could erase negation, punctuation, emoji, word order, speaker context, and sarcasm cues. A contextual language model may perform better on examples such as `not safe` or `Love waiting forty minutes 🙃`, but improvement is an empirical question.
+Before you judge a model, check how well you could do without one. The simplest baseline always guesses the most common label. Its accuracy is the share of texts with that label.
 
-A model cannot recover context that was never collected. It also cannot decide whether a label is a valid social-science construct, whether the sample represents a population, or whether an error is acceptable for a real decision.
-
-## Minimal conceptual model
-
-`text → subword tokens → contextual vectors → next-token probabilities → generated sequence`
-
-- **Tokens** are model units and are not necessarily words.
-- **Contextual representation** lets the same token participate differently depending on surrounding tokens.
-- **Attention** is a learned computational mechanism for mixing information across token positions. It is not human attention and is not a faithful explanation of reasoning.
-- **Generation** repeatedly selects from predicted next-token distributions.
-
-## Define the task first
-
-For the synthetic campus-routing example, one document must receive exactly one of six labels:
-
-`transit`, `study_space`, `accessibility`, `food`, `safety`, `services`
-
-A valid record contains:
-
-```json
-{"document_id": "EV01", "label": "transit", "rationale": "The comment concerns shuttle hours."}
+```python
+(posts["verdict"] == "NTA").mean()  # 0.85
 ```
 
-A response schema helps produce parseable JSON. It does not establish that the ID is the requested ID, the label is substantively correct, the rationale is meaningful, or the task itself is valid.
+A model has to beat this number to show that it learned something from the text. The baseline depends on the texts it is scored on:
 
-## Semantic validation boundary
+| Texts | Always guessing NTA |
+|---|---|
+| 3,832 posts | 0.85 |
+| 1,035 replies with a verdict | 0.63 |
+| 40 posts, 10 of each verdict | 0.25 |
 
-Before a model record enters an analysis table, verify:
+## Split the data
 
-1. the result is an object with exactly the required fields;
-2. `document_id` matches the requested record;
-3. `label` is in the allowed set;
-4. `rationale` is nonblank text;
-5. every expected ID appears once and only once;
-6. invalid records are rejected or sent to review, never silently rewritten.
+A model has to be judged on texts it did not learn from. `train_test_split` keeps a share of the texts aside as a test set. `stratify` keeps the share of each label the same in both parts, and `random_state` gives the same split every time.
 
-Fluent rationales are generated text. They are useful audit artifacts but are not direct access to a model's internal reasoning.
+```python
+from sklearn.model_selection import train_test_split
 
-## Compare methods fairly
+train, test = train_test_split(posts, test_size=0.25, stratify=posts["verdict"], random_state=211)
+```
 
-Hold constant:
+## Train a classifier
 
-- evaluation document IDs;
-- human reference labels;
-- allowed prediction labels;
-- exclusions and missing-data rules;
-- scoring rules.
+TF-IDF turns each text into a row of word weights (Week 8). Logistic regression learns which weights go with which label. Fit TF-IDF on the training texts only, and use `transform` for the test texts so they get the same columns.
 
-Report the denominator with accuracy. Inspect a confusion table to see which labels are exchanged. Then read the actual disagreement documents.
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
 
-Keep three relationships separate:
+tfidf = TfidfVectorizer(stop_words="english", min_df=5)
+train_rows = tfidf.fit_transform(train["text"])
+test_rows = tfidf.transform(test["text"])
 
-- LLM versus traditional baseline;
-- LLM versus human reference label;
-- baseline versus human reference label.
+model = LogisticRegression(max_iter=1000, class_weight="balanced")
+model.fit(train_rows, train["verdict"])
+test["prediction"] = model.predict(test_rows)
+(test["prediction"] == test["verdict"]).mean()
+```
 
-Useful manual failure codes include negation, sarcasm/emoji, missing context, multiple issues, label-boundary ambiguity, and annotation uncertainty.
+With the course's versions of scikit-learn and SciPy, `LogisticRegression` prints `OptimizeWarning: Unknown solver options: iprint`. It does not change the results. The Week 10 notebooks hide it with `warnings.filterwarnings("ignore", message="Unknown solver options")`.
 
-## Provenance, cost, and stopping
+## Look past accuracy
 
-Record at least:
+Without `class_weight="balanced"`, the classifier predicted NTA for all 958 test posts. Its accuracy, 0.85, was the same as the baseline's. A confusion table shows this at once:
 
-- model ID and prompt version;
-- date/time and SDK version;
-- live result versus recorded fixture;
-- data snapshot or hash and document IDs;
-- input and output tokens separately;
-- input and output cost separately;
-- failed/invalid records and retry rule;
-- human-review or stopping rule.
+```python
+pd.crosstab(test["verdict"], test["prediction"])  # rows: true label, columns: prediction
+```
 
-Examples of stopping conditions:
+`class_weight="balanced"` makes mistakes on rare labels count more during training, so the model cannot win by always guessing NTA. Its accuracy is lower, but it finds some of the rare verdicts:
 
-- data transfer is not approved;
-- a credential may have been exposed;
-- invalid records cross the validation boundary;
-- performance is below the predeclared threshold;
-- errors concentrate in a consequential class or group;
-- the evaluation data do not match the intended use.
+| Model | Accuracy | NTA | YTA | ESH | NAH |
+|---|---|---|---|---|---|
+| Default | 0.85 | 1.00 | 0.00 | 0.00 | 0.00 |
+| `class_weight="balanced"` | 0.74 | 0.83 | 0.35 | 0.00 | 0.12 |
 
-## Credentials and privacy
+The columns after Accuracy give the accuracy for each verdict:
 
-- Keep API keys in your gitignored `.env` file (see "API keys" in `SETUP.md`) or a Colab Secret. Never paste them into a notebook, output cell, screenshot, or repository.
-- Live mode should be off by default.
-- Send only approved data. Lab 10 uses synthetic teaching records; HW5 uses public r/AmItheAsshole posts from the course dataset, which contain no usernames. Don't send other text to the API without checking with the instructional team.
-- Free and paid services can have different data-use and retention conditions. Dollar cost and privacy cost are different questions.
+```python
+test["correct"] = test["prediction"] == test["verdict"]
+test.groupby("verdict")["correct"].mean()
+```
 
-## Official references
+Which model is better depends on which mistakes matter for your question. Report accuracy for each label, not only the total.
 
-Current facts below were checked **August 21, 2026**. Recheck shortly before class because APIs, model availability, prices, and terms change.
+## Read the words and the errors
 
-- [Gemini structured outputs](https://ai.google.dev/gemini-api/docs/structured-output)
-- [Gemini API getting started](https://ai.google.dev/gemini-api/docs/get-started)
-- [Gemini model list](https://ai.google.dev/gemini-api/docs/models)
-- [API-key security](https://ai.google.dev/gemini-api/docs/api-key)
-- [Token accounting](https://ai.google.dev/gemini-api/docs/tokens)
-- [Pricing](https://ai.google.dev/gemini-api/docs/pricing)
-- [Gemini API terms](https://ai.google.dev/gemini-api/terms)
-- [Zero data retention](https://ai.google.dev/gemini-api/docs/zdr)
+`model.coef_` holds one weight per word for each label. The words with the largest weights for ESH include names (*amber*, *drew*, *jake*) and details of single stories (*costume*, *piercing*). With 81 ESH posts to learn from, the model learned those posts, not what makes everyone behave badly.
 
-## Prepare for Lab 10 and HW5
+```python
+weights = pd.DataFrame(model.coef_.T, index=tfidf.get_feature_names_out(), columns=model.classes_)
+weights["ESH"].sort_values(ascending=False).head(10)
+```
 
-You should be able to explain:
+Read texts the model got wrong, too. Many YTA posts read like NTA posts: someone describes a conflict with a partner or parent and explains why they were right. TF-IDF sees the topic, not the judgment.
 
-- why valid JSON is necessary but insufficient;
-- why two methods must be evaluated on identical documents;
-- why a human reference label is part of a task definition, not unquestionable truth;
-- why a small synthetic fixture cannot establish deployment or population validity;
-- what evidence would require human review or stop automation.
+The replies are harder still. With NTA and YTA removed from the text, the balanced classifier scores 0.58, below the baseline's 0.63. The verdict of a reply is in how it judges the poster ("That's way too dark a joke"), and NTA and YTA replies use the same topic words.
+
+## Compare with an LLM
+
+Score an LLM on the same texts as the other methods. On Monday we used Gemini's labels for 40 test posts, 10 of each verdict, made with the HW5 system instruction and schema:
+
+| Method | Accuracy on the 40 posts |
+|---|---|
+| Always guessing NTA | 0.25 |
+| Balanced classifier | 0.35 |
+| Gemini (`gemini-3.5-flash-lite`) | 0.475 |
+
+Gemini got 8 of 10 NTA posts and 7 of 10 YTA posts right, but only 3 ESH and 1 NAH post. It called 6 of the NAH posts NTA. Its reasons sound sensible even when the label is wrong: for one ESH post it wrote that leaving a date stranded "makes you an asshole too", then answered YTA.
+
+On the replies in Lab 10, Gemini got 17 of 20 right, the classifier 7, and always guessing NTA 10. Two of Gemini's misses were NTA replies that went on to criticize the poster.
+
+## How much to trust a number
+
+- **The split.** Five other splits of the posts gave the balanced classifier accuracies between 0.70 and 0.75.
+- **Small samples.** On 40 posts, one post is 2.5 percentage points. Differences of a few posts between methods can come from which posts were picked.
+- **Repeated runs.** Gemini can give a different label to the same text on another run, and models are updated or retired. Save every answer with the model name and the date, and keep the system instruction you used.
+- **The label.** The AITA verdict is the result of a vote, not a fact about who was right. In HW4 you labeled your own texts; when you and Gemini disagree, either of you can be wrong, or the definition can be unclear.
+
+## Using this in your final project
+
+If your project labels texts with a classifier or an LLM, report:
+
+- what one text is, how many you labeled by hand, and who labeled them;
+- the baseline: always guessing your most common label;
+- how you split the texts, or which texts the LLM labeled;
+- accuracy overall and for each label, with the number of texts;
+- a confusion table;
+- three texts the method got wrong, and why;
+- the model name, the date, and the system instruction, if you used an LLM.
+
+Not every project needs a classifier. A study that describes a corpus needs checks that fit its claims, such as reading a sample of the texts behind each number.
+
+## Keys and data
+
+Keep your Gemini key in the `.env` file (see "API keys" in `SETUP.md`), never in a notebook or an AI chat. Everything you send to Gemini goes to Google, so leave out texts with names, usernames, or other details that identify a person.
+
+## About the course data
+
+The posts are 3,832 of the 5,000 most upvoted r/AmItheAsshole posts from 2018 to 2021 that have one of the four verdicts and a text that was not removed: 3,239 NTA, 386 YTA, 108 ESH, and 99 NAH. The replies are 1,035 historical replies that start with NTA or YTA. Both samples favor highly scored posts and replies and do not represent Reddit users or public opinion.
+
+## Documentation
+
+- [train_test_split](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html)
+- [LogisticRegression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)
+- [pandas crosstab](https://pandas.pydata.org/docs/reference/api/pandas.crosstab.html)
+- [Gemini structured output](https://ai.google.dev/gemini-api/docs/structured-output)
+- [Törnberg, Best Practices for Text Annotation with Large Language Models](https://sociologica.unibo.it/article/view/19461)
