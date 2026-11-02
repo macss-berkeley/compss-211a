@@ -1,6 +1,6 @@
 # Week 9: comparing texts with embeddings
 
-Which texts are about similar things, even when they use different words? In Week 8 each text became a row of TF-IDF weights. This week each text also becomes an embedding: a row of numbers made by a trained language model. We score pairs of rows with cosine similarity, search the texts with a sentence, and read the results to decide whether they make sense.
+Which texts are about similar things, even when they use different words? This week each text becomes a row of numbers in two ways: a row of TF-IDF weights, one for each word, and an embedding, a row of numbers made by a trained language model. We score pairs of rows with cosine similarity, search the texts with a sentence, and read the results to decide whether they make sense.
 
 Monday's notebook compares TF-IDF rows, average word embeddings, and sentence embeddings on four sentences, then searches and plots the AITA replies with TF-IDF and the sentence model. Lab 9 searches the replies or your project texts four ways: a word search, TF-IDF, word embeddings, and sentence embeddings. This page collects the code and the results from both.
 
@@ -13,6 +13,22 @@ The models come from the `gensim` and `sentence-transformers` libraries, which a
 ```
 
 The first time you load them, the GloVe word embeddings download about 66 MB and the sentence model about 90 MB.
+
+## TF-IDF
+
+TF-IDF turns each text into a row of numbers, one for each word in the vocabulary. A word gets a high number in a text when it appears often in that text (term frequency) and in few other texts (inverse document frequency). Words the text does not use get 0.
+
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+tfidf = TfidfVectorizer(stop_words="english", min_df=5)
+tfidf_rows = tfidf.fit_transform(texts["text"])  # one row per text, one column per word
+tfidf.get_feature_names_out()                    # the words, in column order
+```
+
+- `stop_words="english"` leaves out common words such as *the*, *is*, and *not*.
+- `min_df=5` keeps only words found in at least five texts. This drops typos and names, but it can also drop a rare word you care about. In the AITA replies, *housework* is dropped.
+- `fit_transform` learns the vocabulary from your texts. To score a new query, use `tfidf.transform([query])`, so the query gets the same columns.
 
 ## Three kinds of row
 
