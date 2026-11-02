@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Comparing TF-IDF and embeddings · COMPSS 211A</title>
+<title>Comparing TF-IDF and sentence embeddings · COMPSS 211A</title>
 <meta name="description" content="Compare TF-IDF vectors with sentence embeddings from all-MiniLM-L6-v2 on twelve short sentences: read both vectors, score pairs with cosine similarity, see where the two methods disagree, and find the nearest sentences on a map.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -181,7 +181,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 <div class="mast"><span class="brand"><span class="uc">UC Berkeley</span>COMPSS 211A · Computing I</span><a href="../index.html">← All interactives</a></div>
 
 <header>
-  <h1>Comparing TF-IDF and embeddings</h1>
+  <h1>Comparing TF-IDF and sentence embeddings</h1>
   <div class="chips"><span class="chip chip-gold">Week 9</span></div>
   <p class="lede">
     TF-IDF and sentence embeddings both turn a sentence into a vector: a list of numbers. This page compares
@@ -192,8 +192,9 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
 <main>
 <section class="orientation" aria-label="About this page">
   <p>
-    The embeddings come from the model <code class="inl">all-MiniLM-L6-v2</code>, which gives each
-    sentence 384 numbers. The TF-IDF vectors use <code class="inl">TfidfVectorizer(stop_words="english")</code>.
+    The sentence embeddings come from the model <code class="inl">all-MiniLM-L6-v2</code>, which reads a
+    whole sentence and gives it 384 numbers. These are not word embeddings: the model makes one vector for
+    the sentence, not one for each word. The TF-IDF vectors use <code class="inl">TfidfVectorizer(stop_words="english")</code>.
     All scores were computed in Python and are rounded to 2 decimals.
   </p>
   <details>
@@ -215,7 +216,7 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
   <h2 tabindex="-1"><span class="step">1.</span>A sentence as a vector of numbers</h2>
   <p class="section-note">
     To compare sentences, Python first turns each one into a vector: one list of numbers. TF-IDF and
-    embeddings are two ways to make that list. Choose a sentence to see both.
+    sentence embeddings are two ways to make that list. Choose a sentence to see both.
   </p>
   <div class="card">
     <div class="field">
@@ -229,8 +230,8 @@ footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(5
         <div class="vec"><div class="strip" id="s1-tfrow"></div></div>
       </div>
       <div class="panel">
-        <h3 class="sub">Embedding vector</h3>
-        <p class="small">384 numbers, numbered 0 to 383. A trained model sets them. No number stands for one word.</p>
+        <h3 class="sub">Sentence embedding</h3>
+        <p class="small">384 numbers for the whole sentence, numbered 0 to 383. The model reads the sentence and sets them. It does not give each word its own vector, and no number stands for one word.</p>
         <div class="vec"><div class="strip" id="s1-dims"></div><p class="more">… 376 more</p></div>
       </div>
     </div>
@@ -240,7 +241,7 @@ tfidf_rows = tfidf.fit_transform(sentences)
 tfidf_rows.shape    # (12, 26): one row per sentence, one column per word
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
-embeddings = model.encode(sentences)
+embeddings = model.encode(sentences)   # one vector per sentence
 embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre>
 
     <form class="qcard" data-q="q1">
@@ -248,7 +249,7 @@ embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre
         <legend>Which vector can you read word by word?</legend>
         <div class="opts">
           <label><input type="radio" name="q1" value="tfidf"> The TF-IDF vector</label>
-          <label><input type="radio" name="q1" value="emb"> The embedding vector</label>
+          <label><input type="radio" name="q1" value="emb"> The sentence embedding</label>
           <label><input type="radio" name="q1" value="both"> Both vectors</label>
         </div>
       </fieldset>
@@ -264,7 +265,7 @@ embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre
   <p class="section-note">
     <code class="inl">cosine_similarity</code> scores two vectors of either kind. Identical vectors score 1.
     For TF-IDF, only the words that are not 0 in both vectors add to the score, so it is 0 when two
-    sentences share no words. Embedding scores can be a little below 0.
+    sentences share no words. Sentence embedding scores can be a little below 0.
   </p>
   <div class="card">
     <div class="pairfields">
@@ -273,7 +274,7 @@ embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre
     </div>
     <div aria-live="polite">
       <div class="scores">
-        <div class="score"><span class="lab">Embeddings</span><span class="big" id="s2-emb"></span><div class="b"><i id="s2-embbar"></i></div></div>
+        <div class="score"><span class="lab">Sentence embeddings</span><span class="big" id="s2-emb"></span><div class="b"><i id="s2-embbar"></i></div></div>
         <div class="score"><span class="lab">TF-IDF</span><span class="big" id="s2-tf"></span><div class="b"><i id="s2-tfbar"></i></div></div>
       </div>
       <p class="shared" id="s2-shared"></p>
@@ -331,7 +332,7 @@ embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre
         <div class="opts">
           <label><input type="radio" name="q4" value="a"> They use similar words or are about the same topic</label>
           <label><input type="radio" name="q4" value="b"> They say the same thing</label>
-          <label><input type="radio" name="q4" value="c"> With embeddings, it means they agree, because the model reads words such as “not”</label>
+          <label><input type="radio" name="q4" value="c"> With sentence embeddings, it means they agree, because the model reads words such as “not”</label>
         </div>
       </fieldset>
       <div class="btnrow"><button type="submit" class="btn">Check</button></div>
@@ -344,7 +345,7 @@ embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre
 <section class="stage" id="panel-4" role="tabpanel" aria-labelledby="tab-4" hidden>
   <h2 tabindex="-1"><span class="step">4.</span>Nearest sentences on a map</h2>
   <p class="section-note">
-    PCA flattens the 384 embedding numbers of each sentence into 2, so the sentences can be drawn on
+    PCA flattens the 384 numbers of each sentence embedding into 2, so the sentences can be drawn on
     a map. Distances on the map are approximate. The scores are the reference. Click a point or
     choose a sentence to list its three nearest sentences under each method.
   </p>
@@ -361,7 +362,7 @@ embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre
       </div>
       <div aria-live="polite">
         <div class="field"><label for="s4-sel">Sentence</label><select id="s4-sel"></select></div>
-        <h3 class="sub">Nearest with embeddings</h3>
+        <h3 class="sub">Nearest with sentence embeddings</h3>
         <ol class="ranked" id="s4-emb"></ol>
         <h3 class="sub">Nearest with TF-IDF</h3>
         <ol class="ranked" id="s4-tf"></ol>
@@ -375,7 +376,7 @@ embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre
         <legend>Which sentence scores higher?</legend>
         <p>Choose sentence 7, “You did nothing wrong.” On the map, sentence 6, “You are wrong.”, and
           sentence 9, “Don't wear white to someone else's wedding.”, are about the same distance from it.
-          Which one has the higher embedding score with sentence 7?</p>
+          Which one has the higher sentence embedding score with sentence 7?</p>
         <div class="opts">
           <label><input type="radio" name="q5" value="6"> Sentence 6</label>
           <label><input type="radio" name="q5" value="9"> Sentence 9</label>
@@ -394,7 +395,7 @@ embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre
   <div class="card recap">
     <ul>
       <li>A TF-IDF vector has one number for each word in the vocabulary, so you can read which words a sentence contains.</li>
-      <li>An embedding has 384 columns with no names. Sentences with related meanings get similar numbers, even when they share no words.</li>
+      <li>A sentence embedding is one vector of 384 numbers for the whole sentence, not one per word. Its columns have no names. Sentences with related meanings get similar numbers, even when they share no words.</li>
       <li><code class="inl">cosine_similarity</code> scores both kinds of vector in the same way.</li>
       <li>The stop-word list removes words such as <code class="inl">not</code> and <code class="inl">nothing</code>. This can change what a TF-IDF vector says about a sentence.</li>
       <li>A high score from either method means similar words or a similar topic. It does not show that two sentences agree.</li>
@@ -409,7 +410,7 @@ embeddings.shape    # (12, 384): one row per sentence, 384 numbered columns</pre
 </div>
 </main>
 
-<footer>COMPSS 211A, UC Berkeley. CC BY 4.0. Twelve example sentences. Embeddings from all-MiniLM-L6-v2. TF-IDF vectors and cosine similarity from scikit-learn.</footer>
+<footer>COMPSS 211A, UC Berkeley. CC BY 4.0. Twelve example sentences. Sentence embeddings from all-MiniLM-L6-v2. TF-IDF vectors and cosine similarity from scikit-learn.</footer>
 </div>
 
 <script type="application/json" id="data">
@@ -1163,7 +1164,7 @@ $("s2-next").addEventListener("click", () => {
 function pairHTML(a, b, label) {
   return `<h3 class="sub">${label}</h3>` +
     `<div class="pairtexts"><p><span class="num">${a}</span> ${esc(S[a].text)}</p><p><span class="num">${b}</span> ${esc(S[b].text)}</p></div>` +
-    `<div class="scores"><div class="score"><span class="lab">Embeddings</span><span class="big">${f2(EMB[a][b])}</span><div class="b"><i style="width:${Math.max(0, EMB[a][b]) * 100}%"></i></div></div>` +
+    `<div class="scores"><div class="score"><span class="lab">Sentence embeddings</span><span class="big">${f2(EMB[a][b])}</span><div class="b"><i style="width:${Math.max(0, EMB[a][b]) * 100}%"></i></div></div>` +
     `<div class="score"><span class="lab">TF-IDF</span><span class="big">${f2(TF[a][b])}</span><div class="b"><i style="width:${Math.max(0, TF[a][b]) * 100}%"></i></div></div></div>` +
     pairTableHTML(a, b);
 }
@@ -1266,15 +1267,15 @@ pick4(sel4);
 /* ---------- questions ---------- */
 const QUESTIONS = {
   q1: v => v === "tfidf"
-    ? [true, "Correct. Each number in the TF-IDF vector belongs to a word, so the vector shows which words the sentence contains and their weights. The embedding's numbers are numbered 0 to 383 and have no names."]
-    : [false, "Not quite. The embedding columns are numbered 0 to 383 and have no names. No single embedding number stands for a word. Each TF-IDF column is a word."],
+    ? [true, "Correct. Each number in the TF-IDF vector belongs to a word, so the vector shows which words the sentence contains and their weights. The sentence embedding's numbers are numbered 0 to 383 and have no names."]
+    : [false, "Not quite. The sentence embedding's columns are numbered 0 to 383 and have no names. No single number stands for a word. Each TF-IDF column is a word."],
   q2: v => { setPair(0, 2); $("s2-nextwrap").hidden = false; return v === "a"
-    ? [true, `Correct. The TF-IDF vectors contain ${terms(0).map(x => x[0]).join(", ")} and ${terms(2).map(x => x[0]).join(", ")}. No word is in both vectors, so the score is 0. The embedding score is ${f2(EMB[0][2])}. The model gives sentences with related meanings similar numbers, even when the words differ.`]
+    ? [true, `Correct. The TF-IDF vectors contain ${terms(0).map(x => x[0]).join(", ")} and ${terms(2).map(x => x[0]).join(", ")}. No word is in both vectors, so the score is 0. The sentence embedding score is ${f2(EMB[0][2])}. The model gives sentences with related meanings similar numbers, even when the words differ.`]
     : v === "b"
       ? [false, `Not quite. TF-IDF can score short sentences. Sentences 0 and 1 are just as short and score ${f2(TF[0][1])}. Look at the words in each TF-IDF vector.`]
       : [false, "Not quite. TF-IDF only counts words. It has no information about meaning. Look at the words in each TF-IDF vector."]; },
   q3: v => { setPair(3, 4); return v === "a"
-    ? [true, `Correct. Both vectors contain france and paris. The stop-word list removes is and the, and capital and city each appear in only one of the two sentences. The embedding score is ${f2(EMB[3][4])}. Both sentences are about Paris and France.`]
+    ? [true, `Correct. Both vectors contain france and paris. The stop-word list removes is and the, and capital and city each appear in only one of the two sentences. The sentence embedding score is ${f2(EMB[3][4])}. Both sentences are about Paris and France.`]
     : v === "b"
       ? [false, "Not quite. capital is only in sentence 3 and city is only in sentence 4. A word adds to the score only when it is in both vectors."]
       : [false, "Not quite. is and the are on the stop-word list, so they have no TF-IDF column."]; },
@@ -1282,7 +1283,7 @@ const QUESTIONS = {
     ? [true, `Correct. Both methods score the opposite pair (${f2(EMB[5][6])} and ${f2(TF[5][6])}) higher than the pair with the same meaning (${f2(EMB[5][7])} and ${f2(TF[5][7])}). A high score means similar words or a similar topic. It does not tell you whether two sentences agree. To check that, read the sentences.`]
     : v === "b"
       ? [false, `Not quite. “You are not wrong.” and “You are wrong.” say opposite things and score ${f2(EMB[5][6])} with embeddings and ${f2(TF[5][6])} with TF-IDF.`]
-      : [false, `Not quite. The embedding score for the opposite pair is ${f2(EMB[5][6])}, higher than the ${f2(EMB[5][7])} for the pair with the same meaning. Here the embedding score does not separate “not wrong” from “wrong”.`],
+      : [false, `Not quite. The sentence embedding score for the opposite pair is ${f2(EMB[5][6])}, higher than the ${f2(EMB[5][7])} for the pair with the same meaning. Here the sentence embedding score does not separate “not wrong” from “wrong”.`],
   q5: v => { zoomed = true; renderMap(); pick4(7); return v === "6"
     ? [true, `Correct. Sentence 6 scores ${f2(EMB[7][6])} and sentence 9 scores ${f2(EMB[7][9])}. The map loses information when it flattens 384 numbers into 2, so use the scores to decide which sentences are nearest.`]
     : [false, `Not quite. Sentence 6 scores ${f2(EMB[7][6])} and sentence 9 scores ${f2(EMB[7][9])}. They look about equally close on the map because the map flattens 384 numbers into 2.`]; }
