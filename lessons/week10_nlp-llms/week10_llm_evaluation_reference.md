@@ -2,7 +2,7 @@
 
 How do you know whether a model's labels are good enough to use? This week you predict the verdicts of r/AmItheAsshole posts and replies with three methods: always guessing the most common verdict, a TF-IDF classifier, and Gemini. You score each on the same texts and read the mistakes.
 
-Monday's notebook uses the posts from HW4. Lab 10 uses the replies from Weeks 8 and 9. HW5 asks Gemini about 40 posts and about your project texts. This page collects the code and the results from Monday and the lab.
+Monday's notebook uses the posts from HW4. Lab 10 uses replies to AITA posts. HW5 asks Gemini about 40 posts and about your project texts. This page collects the code and the results from Monday and the lab.
 
 ## Start with a baseline
 
@@ -32,7 +32,7 @@ train, test = train_test_split(posts, test_size=0.25, stratify=posts["verdict"],
 
 ## Train a classifier
 
-TF-IDF turns each text into a row of word weights (Week 8). Logistic regression learns which weights go with which label. Fit TF-IDF on the training texts only, and use `transform` for the test texts so they get the same columns.
+TF-IDF turns each text into a row of word weights. Logistic regression learns which weights go with which label. Fit TF-IDF on the training texts only, and use `transform` for the test texts so they get the same columns.
 
 ```python
 from sklearn.feature_extraction.text import TfidfVectorizer
