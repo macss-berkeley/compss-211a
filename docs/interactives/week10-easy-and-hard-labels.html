@@ -265,6 +265,11 @@ table.acc th{font-size:.85rem}
     Ten replies are NTA and ten are YTA, so always guessing NTA scores 0.50. Choose a method, then click
     a cell to see its replies.
   </p>
+  <p class="section-note">
+    Say you are looking for YTA replies. An NTA reply labeled YTA is a <b>false positive</b>: the method finds
+    something that is not there. A YTA reply labeled NTA is a <b>false negative</b>: the method misses something
+    that is there.
+  </p>
   <div class="card">
     <div class="btnrow" role="group" aria-label="Method" style="margin:0 0 12px" id="s2-methods"></div>
     <div class="methodbox" id="s2-desc"></div>
@@ -272,6 +277,7 @@ table.acc th{font-size:.85rem}
       <div class="score"><span class="lab">Correct</span><span class="big" id="s2-n"></span></div>
       <div class="score"><span class="lab">Accuracy</span><span class="big" id="s2-acc"></span><div class="b"><i id="s2-bar"></i></div></div>
     </div>
+    <p class="small" id="s2-extra" style="margin-top:8px" aria-live="polite"></p>
     <div class="cmlayout" style="margin-top:16px">
       <div><table class="cm" id="s2-cm"></table></div>
       <div>
@@ -392,6 +398,7 @@ table.acc th{font-size:.85rem}
       <li>If the text states the label, a word search is enough. An LLM adds cost and nothing else.</li>
       <li>When the meaning is in plain words, an LLM can label well even with a short prompt, as long as the prompt asks for the right thing.</li>
       <li>A prompt that asks for something else, such as tone, measures something else.</li>
+      <li>Two methods with the same accuracy can make different mistakes. A false positive finds something that is not there; a false negative misses something that is there. Which one hurts more depends on your question.</li>
       <li>When the label is contested, like a vote on who was in the wrong, every method does poorly, and changing the prompt barely moves the score.</li>
       <li>Score every method on the same texts, against labels you trust, before you use any of them.</li>
     </ul>
@@ -1185,7 +1192,8 @@ function picker(cfg) {
     });
     $(cfg.id + "-cm").innerHTML = html;
     const sel = rows.map((r, i) => [r, i]).filter(([r]) => r.verdict === st.cell[0] && pred(r, st.m) === st.cell[1]);
-    $(cfg.id + "-cellhead").textContent = `True ${st.cell[0]}, predicted ${st.cell[1]}: ${sel.length} ${sel.length === 1 ? cfg.one : cfg.many}`;
+    $(cfg.id + "-cellhead").textContent = `True ${st.cell[0]}, predicted ${st.cell[1]}: ${sel.length} ${sel.length === 1 ? cfg.one : cfg.many}` + (cfg.cellNote ? cfg.cellNote(st.cell[0], st.cell[1], sel.length) : "");
+    if (cfg.extra) $(cfg.id + "-extra").textContent = cfg.extra(rows, st.m);
     $(cfg.id + "-rows").innerHTML = sel.length ? sel.map(([r, i]) => cfg.row(r, i, m)).join("") : `<li class="empty">None.</li>`;
   }
   $(cfg.id + "-methods").addEventListener("click", e => { const b = e.target.closest("[data-m]"); if (b) { st.m = b.dataset.m; render(); } });
@@ -1200,6 +1208,13 @@ function tags(r, m) {
 }
 const reasonOf = (r, m) => m.gem ? `<span class="reason">Gemini: ${esc(r[m.key + "_reason"])}</span>` : "";
 const s2 = picker({id: "s2", rows: REP, methods: REPLY_METHODS, labels: ["NTA", "YTA"], one: "reply", many: "replies",
+  cellNote: (t, p, n) => t === "NTA" && p === "YTA" ? ` (false ${n === 1 ? "positive" : "positives"})` : t === "YTA" && p === "NTA" ? ` (false ${n === 1 ? "negative" : "negatives"})` : "",
+  extra: (rows, m) => {
+    const fp = rows.filter(r => r.verdict === "NTA" && pred(r, m) === "YTA").length;
+    const fn = rows.filter(r => r.verdict === "YTA" && pred(r, m) === "NTA").length;
+    const share = rows.filter(r => pred(r, m) === "YTA").length / rows.length;
+    return `False positives: ${fp} · False negatives: ${fn} · Share labeled YTA: ${f2(share)} (the true share is 0.50)`;
+  },
   row: (r, i, m) => `<li><span class="num">${i + 1}</span><span class="txt">${esc(r.text)}${reasonOf(r, m)}</span>${tags(r, m)}</li>`});
 const s3 = picker({id: "s3", rows: POS, methods: POST_METHODS, labels: ["NTA", "YTA", "ESH", "NAH"], one: "post", many: "posts",
   row: (r, i, m) => `<li><span class="num">${i + 1}</span><span class="txt"><b>${esc(r.title)}</b><span class="opening">${esc(r.opening)}</span>${reasonOf(r, m)}</span>${tags(r, m)}</li>`});

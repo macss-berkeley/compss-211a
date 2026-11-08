@@ -160,6 +160,22 @@ The second prompt was written for the same 40 posts, so its score there is too o
 
 Other changes to try, one at a time: add an `unclear` label; say what one text is and where it comes from; give two or three examples taken from texts you won't score; split a hard label into yes/no questions; tell the model to use only what is in the text. When you and the model disagree because the definition is unclear, fix the definition first.
 
+## An easier label: false positives and false negatives
+
+Replies are easier to label than posts. `data/week10_reply_labels.csv` has 20 replies with the verdict word removed, 10 NTA and 10 YTA, labeled by a word search, the TF-IDF classifier and three Gemini prompts. Say you are looking for YTA replies. A **false positive** is an NTA reply labeled YTA: the method finds something that is not there. A **false negative** is a YTA reply labeled NTA: the method misses something that is there.
+
+| Method | Accuracy | False positives | False negatives | Share labeled YTA |
+|---|---|---|---|---|
+| Word search (*rude*, *apologize*, *should have*, ...) | 0.55 | 2 | 7 | 0.25 |
+| Classifier | 0.35 | 6 | 7 | 0.45 |
+| Gemini: `Label this reply NTA or YTA.` | 0.80 | 0 | 4 | 0.30 |
+| Gemini: careful instruction | 0.80 | 2 | 2 | 0.50 |
+| Gemini: `Is this comment positive or negative?` | 0.60 | 7 | 1 | 0.80 |
+
+The true share of YTA replies is 0.50. A one-line prompt does as well as the careful instruction, but the two make different mistakes. The tone prompt measures tone, not the verdict: many NTA replies are negative about someone else in the story. If you want the share of a label, mistakes that cancel can still give the right share, as the classifier shows. If you want to collect texts with a label to read, false positives waste your time and false negatives hide cases.
+
+Two common summaries for the label you are looking for: **precision** is the share of texts labeled YTA that are YTA, and **recall** is the share of YTA texts that were labeled YTA. The short prompt has precision 1.00 and recall 0.60; the tone prompt has precision 0.56 and recall 0.90.
+
 ## Lab 10: the replies
 
 On the replies in Lab 10, Gemini got 17 of 20 right, the classifier 7, and always guessing NTA 10. Two of Gemini's misses were NTA replies that went on to criticize the poster.
