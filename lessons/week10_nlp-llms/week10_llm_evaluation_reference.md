@@ -1,8 +1,21 @@
-# Week 10: evaluating predictions
+# Week 10: labeling text with models
 
-How do you know whether a model's labels are good enough to use? This week you predict the verdicts of r/AmItheAsshole posts and replies with three methods: always guessing the most common verdict, a TF-IDF classifier, and Gemini. You score each on the same texts and read the mistakes.
+Researchers label texts with models so they don't have to read every text. A label is a measurement, so you check it against texts labeled by hand before you count it. This week you practice on r/AmItheAsshole posts and replies, where the community's verdict is known. You compare three methods on the same texts: always guessing the most common verdict, a TF-IDF classifier, and Gemini. You read the mistakes, and you see what a change to Gemini's prompt does.
 
 Monday's notebook uses the posts from HW4. Lab 10 uses replies to AITA posts. HW5 asks Gemini about 40 posts and about your project texts. This page collects the code and the results from Monday and the lab.
+
+## When to label texts with a model
+
+A label for each text turns many texts into a column you can count and compare, such as the share of app reviews that complain about ads. Labeling works like any measurement. You start from a concept, write a definition for each label, choose an instrument that applies the definitions, and check the instrument against texts you labeled by hand. Then you use it on the texts nobody read.
+
+| Method | What it needs | Works well for | Struggles with |
+|---|---|---|---|
+| Reading the texts yourself | Time | Anything you can define | More than a few hundred texts |
+| A keyword rule | A list of words | Concepts marked by words, such as *refund* or *price* | Sarcasm, negation, other wordings |
+| A classifier | Hundreds of labeled texts | Many texts, fast and free | Rare labels, meaning beyond single words |
+| An LLM | A written definition of each label | Sarcasm, stance, framing | Cost, model updates, texts sent to Google |
+
+An LLM is worth trying when you have thousands of texts, a concept you can define in a sentence or two, and about 50 texts you can label by hand to check it. If a keyword finds the concept, use the keyword. If you can't define the concept, you can't check the labels either.
 
 ## Start with a baseline
 
@@ -99,13 +112,63 @@ Score an LLM on the same texts as the other methods. On Monday we used Gemini's 
 
 Gemini got 8 of 10 NTA posts and 7 of 10 YTA posts right, but only 3 ESH and 1 NAH post. It called 6 of the NAH posts NTA. Its reasons sound sensible even when the label is wrong: for one ESH post it wrote that leaving a date stranded "makes you an asshole too", then answered YTA.
 
+## Free text or a fixed form
+
+The labels above were made with a schema: Gemini had to answer with one of the four labels and a reason. We also asked Gemini about 8 of the posts in two other ways: with only the post, and with the system instruction but no schema. With no instruction, Gemini wrote essays of 138 to 642 words, with headings and bold text. With the instruction but no schema, it put a label first, in a different format each time ("NTA.", "**YTA**", "NTA" followed by "**Reason:**"). On 4 of the 8 posts, the label changed with the way of asking.
+
+```python
+SCHEMA = {
+    "type": "object",
+    "properties": {
+        "llm_label": {"type": "string", "enum": ["ESH", "NAH", "NTA", "YTA"]},
+        "llm_reason": {"type": "string"},
+    },
+    "required": ["llm_label", "llm_reason"],
+}
+config = types.GenerateContentConfig(
+    system_instruction=SYSTEM,
+    response_mime_type="application/json",
+    response_schema=SCHEMA,
+)
+```
+
+`enum` lists the only labels allowed. A schema fixes the form of the answer, not its quality: the label can still be wrong.
+
+## Change the prompt
+
+The first prompt names the four labels but never says what separates them. The second prompt defines each one:
+
+```text
+- NTA (not the asshole): the poster was not in the wrong, and someone else was.
+- YTA (you're the asshole): the poster was in the wrong, and the others were not.
+- ESH (everyone sucks here): the poster was in the wrong, and someone else was too.
+- NAH (no assholes here): nobody was in the wrong. They disagree, but each has a fair point.
+```
+
+We wrote the second prompt after reading Gemini's errors on the 40 posts above. We then asked Gemini about those 40 posts and about 40 other test posts, 10 of each verdict, with both prompts. Correct labels out of 10 for each verdict:
+
+| Posts | Prompt | NTA | YTA | ESH | NAH | All 40 |
+|---|---|---|---|---|---|---|
+| same 40 | first | 8 | 7 | 3 | 1 | 19 |
+| same 40 | second | 8 | 6 | 5 | 2 | 21 |
+| other 40 | first | 7 | 8 | 6 | 0 | 21 |
+| other 40 | second | 7 | 8 | 7 | 0 | 22 |
+
+The second prompt helped a little. ESH went up by two posts on the same 40 and by one on the other 40. NAH barely moved: on the other 40, Gemini never answered NAH with either prompt. The first prompt, run again a week later on the same 40 posts, got 22 right instead of 19, so a difference of one or two posts can come from rerunning alone.
+
+The second prompt was written for the same 40 posts, so its score there is too optimistic. The other 40 posts played no part in writing it, so that is the score to report. This is the train and test split again: change the prompt on some texts, and report the score on others. With 50 hand-labeled texts, you could write the prompt on 20 and report the score on the other 30.
+
+Other changes to try, one at a time: add an `unclear` label; say what one text is and where it comes from; give two or three examples taken from texts you won't score; split a hard label into yes/no questions; tell the model to use only what is in the text. When you and the model disagree because the definition is unclear, fix the definition first.
+
+## Lab 10: the replies
+
 On the replies in Lab 10, Gemini got 17 of 20 right, the classifier 7, and always guessing NTA 10. Two of Gemini's misses were NTA replies that went on to criticize the poster.
 
 ## How much to trust a number
 
 - **The split.** Five other splits of the posts gave the balanced classifier accuracies between 0.70 and 0.75.
 - **Small samples.** On 40 posts, one post is 2.5 percentage points. Differences of a few posts between methods can come from which posts were picked.
-- **Repeated runs.** Gemini can give a different label to the same text on another run, and models are updated or retired. Save every answer with the model name and the date, and keep the system instruction you used.
+- **Repeated runs.** Gemini can give a different label to the same text on another run, and models are updated or retired. The first prompt, run again a week later on the same 40 posts, gave the same label for 34 of them. Save every answer with the model name and the date, and keep the system instruction you used.
 - **The label.** The AITA verdict is the result of a vote, not a fact about who was right. In HW4 you labeled your own texts; when you and Gemini disagree, either of you can be wrong, or the definition can be unclear.
 
 ## Using this in your final project
@@ -114,7 +177,7 @@ If your project labels texts with a classifier or an LLM, report:
 
 - what one text is, how many you labeled by hand, and who labeled them;
 - the baseline: always guessing your most common label;
-- how you split the texts, or which texts the LLM labeled;
+- how you split the texts, or which texts the LLM labeled, and which texts you used to write the prompt;
 - accuracy overall and for each label, with the number of texts;
 - a confusion table;
 - three texts the method got wrong, and why;
