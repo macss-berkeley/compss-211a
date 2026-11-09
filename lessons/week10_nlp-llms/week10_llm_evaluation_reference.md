@@ -1,4 +1,4 @@
-# Week 10: labeling text with models
+# Week 10: measuring text with TF-IDF, embeddings and LLM labels
 
 Researchers turn texts into something they can count. This week compares three ways to do that on r/AmItheAsshole posts: TF-IDF word weights, embeddings, and labels from an LLM. A label is a measurement, so before you count it you check it against labels you made by hand.
 
