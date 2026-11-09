@@ -32,10 +32,14 @@ weights = pd.DataFrame(tfidf.fit_transform(comments["text"]).toarray(),
                        columns=tfidf.get_feature_names_out())  # 1,035 rows, 220 columns
 ```
 
-To compare the verdicts, average the rows in each group and divide one average by the other:
+To compare the verdicts, average the rows of the NTA comments and of the YTA comments, then divide one average by the other:
 
 ```python
-by_verdict = weights.groupby(comments["verdict"]).mean().T  # one row per word, columns NTA and YTA
+# one row per word: its average weight in the NTA comments and in the YTA comments
+by_verdict = pd.DataFrame({
+    "NTA": weights[comments["verdict"] == "NTA"].mean(),
+    "YTA": weights[comments["verdict"] == "YTA"].mean(),
+})
 by_verdict["ratio"] = by_verdict["YTA"] / by_verdict["NTA"]  # above 1: more common in YTA comments
 ```
 
