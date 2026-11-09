@@ -123,17 +123,17 @@ To check Gemini, you need labels you trust for some of the posts. Label a sample
 
 One person's labels can be wrong too. Before you use hand labels as an answer key, have two people label the same texts with the same definition, without talking. **Agreement** is the share of texts they give the same label. If they often disagree, fix the definition before you check a model.
 
-When one label is rare, agreement is high by chance. Say labelers A and B each say yes to 2 of 10 posts and agree on 8. Two labelers who said yes at random at that rate would still agree on about 7. **Cohen's kappa** (Cohen 1960) corrects for chance:
+When one label is rare, agreement is high by chance. Say you (A) and a classmate (B) label the same 30 posts. You say yes to 4, B says yes to 5, and you agree on 27. Two labelers who said yes at random at those rates would still agree on about 22. **Cohen's kappa** (Cohen 1960) corrects for chance:
 
 ```text
-expected by chance = P(A yes) × P(B yes) + P(A no) × P(B no) = 0.2 × 0.2 + 0.8 × 0.8 = 0.68
-kappa = (agreement − expected) / (1 − expected) = (0.80 − 0.68) / (1 − 0.68) = 0.375
+expected by chance = P(A yes) × P(B yes) + P(A no) × P(B no) = 4/30 × 5/30 + 26/30 × 25/30 = 0.744
+kappa = (agreement − expected) / (1 − expected) = (0.90 − 0.744) / (1 − 0.744) = 0.61
 ```
 
 ```python
 from sklearn.metrics import cohen_kappa_score
 
-cohen_kappa_score(labels_a, labels_b)  # 0.375
+cohen_kappa_score(labels_a, labels_b)  # 0.61
 ```
 
 Kappa is 1 for perfect agreement, 0 for what chance would give, and below 0 for less than chance. For more than two labelers, use Krippendorff's alpha (Krippendorff 2018).
