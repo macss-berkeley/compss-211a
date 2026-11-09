@@ -113,13 +113,12 @@ A method has to beat this number to show that it learned something from the text
 
 ## Checking labels on 20 comments
 
-`data/week10_reply_labels.csv` has 20 comments, 10 NTA and 10 YTA, with the verdict word removed before labeling. Five methods labeled them:
+`data/week10_reply_labels.csv` has 20 comments, 10 NTA and 10 YTA, with the verdict word removed before labeling. Four methods labeled them:
 
 | Method | Accuracy |
 |---|---|
 | Always guessing NTA | 0.50 |
 | Word search (*rude*, *should have*, ...) | 0.55 |
-| Classifier (TF-IDF and logistic regression) | 0.35 |
 | Gemini, short prompt: `Label this reply NTA or YTA.` | 0.80 |
 | Gemini, longer instruction that defines NTA and YTA | 0.80 |
 
@@ -146,7 +145,6 @@ Accuracy counts both kinds of mistakes the same way, but they matter in differen
 |---|---|---|---|---|
 | Gemini, short prompt | 0.80 | 0 | 4 | 0.30 |
 | Gemini, longer instruction | 0.80 | 2 | 2 | 0.50 |
-| Classifier | 0.35 | 6 | 7 | 0.45 |
 
 The true share of YTA is 0.50. If you want the share of a label, mistakes that cancel can still give the right share, as the longer instruction does. If you want to collect YTA comments to read, they don't cancel: false positives waste your time and false negatives hide cases.
 
