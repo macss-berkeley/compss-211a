@@ -2,7 +2,7 @@
 
 Researchers label texts with models so they don't have to read every text. A label is a measurement, so you check it against texts labeled by hand before you count it. This week you practice on r/AmItheAsshole posts and replies, where the community's verdict is known. You compare three methods on the same texts: always guessing the most common verdict, a TF-IDF classifier, and Gemini. You read the mistakes, and you see what a change to Gemini's prompt does.
 
-Monday's notebook uses the posts from HW4. Lab 10 uses replies to AITA posts. HW5 asks Gemini about 40 posts and about your project texts. This page collects the code and the results from Monday and the lab.
+Monday's notebook uses the posts from HW4. Lab 10 checks Gemini on AITA replies that start with a verdict, then uses it on replies that have none. HW5 asks Gemini about 40 posts and about your project texts. This page collects the code and the results from Monday and the lab.
 
 ## When to label texts with a model
 
@@ -176,9 +176,13 @@ The true share of YTA replies is 0.50. A one-line prompt does as well as the car
 
 Two common summaries for the label you are looking for: **precision** is the share of texts labeled YTA that are YTA, and **recall** is the share of YTA texts that were labeled YTA. The short prompt has precision 1.00 and recall 0.60; the tone prompt has precision 0.56 and recall 0.90.
 
-## Lab 10: the replies
+## Lab 10: check, then use
 
-On the replies in Lab 10, Gemini got 17 of 20 right, the classifier 7, and always guessing NTA 10. Two of Gemini's misses were NTA replies that went on to criticize the poster.
+Most replies start with a verdict, and for those the verdict already says whether the reply found the poster in the wrong. That gives you a check for free. Lab 10 asks Gemini a yes/no question, whether the reply says the poster was in the wrong, on the 20 replies above with the verdict words removed. Then it uses the same instruction on 20 of the 176 replies that have no verdict word, where nothing else gives the answer.
+
+On the 20 replies with a verdict, always guessing "no" gets 0.50 and the word search gets 0.55. In Monday's file, the short and the careful Gemini prompts each got 16 of 20; the lab's yes/no instruction is different, so its score can differ. On all 1,035 replies with a verdict, the word search gets 0.61, below always guessing "no" at 0.63. It labels 87 replies yes, 54 of them wrongly, and misses 345 of the 378 YTA replies.
+
+The check has a limit. Every reply with a verdict takes a side. Some replies with no verdict take no side, such as a reply that only points to another subreddit, and the check can't tell you how Gemini labels those. Read them before you count them.
 
 ## How much to trust a number
 
@@ -207,7 +211,7 @@ Keep your Gemini key in the `.env` file (see "API keys" in `SETUP.md`), never in
 
 ## About the course data
 
-The posts are 3,832 of the 5,000 most upvoted r/AmItheAsshole posts from 2018 to 2021 that have one of the four verdicts and a text that was not removed: 3,239 NTA, 386 YTA, 108 ESH, and 99 NAH. The replies are 1,035 historical replies that start with NTA or YTA. Both samples favor highly scored posts and replies and do not represent Reddit users or public opinion.
+The posts are 3,832 of the 5,000 most upvoted r/AmItheAsshole posts from 2018 to 2021 that have one of the four verdicts and a text that was not removed: 3,239 NTA, 386 YTA, 108 ESH, and 99 NAH. The replies are 1,512 historical replies: 1,035 start with NTA or YTA, and 176 have no verdict word. Both samples favor highly scored posts and replies and do not represent Reddit users or public opinion.
 
 ## Documentation
 
