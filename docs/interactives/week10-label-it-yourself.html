@@ -248,11 +248,11 @@ pre.code.defn{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 14px}
 
     <form class="qcard" data-q="q1">
       <fieldset>
-        <legend>You can check these labels. Why?</legend>
+        <legend>Gemini said comment 4 does not call the poster wrong, but the commenter wrote YTA. What happened?</legend>
         <div class="opts">
-          <label><input type="radio" name="q1" value="a"> Gemini is usually right about comments.</label>
-          <label><input type="radio" name="q1" value="b"> The commenter wrote the verdict, so each comment has a known answer to compare with.</label>
-          <label><input type="radio" name="q1" value="c"> Comments are shorter than posts.</label>
+          <label><input type="radio" name="q1" value="a"> The comment is too short for Gemini to label.</label>
+          <label><input type="radio" name="q1" value="b"> The comment feels sorry for "this guy", and Gemini guessed that "this guy" was the poster.</label>
+          <label><input type="radio" name="q1" value="c"> Gemini can't read the :( at the end.</label>
         </div>
       </fieldset>
       <div class="btnrow"><button type="submit" class="btn">Check</button></div>
@@ -415,10 +415,10 @@ renderPosts();
 /* ---------- questions ---------- */
 const QUESTIONS = {
   q1: v => v === "b"
-    ? [true, "Correct. The verdict word is a label the commenter gave, so each comment has an answer. That lets you score Gemini, and yourself."]
+    ? [true, "Correct. The comment never says who was wrong. It feels sorry for the other person in the story, and Gemini read that as support for the poster. Comments that only hint at a judgment are where labels go wrong."]
     : v === "a"
-      ? [false, "Not quite. You only know whether Gemini is right because each comment has a known answer: the verdict word."]
-      : [false, "Not quite. Length is not what matters. Each comment has a known answer, the verdict word, to compare with."],
+      ? [false, "Not quite. Gemini labels short comments fine. The problem is what this one leaves out: it never says who was wrong, only who it feels sorry for."]
+      : [false, "Not quite. The emoji is not the problem. The comment never says who was wrong; it feels sorry for \"this guy\", and Gemini assumed that meant the poster."],
   q2: v => v === "c"
     ? [true, "Correct. A disagreement often means the definition does not say what to do with this kind of post. Fix it, then label again."]
     : v === "a"
