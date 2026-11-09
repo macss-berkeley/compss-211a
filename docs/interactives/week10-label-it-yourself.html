@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Label it yourself · COMPSS 211A</title>
+<meta name="description" content="Label r/AmItheAsshole comments and posts by hand, then compare your labels with the commenter's verdict, with Gemini, and with each other.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Inter+Tight:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --berkeley:#002676; --ink:#1A1A1A; --paper:#FFFFFF; --card:#FFFFFF;
+  --gold:#FDBA12; --gold-soft:#FFF1CC; --blue-mid:#2A4D9B; --line:#DDDDDD; --pale:#EEF3F9;
+  --ok:#1E7D4E; --err:#B3403A; --code-bg:#0E1B45; --code-ink:#E8EDF6;
+  --serif:"Inter Tight","Inter",-apple-system,"Segoe UI",sans-serif;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);color:var(--ink);background:var(--paper);line-height:1.6;font-size:16.5px}
+.wrap{max-width:940px;margin:0 auto;padding:0 22px}
+h1{font-family:var(--serif);font-size:clamp(2rem,5vw,2.9rem);line-height:1.12;margin:.35rem 0 .7rem}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin:.4rem 0 1rem}
+.chip{display:inline-flex;align-items:center;font-size:.78rem;font-weight:600;padding:4px 12px;border-radius:3px}
+.chip-gold{background:var(--gold);color:var(--berkeley)}
+.lede{max-width:680px}
+h2{font-family:var(--serif);font-weight:600;color:var(--berkeley);font-size:1.5rem;margin:0 0 .35rem}
+h2:focus{outline:none}
+h2 .step{color:var(--berkeley);margin-right:.4rem}
+.section-note{color:#3A4A63;font-size:.95rem;margin-bottom:1rem;max-width:720px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:22px 24px;box-shadow:0 1px 2px rgba(18,35,61,.05);margin-bottom:24px}
+h3.sub{font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:var(--blue-mid);margin:0 0 8px}
+.small{font-size:.85rem;color:#51607A}
+.mono{font-family:var(--mono)}
+/* orientation */
+.orientation{background:var(--pale);border-left:4px solid var(--gold);padding:12px 18px;margin:0 0 22px;border-radius:0 4px 4px 0;font-size:.95rem}
+.orientation p{margin:4px 0 8px;max-width:720px}
+.orientation summary{cursor:pointer;color:var(--berkeley);font-weight:600}
+.orientation summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.sentlist{list-style:none;margin:8px 0 4px;display:grid;gap:3px}
+.sentlist li{display:flex;gap:10px;align-items:baseline;font-size:.9rem}
+.num{font-family:var(--mono);font-size:.8rem;font-weight:500;color:var(--berkeley);min-width:1.6em;text-align:right;flex:none}
+.topic{font-size:.78rem;color:#51607A}
+.swatch{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:0}
+/* code */
+pre.code{background:var(--code-bg);color:var(--code-ink);font-family:var(--mono);font-size:.82rem;line-height:1.55;border-radius:4px;padding:12px 16px;overflow-x:auto;margin:14px 0 0}
+code.inl{font-family:var(--mono);font-size:.82em;background:#ECEFF5;border-radius:4px;padding:1px 6px;overflow-wrap:anywhere}
+/* tabs and pager */
+.steps{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:22px}
+.steps button{font-family:var(--sans);font-size:.92rem;font-weight:500;color:var(--berkeley);background:#fff;border:0;border-bottom:3px solid transparent;padding:11px 15px;cursor:pointer}
+.steps button:hover{background:var(--pale)}
+.steps button[aria-selected=true]{border-bottom-color:var(--gold);background:var(--pale);font-weight:700}
+.steps button:focus-visible{outline:2.5px solid var(--gold);outline-offset:-2px}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:6px;padding-top:18px;border-top:1px solid var(--line)}
+.pager .right{display:flex;gap:10px;align-items:center}
+.progress{color:#51607A;font-size:.85rem}
+/* form controls */
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;max-width:560px}
+.field label{font-size:.82rem;font-weight:600;color:var(--blue-mid);letter-spacing:.04em;text-transform:uppercase}
+select{font-family:var(--sans);font-size:.95rem;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:4px;padding:8px 10px;width:100%;max-width:100%}
+select:focus-visible{outline:2.5px solid var(--gold);outline-offset:1px;border-color:var(--berkeley)}
+.pairfields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* two rows side by side */
+.tworows{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+.panel{border:1px solid var(--line);border-radius:4px;padding:12px 16px;background:#FAFAFA;min-width:0}
+.bars{display:grid;grid-template-columns:max-content minmax(40px,1fr) max-content;gap:4px 10px;align-items:center;margin-top:6px}
+.bars .t{font-family:var(--mono);font-size:.84rem;color:#2B3B57}
+.bars .b{height:10px;background:#E6EBF3;border-radius:2px;overflow:hidden}
+.bars .b i{display:block;height:100%;background:var(--blue-mid)}
+.bars .v{font-family:var(--mono);font-size:.82rem;color:#3A4A63;text-align:right}
+.dims{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:8px}
+.dim{border:1px solid var(--line);border-radius:3px;background:#fff;padding:4px 6px;text-align:center}
+.dim .k{display:block;font-family:var(--mono);font-size:.72rem;color:#51607A}
+.dim .x{display:block;font-family:var(--mono);font-size:.84rem;color:var(--berkeley)}
+.more{font-family:var(--mono);font-size:.84rem;color:#51607A;margin-top:8px}
+/* scores */
+.scores{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}
+.score{border:1px solid var(--line);border-radius:4px;padding:12px 16px;background:#FAFAFA}
+.score .lab{font-size:.82rem;font-weight:600;color:var(--blue-mid);letter-spacing:.04em;text-transform:uppercase}
+.score .big{display:block;font-family:var(--mono);font-size:1.6rem;color:var(--berkeley);line-height:1.3}
+.score .b{height:8px;background:#E6EBF3;border-radius:2px;overflow:hidden;margin-top:4px}
+.score .b i{display:block;height:100%;background:var(--blue-mid)}
+.shared{margin-top:12px;font-size:.92rem}
+.term{display:inline-block;font-family:var(--mono);font-size:.82rem;background:var(--pale);border:1px solid #CBD4E1;border-radius:3px;padding:1px 8px;margin:2px 4px 2px 0}
+.pairtexts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:4px 0 12px}
+.pairtexts p{font-size:.95rem;border-left:3px solid #2D6AA3;padding-left:10px}
+.pairtexts p+p{border-left-color:#C4820E}
+.pairblock{border-top:1px solid var(--line);padding-top:16px;margin-top:18px}
+.pairblock:first-of-type{border-top:0;padding-top:0;margin-top:0}
+/* buttons */
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+button.btn{font-family:var(--sans);font-weight:600;font-size:.9rem;color:#fff;background:var(--berkeley);border:1.5px solid var(--berkeley);border-radius:4px;padding:9px 18px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+button.btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,38,118,.22)}
+button.btn:focus-visible{outline:2.5px solid var(--gold);outline-offset:2px}
+button.btn-ghost{background:#fff;color:var(--berkeley)}
+button.btn-sm{padding:6px 12px;font-size:.84rem}
+button.btn-ghost[aria-pressed=true]{background:var(--berkeley);color:#fff}
+button.btn:disabled{opacity:.4;cursor:default;transform:none;box-shadow:none}
+/* questions */
+.qcard{border:1px solid var(--line);border-radius:4px;padding:18px 20px;margin:18px 0 0;background:#FAFAFA}
+.qcard fieldset{border:0}
+.qcard legend{font-family:var(--serif);font-size:1.12rem;font-weight:600;color:var(--berkeley);margin-bottom:6px}
+.qcard p{font-size:.93rem;margin-bottom:6px}
+.qcard .opts{display:flex;flex-direction:column;gap:8px;margin:10px 0 4px}
+.qcard label{display:flex;gap:10px;align-items:flex-start;font-size:.93rem;cursor:pointer}
+.qcard input[type=radio]{margin-top:5px;accent-color:var(--berkeley);flex:none}
+.qcard input[type=radio]:focus-visible{outline:2.5px solid var(--gold);outline-offset:2px}
+.verdict{border-radius:4px;padding:10px 14px;font-size:.92rem;margin-top:12px}
+.verdict.good{background:#E8F4EC;color:#17643C;border:1px solid #BFE0CB}
+.verdict.bad{background:#F9E9E7;color:#9B2F29;border:1px solid #EAC7C3}
+/* map */
+.maplayout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px;align-items:start}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.84rem;color:#3A4A63;margin-bottom:6px}
+svg.map{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:4px;background:#FCFCFD}
+svg.map .pt{cursor:pointer}
+svg.map .pt:focus{outline:none}
+svg.map .pt .ring{fill:none;stroke:transparent;stroke-width:3}
+svg.map .pt:focus-visible .ring{stroke:var(--gold)}
+svg.map .pt[aria-pressed=true] .ring{stroke:var(--berkeley)}
+svg.map .pt .lbl{font-family:var(--mono);font-size:20px;font-weight:500;fill:var(--ink);paint-order:stroke;stroke:#fff;stroke-width:5px}
+svg.map .pt[aria-pressed=true] .lbl{font-weight:700;fill:var(--berkeley)}
+svg.map .link{stroke:var(--berkeley);stroke-width:1.5;stroke-dasharray:4 4;opacity:.7}
+ol.ranked{list-style:none;display:flex;flex-direction:column;gap:6px;margin:6px 0 16px}
+ol.ranked li{display:grid;grid-template-columns:3.4em 1fr;gap:10px;align-items:baseline;font-size:.9rem;line-height:1.45;background:#fff;border:1px solid var(--line);border-radius:4px;padding:7px 12px}
+ol.ranked .sc{font-family:var(--mono);color:var(--berkeley);font-weight:500}
+.selected-text{font-size:1rem;margin:0 0 14px;padding-left:10px;border-left:3px solid var(--berkeley)}
+/* summary */
+.recap{background:linear-gradient(0deg,rgba(0,38,118,.045),rgba(0,38,118,.045)),var(--card)}
+.recap ul{margin:4px 0 0 20px}
+.recap li{margin-bottom:7px;font-size:.95rem}
+.recap li::marker{color:var(--gold)}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media (max-width:760px){
+  .tworows,.pairtexts,.pairfields,.maplayout{grid-template-columns:1fr}
+  .scores{gap:10px}.score{padding:10px 12px}
+  .card{padding:18px 16px}
+}
+@media (max-width:480px){
+  .wrap{padding:0 16px}
+  .steps button{padding:9px 10px;font-size:.86rem}
+  .progress{display:none}
+  .qcard{padding:14px 14px}
+}
+
+/* MaCSS skin, aligned with macss.berkeley.edu */
+html,body{overflow-x:clip}
+.mast{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:12px calc(50vw - 50%);display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.14)}
+.mast .brand{color:#fff;font-family:var(--sans);font-size:.9rem;font-weight:600;letter-spacing:.01em}
+.mast .brand .uc{font-family:Georgia,"Times New Roman",serif;color:var(--gold);font-size:1.04rem;font-weight:700;margin-right:7px}
+.mast a{color:#fff;font-family:var(--sans);font-weight:600;font-size:.83rem;text-decoration:none;border-bottom:1.5px solid rgba(255,255,255,.35)}
+.mast a:hover{border-bottom-color:var(--gold)}
+.mast a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap>header{background:var(--berkeley);margin:0 calc(50% - 50vw);padding:30px calc(50vw - 50%) 28px;border-bottom:5px solid var(--gold);margin-bottom:30px}
+.wrap>header h1{color:#fff;font-weight:800;letter-spacing:-.015em}
+.wrap>header .lede{color:rgba(255,255,255,.9)}
+footer{background:var(--berkeley);color:rgba(255,255,255,.85);margin:44px calc(50% - 50vw) 0;padding:20px calc(50vw - 50%) 26px;font-size:.85rem}
+
+/* week 10: reply rows and tables */
+ol.rows{list-style:none;display:flex;flex-direction:column;gap:5px;margin:12px 0 4px}
+ol.rows li{display:grid;grid-template-columns:2em 1fr auto;gap:10px;align-items:baseline;font-size:.9rem;line-height:1.45;background:#fff;border:1px solid var(--line);border-radius:4px;padding:6px 12px}
+ol.rows li.empty{display:block;color:#51607A}
+ol.rows .reason{display:block;font-size:.8rem;color:#51607A;margin-top:2px}
+.lbls{display:flex;gap:6px}
+.tag{font-family:var(--mono);font-size:.78rem;font-weight:500;border:1px solid #CBD4E1;background:var(--pale);color:var(--berkeley);border-radius:3px;padding:0 6px}
+.tag.ok{background:#E8F4EC;border-color:#BFE0CB;color:#17643C}
+.tag.no{background:#F9E9E7;border-color:#EAC7C3;color:#9B2F29}
+.rowkey{margin-top:14px}
+.cmlayout{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:22px;align-items:start}
+table.cm,table.acc{border-collapse:collapse;font-size:.92rem;margin-bottom:6px}
+table.cm caption{caption-side:top;text-align:left;font-size:.82rem;font-weight:600;color:var(--blue-mid);letter-spacing:.04em;text-transform:uppercase;padding-bottom:6px}
+table.cm th,table.cm td,table.acc th,table.acc td{border:1px solid var(--line);padding:6px 12px;text-align:center}
+table.cm th,table.acc th{background:var(--pale);color:var(--berkeley);font-weight:600}
+table.acc{width:100%}
+table.acc td{font-family:var(--mono)}
+table.acc th:first-child{text-align:left}
+table.cm td{padding:0}
+.cellbtn{font-family:var(--mono);font-size:1.25rem;color:var(--ink);background:#fff;border:0;width:100%;min-width:64px;padding:10px 14px;cursor:pointer}
+.cellbtn.diag{background:#F2F8F4}
+.cellbtn:hover{background:var(--gold-soft)}
+.cellbtn[aria-pressed=true]{outline:3px solid var(--berkeley);outline-offset:-3px;font-weight:700}
+.cellbtn:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
+@media (max-width:760px){.cmlayout{grid-template-columns:1fr}ol.rows li{grid-template-columns:1.6em 1fr}ol.rows .lbls{grid-column:2}}
+/* label it yourself */
+ol.items{list-style:none;display:flex;flex-direction:column;gap:10px;margin:14px 0 6px}
+ol.items>li{display:grid;grid-template-columns:2em 1fr;gap:10px;background:#fff;border:1px solid var(--line);border-radius:4px;padding:12px 14px}
+ol.items .n{font-family:var(--mono);color:var(--berkeley);font-weight:500}
+ol.items .txt{margin:0 0 8px;font-size:.95rem;line-height:1.5}
+ol.items .ptitle{margin:0 0 6px;font-weight:600;color:var(--berkeley)}
+ol.items .ptext{font-size:.9rem;line-height:1.5;max-height:15em;overflow:auto;border-left:3px solid var(--line);padding-left:10px;margin-bottom:8px}
+.choices{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.choices .ask{font-size:.85rem;font-weight:600;color:var(--blue-mid)}
+button.choice{font:inherit;font-size:.86rem;border:1px solid #CBD4E1;background:var(--pale);color:var(--berkeley);border-radius:4px;padding:5px 12px;cursor:pointer}
+button.choice:hover{background:var(--gold-soft)}
+button.choice[aria-pressed=true]{background:var(--berkeley);color:#fff;border-color:var(--berkeley)}
+button.choice:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.reveal{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;margin-top:8px}
+.reveal .reason{flex-basis:100%;font-size:.82rem;color:#51607A}
+pre.code.defn{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="mast"><span class="brand"><span class="uc">UC Berkeley</span>COMPSS 211A · Computing I</span><a href="../index.html">← All interactives</a></div>
+
+<header>
+  <h1>Label it yourself</h1>
+  <div class="chips"><span class="chip chip-gold">Week 10</span></div>
+  <p class="lede">
+    Label comments and posts from r/AmItheAsshole by hand. Then compare your labels with the
+    commenter's own verdict, with Gemini, and with the person next to you.
+  </p>
+</header>
+
+<main>
+<section class="orientation" aria-label="About this page">
+  <p>
+    On r/AmItheAsshole, people describe a conflict and ask whether they were in the wrong.
+    Most comments start with a verdict: NTA (not the asshole) or YTA (you're the asshole).
+    Here that first word is removed, so you can label the comment yourself and then check.
+  </p>
+  <p>
+    Posts have no word that gives the answer. For posts you label something else: does the poster
+    admit they did something wrong? <b>Gemini</b> is <code class="inl">gemini-3.5-flash-lite</code>,
+    and its labels are from one run.
+  </p>
+</section>
+
+<nav class="steps" role="tablist" aria-label="Steps">
+  <button type="button" role="tab" id="tab-1" aria-controls="panel-1" data-step="1">1. Comments</button>
+  <button type="button" role="tab" id="tab-2" aria-controls="panel-2" data-step="2">2. Posts</button>
+  <button type="button" role="tab" id="tab-3" aria-controls="panel-3" data-step="3">Summary</button>
+</nav>
+
+<!-- Step 1 -->
+<section class="stage" id="panel-1" role="tabpanel" aria-labelledby="tab-1">
+  <h2 tabindex="-1"><span class="step">1.</span>Does the comment say the poster was in the wrong?</h2>
+  <p class="section-note">
+    Read each comment and pick a label. The answer is the verdict word the commenter wrote at the start.
+  </p>
+  <div class="card">
+    <div class="scores" aria-live="polite">
+      <div class="score"><span class="lab">You</span><span class="big" id="s1-you">0 of 0</span></div>
+      <div class="score"><span class="lab">Gemini</span><span class="big" id="s1-gem">0 of 0</span></div>
+    </div>
+    <ol class="items" id="s1-items"></ol>
+
+    <form class="qcard" data-q="q1">
+      <fieldset>
+        <legend>You can check these labels. Why?</legend>
+        <div class="opts">
+          <label><input type="radio" name="q1" value="a"> Gemini is usually right about comments.</label>
+          <label><input type="radio" name="q1" value="b"> The commenter wrote the verdict, so each comment has a known answer to compare with.</label>
+          <label><input type="radio" name="q1" value="c"> Comments are shorter than posts.</label>
+        </div>
+      </fieldset>
+      <div class="btnrow"><button type="submit" class="btn">Check</button></div>
+      <div class="verdict" id="v-q1" role="status" hidden></div>
+    </form>
+  </div>
+</section>
+
+<!-- Step 2 -->
+<section class="stage" id="panel-2" role="tabpanel" aria-labelledby="tab-2" hidden>
+  <h2 tabindex="-1"><span class="step">2.</span>Does the poster admit fault?</h2>
+  <p class="section-note">
+    No word in a post gives this label, and there is no answer to check against. Use the definition
+    Gemini was given, then compare.
+  </p>
+  <div class="card">
+    <pre class="code defn" id="s2-def"></pre>
+    <div class="scores" aria-live="polite">
+      <div class="score"><span class="lab">You and Gemini agree</span><span class="big" id="s2-agree">0 of 0</span></div>
+    </div>
+    <ol class="items" id="s2-items"></ol>
+
+    <form class="qcard" data-q="q2">
+      <fieldset>
+        <legend>You and Gemini disagree on a post. What do you do?</legend>
+        <div class="opts">
+          <label><input type="radio" name="q2" value="a"> Trust Gemini. It read more posts than you.</label>
+          <label><input type="radio" name="q2" value="b"> Trust yourself. You are the researcher.</label>
+          <label><input type="radio" name="q2" value="c"> Ask whether the definition is clear for this post. If two people disagree too, fix the definition before you label more posts.</label>
+        </div>
+      </fieldset>
+      <div class="btnrow"><button type="submit" class="btn">Check</button></div>
+      <div class="verdict" id="v-q2" role="status" hidden></div>
+    </form>
+  </div>
+</section>
+
+<!-- Summary -->
+<section class="stage" id="panel-3" role="tabpanel" aria-labelledby="tab-3" hidden>
+  <h2 tabindex="-1">Summary</h2>
+  <div class="card recap">
+    <ul>
+      <li>An LLM label answers a question you define, one text at a time.</li>
+      <li>Check the labels on texts where you know the answer, such as comments whose verdict word you removed.</li>
+      <li>When there is no answer to check against, label some texts by hand first. Where people disagree, the definition needs work.</li>
+      <li>Count with the labels only after you know how often they match yours.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="pager">
+  <button type="button" class="btn btn-ghost" id="prev">Previous</button>
+  <div class="right"><span class="progress" id="progress"></span><button type="button" class="btn" id="next">Next</button></div>
+</div>
+</main>
+
+<footer>COMPSS 211A, UC Berkeley. CC BY 4.0. Comments and posts from r/AmItheAsshole. Labels from gemini-3.5-flash-lite, one run, November 2026.</footer>
+</div>
+
+<script type="application/json" id="data">
+{"comments": [{"text": "He needed to know - otherwise he's left thinking guys get locked up for bad breakups", "verdict": "NTA", "gemini": "NTA", "reason": "The responder believes the poster was right to inform him so he wouldn't misunderstand the situation."}, {"text": "but you already know this. Kids have the right to use the toilet when needed. If one person is causing an issue then you deal with that person. I hope you lose your job - you have no business teaching children if you can’t understand this.", "verdict": "YTA", "gemini": "YTA", "reason": "The commenter strongly criticizes the teacher for denying a basic right to a child and hopes they lose their job."}, {"text": "at all. She is taking advantage of you and admitted it’s for convenience. If she’s that worried about having it in your country, she’s welcome to stay in a hotel.", "verdict": "NTA", "gemini": "NTA", "reason": "The respondent reassures the poster that they are not wrong for refusing to be taken advantage of for convenience."}, {"text": "and I feel so bad for this guy :(", "verdict": "YTA", "gemini": "NTA", "reason": "The commenter expresses sympathy for the poster, implying they were not in the wrong."}, {"text": "This decision requires both parents to be on board, and you have legitimate concerns here. I hope she sees the light and handles the disagreement better going forward.", "verdict": "NTA", "gemini": "NTA", "reason": "The reply validates the poster's legitimate concerns and implies that major decisions require agreement from both parents."}, {"text": "because this is exactly what you agreed to, but you both suck for thinking this was a good idea in the first place. Raising a kid is a full time job. If you didn't want that, you shouldn't have had one.", "verdict": "YTA", "gemini": "YTA", "reason": "The commenter points out that the poster agreed to the situation and criticizes them for not realizing that raising a child is a full-time job."}], "posts": [{"title": "AITA for letting my daughter get a piercing because her stepmother said no", "text": "My daughter (15f) came home after spending a weekend with her father and she expressed that she really wanted a nose piercing but her stepmother said no because she’s too young and her dad agreed. \nI was angry hearing this because that is a discussion that her actual parents (Her father and I) should have together. I’m not sure why her stepmom would try and make that decision when she has no right to have any input.\n\nYesterday I took her to a piercing shop and let her get the piercing without informing her father so now he and his wife are unhappy with me and are calling me “childish.” But I simply don’t want some random woman to try and act like my daughter’s mother. \n\nAITA", "gemini": "no", "reason": "The poster defends their action entirely out of spite for the stepmother without acknowledging any wrongdoing."}, {"title": "AITA for not paying to fix the laptop my boyfriend broke in a temper tantrums?", "text": "I (M34) bought my boyfriend (M32) a 2018 Macbook Air on sale a few months ago because he needed a new computer. It did not come with a warranty. Two days ago, he got annoyed at me that I asked him to come to bed (it was 2am), slammed the laptop shut and came.\n\nThen, he discovered the next day that his slamming the laptop shut broke the screen. He started demanding that I pay for it because \"I provoked him\" and because I was so stupid to buy a laptop without a warranty. I told him he should learn not to have temper tantrums.\n\nHe has a stable, salaried job. I understand that he doesn't want to pay to fix it, but I don't see how this is my problem.", "gemini": "no", "reason": "The poster maintains that they bear no responsibility for the damage and refuses to pay, arguing that their boyfriend's temper tantrum is entirely his own fault."}, {"title": "AITA for being upset that my sister won’t be a kidney donor for me?", "text": "I have double kidney failure and I’ve been on dialysis for 3 years. 3x a week for 4.5 hrs. The treatments are painful and grueling. I need a kidney transplant to survive. Some friends and other family members have been screened as donors but they were eliminated for various reasons. I have a sister that has never offered to be tested as a donor. She and I are very close and speak often. She knows I will die without a transplant. Yet she’s never once showed any interest in being a donor for me. I know it’s a personal choice when it comes to a persons body but I can’t help but feel like she’s turning her back on me when I need her the most. If the roles were reversed I would step right away to help her. So Reddit, AITA..?", "gemini": "no", "reason": "The poster expresses hurt and disappointment regarding their sister's choice but does not admit to any wrongdoing or fault of their own."}, {"title": "AITA for announcing my pregnancy 6 months after my niece's passing?", "text": "My sister (Aileen 30f) lost her only child (5 F) February of this year. Her death was tragic and Aileen and BIL are still seeking justice for their daughter's death. It has taken a huge toll on my sister's health so I didn't inform my family when I found out I was pregnant 2 months ago.\n\nLast week was my mom's birthday and the whole family noticed my growing belly. While my aunt gave her birthday wishes for mom she told everyone that I have something amazing to announce. I got the mic and informed everyone that my husband and I are expecting our first children (we're having twins). Everyone in the party congratulated us and mom said it was the best birthday present.\n\nAfter the party, my BIL called me and said I hurt my sister after I my announcement. He said it was insensitive of me and that I owe my sister an apology. I went to my Aileen's home right away but she refused to see me. AITA? I really felt sorry for causing pain to my grieving sister.", "gemini": "yes", "reason": "The poster states that they felt sorry for causing pain to their grieving sister."}], "definition": "Label whether the poster admits that they did something wrong.\n- yes: the poster says that something they did was wrong, unfair, or an overreaction, even in passing.\n- no: the poster does not admit any fault."}
+</script>
+<script>
+const D = JSON.parse(document.getElementById("data").textContent);
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function showVerdict(id, good, text) {
+  const v = $(id); v.hidden = false; v.className = "verdict " + (good ? "good" : "bad"); v.textContent = text;
+}
+
+/* ---------- tabs ---------- */
+const STEPS = [1, 2, 3];
+let step = 1;
+function go(n, focusHeading) {
+  step = n;
+  STEPS.forEach(k => {
+    const on = k === n;
+    $("panel-" + k).hidden = !on;
+    const t = $("tab-" + k);
+    t.setAttribute("aria-selected", on);
+    t.tabIndex = on ? 0 : -1;
+  });
+  $("prev").disabled = n === 1;
+  $("next").disabled = n === STEPS.length;
+  $("next").textContent = n === 2 ? "Summary" : "Next";
+  $("progress").textContent = n <= 2 ? `Step ${n} of 2` : "";
+  if (focusHeading) $("panel-" + n).querySelector("h2").focus({preventScroll: true});
+}
+document.querySelector(".steps").addEventListener("click", e => {
+  const b = e.target.closest("[data-step]"); if (b) go(+b.dataset.step, true);
+});
+document.querySelector(".steps").addEventListener("keydown", e => {
+  const b = e.target.closest("[data-step]"); if (!b) return;
+  const i = STEPS.indexOf(+b.dataset.step); let n;
+  if (e.key === "ArrowRight") n = (i + 1) % STEPS.length;
+  if (e.key === "ArrowLeft") n = (i + STEPS.length - 1) % STEPS.length;
+  if (e.key === "Home") n = 0;
+  if (e.key === "End") n = STEPS.length - 1;
+  if (n !== undefined) { e.preventDefault(); go(STEPS[n], false); $("tab-" + STEPS[n]).focus(); }
+});
+$("prev").addEventListener("click", () => { go(step - 1, true); window.scrollTo({top: document.querySelector(".steps").offsetTop - 10}); });
+$("next").addEventListener("click", () => { go(step + 1, true); window.scrollTo({top: document.querySelector(".steps").offsetTop - 10}); });
+
+/* ---------- step 1: comments ---------- */
+const C = D.comments, mineC = {};
+const NAME = {YTA: "in the wrong (YTA)", NTA: "not in the wrong (NTA)"};
+function renderComments() {
+  $("s1-items").innerHTML = C.map((c, i) => {
+    const pick = mineC[i];
+    const btn = v => `<button type="button" class="choice" data-c="${i}" data-v="${v}" aria-pressed="${pick === v}">${NAME[v]}</button>`;
+    let reveal = "";
+    if (pick) {
+      const youOk = pick === c.verdict, gemOk = c.gemini === c.verdict;
+      reveal = `<div class="reveal">
+        <span class="tag">commenter wrote: ${c.verdict}</span>
+        <span class="tag ${youOk ? "ok" : "no"}">you: ${pick}</span>
+        <span class="tag ${gemOk ? "ok" : "no"}">Gemini: ${c.gemini}</span>
+        <span class="reason">Gemini's reason: ${esc(c.reason)}</span></div>`;
+    }
+    return `<li><span class="n">${i + 1}</span><div><p class="txt">${esc(c.text)}</p>
+      <div class="choices">${btn("YTA")}${btn("NTA")}</div>${reveal}</div></li>`;
+  }).join("");
+  const done = Object.keys(mineC).map(Number);
+  $("s1-you").textContent = `${done.filter(i => mineC[i] === C[i].verdict).length} of ${done.length}`;
+  $("s1-gem").textContent = `${done.filter(i => C[i].gemini === C[i].verdict).length} of ${done.length}`;
+}
+$("s1-items").addEventListener("click", e => {
+  const b = e.target.closest("[data-c]"); if (!b) return;
+  mineC[+b.dataset.c] = b.dataset.v; renderComments();
+});
+renderComments();
+
+/* ---------- step 2: posts ---------- */
+const P = D.posts, mineP = {};
+$("s2-def").textContent = D.definition;
+function renderPosts() {
+  $("s2-items").innerHTML = P.map((p, i) => {
+    const pick = mineP[i];
+    const btn = v => `<button type="button" class="choice" data-p="${i}" data-v="${v}" aria-pressed="${pick === v}">${v}</button>`;
+    let reveal = "";
+    if (pick) {
+      const agree = pick === p.gemini;
+      reveal = `<div class="reveal">
+        <span class="tag">you: ${pick}</span>
+        <span class="tag ${agree ? "ok" : "no"}">Gemini: ${p.gemini}</span>
+        <span class="reason">Gemini's reason: ${esc(p.reason)}</span></div>`;
+    }
+    return `<li><span class="n">${i + 1}</span><div><p class="ptitle">${esc(p.title)}</p><div class="ptext">${esc(p.text).replace(/\n+/g, "<br><br>")}</div>
+      <div class="choices"><span class="ask">Admits fault?</span>${btn("yes")}${btn("no")}</div>${reveal}</div></li>`;
+  }).join("");
+  const done = Object.keys(mineP).map(Number);
+  $("s2-agree").textContent = `${done.filter(i => mineP[i] === P[i].gemini).length} of ${done.length}`;
+}
+$("s2-items").addEventListener("click", e => {
+  const b = e.target.closest("[data-p]"); if (!b) return;
+  mineP[+b.dataset.p] = b.dataset.v; renderPosts();
+});
+renderPosts();
+
+/* ---------- questions ---------- */
+const QUESTIONS = {
+  q1: v => v === "b"
+    ? [true, "Correct. The verdict word is a label the commenter gave, so each comment has an answer. That lets you score Gemini, and yourself."]
+    : v === "a"
+      ? [false, "Not quite. You only know whether Gemini is right because each comment has a known answer: the verdict word."]
+      : [false, "Not quite. Length is not what matters. Each comment has a known answer, the verdict word, to compare with."],
+  q2: v => v === "c"
+    ? [true, "Correct. A disagreement often means the definition does not say what to do with this kind of post. Fix it, then label again."]
+    : v === "a"
+      ? [false, "Not quite. Gemini's label is only as good as the definition, and you have not checked it yet."]
+      : [false, "Not quite. Your label is a check, not the truth. If a second person disagrees with you too, the definition is unclear."],
+};
+document.querySelectorAll("form.qcard").forEach(form => {
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const q = form.dataset.q, pick = form.querySelector(`input[name=${q}]:checked`);
+    if (!pick) { showVerdict("v-" + q, false, "Pick an answer first."); return; }
+    const [good, text] = QUESTIONS[q](pick.value);
+    showVerdict("v-" + q, good, text);
+  });
+});
+
+go(1, false);
+</script>
+</body>
+</html>
