@@ -616,7 +616,7 @@ export const skills = [
     "weeks": "Week 10",
     "releaseWeek": 10,
     "activity": null,
-    "practice": "Lab 10 — Check Gemini's labels on 20 AITA comments that have a verdict, then use it on 20 comments that have none.",
+    "practice": "Lab 10 — Label AITA posts with a partner, check Gemini against hand labels and a baseline, then use it on posts it has not seen.",
     "url": "https://github.com/macss-berkeley/compss-211a/blob/main/lab/lab10_live_gemini_evaluation.ipynb"
   },
   {
