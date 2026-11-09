@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Label it yourself · COMPSS 211A</title>
-<meta name="description" content="Label r/AmItheAsshole comments and posts by hand, then compare your labels with the commenter's verdict, with Gemini, and with each other.">
+<meta name="description" content="Label r/AmItheAsshole comments and posts on a labeling sheet. Check comments against the commenter's verdict; for posts, measure agreement between two labelers and Gemini, with Cohen's kappa.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Inter+Tight:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -198,6 +198,27 @@ button.choice:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .reveal{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;margin-top:8px}
 .reveal .reason{flex-basis:100%;font-size:.82rem;color:#51607A}
 pre.code.defn{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 14px}
+.sheetwrap{overflow-x:auto;margin:12px 0}
+table.sheet{border-collapse:collapse;width:100%;min-width:640px;font-size:.9rem}
+table.sheet th,table.sheet td{border:1px solid var(--line);padding:8px 10px;vertical-align:top;text-align:left}
+table.sheet thead th{background:var(--pale);color:var(--berkeley);font-weight:600;font-size:.82rem}
+table.sheet td.n{font-family:var(--mono);color:var(--berkeley);width:2em}
+table.sheet td.lab{white-space:nowrap;text-align:center;width:1%}
+table.sheet td.lab .choice{margin:2px}
+table.sheet .ptitle{margin:0 0 4px;font-weight:600;color:var(--berkeley)}
+table.sheet .ptext{font-size:.86rem;line-height:1.45;max-height:11em;overflow:auto;border-left:3px solid var(--line);padding-left:8px}
+table.sheet .reason{display:block;font-size:.8rem;color:#51607A;margin-top:6px}
+table.sheet tr.split td{background:#FFF8E6}
+.hidden-cell{color:#8A94A6;font-style:italic;font-size:.82rem}
+.hint{font-size:.85rem;color:#51607A;margin-left:10px}
+.phase{font-weight:600;color:var(--blue-mid);margin:4px 0 0}
+h3.sub{font-size:1.05rem;color:var(--berkeley);margin:18px 0 8px}
+details.calcbox{margin:14px 0 6px}
+details.calcbox summary{cursor:pointer;color:var(--berkeley);font-weight:600;margin-bottom:10px}
+.calc p{font-size:.9rem;margin:0 0 8px}
+table.cm td.c{padding:8px 16px;font-family:var(--mono)}
+#s2-agree{min-width:560px}
+#s2-agree th[scope=row]{white-space:nowrap}
 </style>
 </head>
 <body>
@@ -208,8 +229,9 @@ pre.code.defn{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 14px}
   <h1>Label it yourself</h1>
   <div class="chips"><span class="chip chip-gold">Week 10</span></div>
   <p class="lede">
-    Label comments and posts from r/AmItheAsshole by hand. Then compare your labels with the
-    commenter's own verdict, with Gemini, and with the person next to you.
+    Label comments and posts from r/AmItheAsshole on a labeling sheet. Comments have an answer key, so you
+    check your labels against it. Posts have none, so two people label the same posts and compare with each
+    other and with Gemini.
   </p>
 </header>
 
@@ -221,9 +243,8 @@ pre.code.defn{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 14px}
     Here that first word is removed, so you can label the comment yourself and then check.
   </p>
   <p>
-    Posts have no word that gives the answer. For posts you label something else: does the poster
-    admit they did something wrong? <b>Gemini</b> is <code class="inl">gemini-3.5-flash-lite</code>,
-    and its labels are from one run.
+    For posts you label something no word gives away: does the poster admit they did something wrong?
+    <b>Gemini</b> is <code class="inl">gemini-3.5-flash-lite</code>, and its labels are from one run.
   </p>
 </section>
 
@@ -235,18 +256,25 @@ pre.code.defn{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 14px}
 
 <!-- Step 1 -->
 <section class="stage" id="panel-1" role="tabpanel" aria-labelledby="tab-1">
-  <h2 tabindex="-1"><span class="step">1.</span>Does the comment say the poster was in the wrong?</h2>
+  <h2 tabindex="-1"><span class="step">1.</span>Comments: check labels against an answer key</h2>
   <p class="section-note">
-    Read each comment and pick a label. The answer is the verdict word the commenter wrote at the start.
+    Does the comment say the poster was in the wrong? Label all 6, then show the answers: the verdict word
+    the commenter wrote, and Gemini's label.
   </p>
   <div class="card">
-    <div class="scores" aria-live="polite">
-      <div class="score"><span class="lab">You</span><span class="big" id="s1-you">0 of 0</span></div>
-      <div class="score"><span class="lab">Gemini</span><span class="big" id="s1-gem">0 of 0</span></div>
+    <div class="sheetwrap">
+      <table class="sheet" id="s1-sheet">
+        <thead><tr><th scope="col">#</th><th scope="col">Comment</th><th scope="col">Your label</th><th scope="col">Commenter wrote</th><th scope="col">Gemini</th></tr></thead>
+        <tbody></tbody>
+      </table>
     </div>
-    <ol class="items" id="s1-items"></ol>
+    <div class="btnrow"><button type="button" class="btn" id="s1-show" disabled>Show the answers</button><span class="hint" id="s1-hint">Label all 6 comments first.</span></div>
+    <div class="scores" id="s1-scores" aria-live="polite" hidden>
+      <div class="score"><span class="lab">You</span><span class="big" id="s1-you"></span></div>
+      <div class="score"><span class="lab">Gemini</span><span class="big" id="s1-gem"></span></div>
+    </div>
 
-    <form class="qcard" data-q="q1">
+    <form class="qcard" data-q="q1" id="q1-card" hidden>
       <fieldset>
         <legend>Gemini said comment 4 does not call the poster wrong, but the commenter wrote YTA. What happened?</legend>
         <div class="opts">
@@ -263,30 +291,55 @@ pre.code.defn{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 14px}
 
 <!-- Step 2 -->
 <section class="stage" id="panel-2" role="tabpanel" aria-labelledby="tab-2" hidden>
-  <h2 tabindex="-1"><span class="step">2.</span>Does the poster admit fault?</h2>
+  <h2 tabindex="-1"><span class="step">2.</span>Posts: agreement without an answer key</h2>
   <p class="section-note">
-    No word in a post gives this label, and there is no answer to check against. Use the definition
-    Gemini was given, then compare.
+    Two people label the same 6 posts with the definition below, without talking: Labeler A first, then
+    Labeler B. Labeler A's labels are hidden while Labeler B works. Then compare the two labelers with each
+    other and with Gemini.
   </p>
   <div class="card">
     <pre class="code defn" id="s2-def"></pre>
-    <div class="scores" aria-live="polite">
-      <div class="score"><span class="lab">You and Gemini agree</span><span class="big" id="s2-agree">0 of 0</span></div>
+    <p class="phase" id="s2-phase" aria-live="polite"></p>
+    <div class="sheetwrap">
+      <table class="sheet" id="s2-sheet">
+        <thead><tr><th scope="col">#</th><th scope="col">Post</th><th scope="col">Labeler A</th><th scope="col">Labeler B</th><th scope="col">Gemini</th></tr></thead>
+        <tbody></tbody>
+      </table>
     </div>
-    <ol class="items" id="s2-items"></ol>
+    <div class="btnrow">
+      <button type="button" class="btn" id="s2-next" disabled></button>
+      <button type="button" class="btn btn-ghost" id="s2-reset">Start over</button>
+    </div>
 
-    <form class="qcard" data-q="q2">
-      <fieldset>
-        <legend>You and Gemini disagree on a post. What do you do?</legend>
-        <div class="opts">
-          <label><input type="radio" name="q2" value="a"> Trust Gemini. It read more posts than you.</label>
-          <label><input type="radio" name="q2" value="b"> Trust yourself. You are the researcher.</label>
-          <label><input type="radio" name="q2" value="c"> Ask whether the definition is clear for this post. If two people disagree too, fix the definition before you label more posts.</label>
+    <div id="s2-results" hidden>
+      <h3 class="sub">Agreement</h3>
+      <div class="sheetwrap">
+        <table class="acc" id="s2-agree">
+          <thead><tr><th scope="col">Pair</th><th scope="col">Same label</th><th scope="col">Agreement</th><th scope="col">Expected by chance</th><th scope="col">Cohen's kappa</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <details class="calcbox" open>
+        <summary>How the numbers for Labeler A and Labeler B are calculated</summary>
+        <div class="cmlayout">
+          <table class="cm" id="s2-cm"></table>
+          <div class="calc" id="s2-calc"></div>
         </div>
-      </fieldset>
-      <div class="btnrow"><button type="submit" class="btn">Check</button></div>
-      <div class="verdict" id="v-q2" role="status" hidden></div>
-    </form>
+      </details>
+
+      <form class="qcard" data-q="q2">
+        <fieldset>
+          <legend>In posts 2 and 5, the poster says they feel bad. Gemini labeled post 2 no and post 5 yes. What should change?</legend>
+          <div class="opts">
+            <label><input type="radio" name="q2" value="a"> Use a bigger model, which reads posts more carefully.</label>
+            <label><input type="radio" name="q2" value="b"> Add a rule to the definition that says whether feeling bad counts as admitting fault, then label again.</label>
+            <label><input type="radio" name="q2" value="c"> Leave out posts like these, because they are unclear.</label>
+          </div>
+        </fieldset>
+        <div class="btnrow"><button type="submit" class="btn">Check</button></div>
+        <div class="verdict" id="v-q2" role="status" hidden></div>
+      </form>
+    </div>
   </div>
 </section>
 
@@ -295,10 +348,10 @@ pre.code.defn{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 14px}
   <h2 tabindex="-1">Summary</h2>
   <div class="card recap">
     <ul>
-      <li>An LLM label answers a question you define, one text at a time.</li>
-      <li>Check the labels on texts where you know the answer, such as comments whose verdict word you removed.</li>
-      <li>When there is no answer to check against, label some texts by hand first. Where people disagree, the definition needs work.</li>
-      <li>Count with the labels only after you know how often they match yours.</li>
+      <li>When there is an answer key, check labels against it: the share that match is the accuracy.</li>
+      <li>When there is none, two people label the same texts. Agreement is the share of texts they give the same label.</li>
+      <li>When one label is rare, two labelers agree often by chance. Cohen's kappa subtracts that: 1 is perfect agreement, 0 is what chance would give.</li>
+      <li>Where labelers disagree, the definition usually has no rule for that kind of text. Add one before you label more.</li>
     </ul>
   </div>
 </section>
@@ -313,12 +366,13 @@ pre.code.defn{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 14px}
 </div>
 
 <script type="application/json" id="data">
-{"comments": [{"text": "He needed to know - otherwise he's left thinking guys get locked up for bad breakups", "verdict": "NTA", "gemini": "NTA", "reason": "The responder believes the poster was right to inform him so he wouldn't misunderstand the situation."}, {"text": "but you already know this. Kids have the right to use the toilet when needed. If one person is causing an issue then you deal with that person. I hope you lose your job - you have no business teaching children if you can’t understand this.", "verdict": "YTA", "gemini": "YTA", "reason": "The commenter strongly criticizes the teacher for denying a basic right to a child and hopes they lose their job."}, {"text": "at all. She is taking advantage of you and admitted it’s for convenience. If she’s that worried about having it in your country, she’s welcome to stay in a hotel.", "verdict": "NTA", "gemini": "NTA", "reason": "The respondent reassures the poster that they are not wrong for refusing to be taken advantage of for convenience."}, {"text": "and I feel so bad for this guy :(", "verdict": "YTA", "gemini": "NTA", "reason": "The commenter expresses sympathy for the poster, implying they were not in the wrong."}, {"text": "This decision requires both parents to be on board, and you have legitimate concerns here. I hope she sees the light and handles the disagreement better going forward.", "verdict": "NTA", "gemini": "NTA", "reason": "The reply validates the poster's legitimate concerns and implies that major decisions require agreement from both parents."}, {"text": "because this is exactly what you agreed to, but you both suck for thinking this was a good idea in the first place. Raising a kid is a full time job. If you didn't want that, you shouldn't have had one.", "verdict": "YTA", "gemini": "YTA", "reason": "The commenter points out that the poster agreed to the situation and criticizes them for not realizing that raising a child is a full-time job."}], "posts": [{"title": "AITA for letting my daughter get a piercing because her stepmother said no", "text": "My daughter (15f) came home after spending a weekend with her father and she expressed that she really wanted a nose piercing but her stepmother said no because she’s too young and her dad agreed. \nI was angry hearing this because that is a discussion that her actual parents (Her father and I) should have together. I’m not sure why her stepmom would try and make that decision when she has no right to have any input.\n\nYesterday I took her to a piercing shop and let her get the piercing without informing her father so now he and his wife are unhappy with me and are calling me “childish.” But I simply don’t want some random woman to try and act like my daughter’s mother. \n\nAITA", "gemini": "no", "reason": "The poster defends their action entirely out of spite for the stepmother without acknowledging any wrongdoing."}, {"title": "AITA for not paying to fix the laptop my boyfriend broke in a temper tantrums?", "text": "I (M34) bought my boyfriend (M32) a 2018 Macbook Air on sale a few months ago because he needed a new computer. It did not come with a warranty. Two days ago, he got annoyed at me that I asked him to come to bed (it was 2am), slammed the laptop shut and came.\n\nThen, he discovered the next day that his slamming the laptop shut broke the screen. He started demanding that I pay for it because \"I provoked him\" and because I was so stupid to buy a laptop without a warranty. I told him he should learn not to have temper tantrums.\n\nHe has a stable, salaried job. I understand that he doesn't want to pay to fix it, but I don't see how this is my problem.", "gemini": "no", "reason": "The poster maintains that they bear no responsibility for the damage and refuses to pay, arguing that their boyfriend's temper tantrum is entirely his own fault."}, {"title": "AITA for being upset that my sister won’t be a kidney donor for me?", "text": "I have double kidney failure and I’ve been on dialysis for 3 years. 3x a week for 4.5 hrs. The treatments are painful and grueling. I need a kidney transplant to survive. Some friends and other family members have been screened as donors but they were eliminated for various reasons. I have a sister that has never offered to be tested as a donor. She and I are very close and speak often. She knows I will die without a transplant. Yet she’s never once showed any interest in being a donor for me. I know it’s a personal choice when it comes to a persons body but I can’t help but feel like she’s turning her back on me when I need her the most. If the roles were reversed I would step right away to help her. So Reddit, AITA..?", "gemini": "no", "reason": "The poster expresses hurt and disappointment regarding their sister's choice but does not admit to any wrongdoing or fault of their own."}, {"title": "AITA for announcing my pregnancy 6 months after my niece's passing?", "text": "My sister (Aileen 30f) lost her only child (5 F) February of this year. Her death was tragic and Aileen and BIL are still seeking justice for their daughter's death. It has taken a huge toll on my sister's health so I didn't inform my family when I found out I was pregnant 2 months ago.\n\nLast week was my mom's birthday and the whole family noticed my growing belly. While my aunt gave her birthday wishes for mom she told everyone that I have something amazing to announce. I got the mic and informed everyone that my husband and I are expecting our first children (we're having twins). Everyone in the party congratulated us and mom said it was the best birthday present.\n\nAfter the party, my BIL called me and said I hurt my sister after I my announcement. He said it was insensitive of me and that I owe my sister an apology. I went to my Aileen's home right away but she refused to see me. AITA? I really felt sorry for causing pain to my grieving sister.", "gemini": "yes", "reason": "The poster states that they felt sorry for causing pain to their grieving sister."}], "definition": "Label whether the poster admits that they did something wrong.\n- yes: the poster says that something they did was wrong, unfair, or an overreaction, even in passing.\n- no: the poster does not admit any fault."}
+{"comments": [{"text": "He needed to know - otherwise he's left thinking guys get locked up for bad breakups", "verdict": "NTA", "gemini": "NTA", "reason": "The responder believes the poster was right to inform him so he wouldn't misunderstand the situation."}, {"text": "but you already know this. Kids have the right to use the toilet when needed. If one person is causing an issue then you deal with that person. I hope you lose your job - you have no business teaching children if you can’t understand this.", "verdict": "YTA", "gemini": "YTA", "reason": "The commenter strongly criticizes the teacher for denying a basic right to a child and hopes they lose their job."}, {"text": "at all. She is taking advantage of you and admitted it’s for convenience. If she’s that worried about having it in your country, she’s welcome to stay in a hotel.", "verdict": "NTA", "gemini": "NTA", "reason": "The respondent reassures the poster that they are not wrong for refusing to be taken advantage of for convenience."}, {"text": "and I feel so bad for this guy :(", "verdict": "YTA", "gemini": "NTA", "reason": "The commenter expresses sympathy for the poster, implying they were not in the wrong."}, {"text": "This decision requires both parents to be on board, and you have legitimate concerns here. I hope she sees the light and handles the disagreement better going forward.", "verdict": "NTA", "gemini": "NTA", "reason": "The reply validates the poster's legitimate concerns and implies that major decisions require agreement from both parents."}, {"text": "because this is exactly what you agreed to, but you both suck for thinking this was a good idea in the first place. Raising a kid is a full time job. If you didn't want that, you shouldn't have had one.", "verdict": "YTA", "gemini": "YTA", "reason": "The commenter points out that the poster agreed to the situation and criticizes them for not realizing that raising a child is a full-time job."}], "posts": [{"title": "AITA for giving daughter's friend sanitary products?", "text": "I(43M) and my ex(44F) separated when my daughter was born. Ex sees daughter monthly,  but she lives with me as her school is near my house. I grew up with 3 sisters and very aware of the monthly period. I went out and bought my daughter a ton of products that she can choose from. I sent her a few videos to watch as well to avoid any issues. \n\nDaughter(13F) got her period two months ago and she was very thankful to have products on hand. One of her friends came over for a sleepover and during the night, I heard screaming. I woke up and ran into daughter's room. Her friend started crying and daughter tried to explain what was going on. She then showed her friend where the products were and everything calmed down.\n\nHer friend's mom came to pick her up in the morning and I informed her in small details what happened. Her mother started scolding me for being a creep and should be ashamed of myself. Her friend won't be coming over anymore because of me. \n\nAITA for giving daughter's friend sanitary products?", "gemini": "no", "reason": "The poster maintains that they only acted helpfully and does not admit to any wrongdoing in their actions."}, {"title": "AITA for making a joke about my friends 6th wedding?", "text": "Throwaway: Me (54F) and my friend \"Debra\" (55F) have known eachother since HighSchool. Debra recently got engaged to her BF after dating him for 2 years. This is going to be Debra's 6th marriage, and the wedding took place today. I was supposed to be her MOH again, so I was looking forward to it. 2 days ago, I called Debra and told her that I won't be able to attend the wedding. My ill Mother recently broke her leg and needed someone to stay with her for a while.\n\nDebra was a bit sad, but she understood my emergency situation. She made a joke about how she'll have to drink double the wine to make up for my absence. I chuckled and joked back, \"Don't worry, I'll just come to your 7th wedding.\" The call went dead silent and she just hung up on me. A few hrs later, I received several aggressive texts from the Bridesmaids. They said I was a bitch for making such a cruel joke, and that Debra had called them crying about how I \"made fun of her.\" I feel bad and I'm wondering if I went too far. AITA?", "gemini": "no", "reason": "The poster questions her actions and feels bad, but she never explicitly admits that she did something wrong."}, {"title": "WIBTA if I gave my neighbor the rest of his cigarette butts back?", "text": "I came back from a 6 week vacation, only to find my flower garden has been littered with cigarette butts. They all came from my neighbor. He's the only one that still smokes. I went to his house and politely asked him if he could clean them up. He told me to fuck off and then slammed the door in my face. Since everything was mixed in with the mulch, I had to get on my hands and knees and pick everything out by hand. Fucking 47 cigarette butts!\n\nI've been mailing them back to him one by one, with a simple note \"don't be an ass, pick up your trash.\" I've sent 26 so far.\n\nhis wife just came to my house and talked to my wife, she made a peace treaty she apologized on behalf of her husband. My wife is furious with the amount of pettiness that I have displayed, and told me that I need to stop.\n\nI don't know if I can, I feel like I'm emotionally invested in this now. I mean he sent his wife to apologize to my wife. He didn't even have the decency to apologize to me man to man.", "gemini": "no", "reason": "The poster does not admit any wrongdoing and instead justifies their ongoing petty retaliation."}, {"title": "AITA for saying I don't want my DILs food for Christmas?", "text": "So my son married a chef. Shes very into cooking and baking and I have to admit, she's rather good at it. The problem is, it's really embarrassing for me because when I cook the same things that she's sent us they're nowhere near as good and it makes me seem like a bad cook. Also she doesn't just make us small things, if we get together she'll make most of the meal for us and gets all the praise.\n\n\nWell my son called us up saying tomorrow he'd bring by our Christmas stuff and to \"look forward to it because she made all sorts of goodies\". I flat out told him I dont want her \"goodies\", that I feel like she's just trying to show off and im done with her showing off how much better of a cook than me she is every chance she gets. My son got mad at me and told me how rude and cruel I was and that I didn't deserve her cooking anyways, and my husband and other children are mad because they were apparently looking forward to her cooking and now they don't get it. But I can just make them something they like, they don't need it to be HER cooking. AITA?", "gemini": "no", "reason": "The poster defends her actions and blames her daughter-in-law for showing off, without admitting any wrongdoing."}, {"title": "AITA for hanging up Satanic decorations?", "text": "Posting from a throwaway. So I (21F) live with my  roommate “Bethany” (19F). Bethany is an extremely religious Christian and I’m an atheist. She has hung up tons of Bible verse/Christian decorations in the shared spaces of our apartment. The other week I asked if she could keep them out of the common areas, as I’m an atheist and have had some trauma with organized religion growing up and would rather not see reminders of that every day. Bethany took this as a evidence that she’s being persecuted for her faith, and refused to take anything down. \n\nWe’re now pretty much stuck in the apartment together because of coronavirus, and it’s getting worse. Yesterday she overheard me saying some sexy things on FaceTime with my girlfriend (I was in my room) and later passive aggressively made a comment about how God can “heal” all sorts of “sinners.” I didn’t even know what to say. She left to go get groceries and while she was gone I printed out pictures of Satan, pentagrams, etc. and hung them all over the common spaces. When she came back she freaked out, started crying and accused me of bringing demons into the apartment. \n\nI feel bad for making her cry and causing more tension, but I also feel like it’s warranted after how pushy and homophobic she’s been. \n\n(I signed a lease for a new apartment with a more compatible roommate but that doesn’t start until August, so I have to tough out the next few months here.)\n\nEdit: I did tell Bethany about my trauma when I originally asked her to take the decorations down.", "gemini": "yes", "reason": "The poster explicitly admits that they feel bad for making her roommate cry and causing more tension."}, {"title": "AITA for giving a three year old beer?", "text": "Yeah it sounds bad but it really was an innocent thing. I was at a cookout with my wife's family and I just opened up a cold one. My wife's three year old neice asked me what I was drinking, and I told her it was beer. She asked to taste it, so I poured her like a tenth of a sip into a plastic cup thinking it will be bitter for her, but, well, she liked it.\n\nShe wanted more and I told her it was a grownup drink but it was too late. She ran around demanding to drink more beer for the entire cookout, she wouldn't eat anything, just demanded beer, and they had to put her in a time out.\n\nAnyway, the inlaws are mad now and the wife isn't happy. So AITA?\n\nEdit: the kids are given watered down wine on  shabbas if it's relevant\n\nUpdate: apologised and sorted it out with the in laws. They know I love that little rascal and would never intend to harm her. I do agree with people that things like that should be leveled with the parents first. Interesting that the divide along YTA/NTA was highly correlated with upbringing - Europeans and more rural oriented Americans (for lack of better wording) did realise that this a just a dumb brain fart on my part at worst, and just being an uncle at best. \nI think mostly Americans were highly critical of my actions, there does seem to be a series taboo regarding alcohol and boundaries in that culture. I guess its a matter of outlook, as most things are.\n\nHaving said that, I got some literal death threats, and some people said I should be locked up and never ever be around children. Really now?", "gemini": "yes", "reason": "The poster explicitly states in their update that they agree with people who said they should have cleared it with the parents first and acknowledges it was a dumb brain fart."}], "definition": "Label whether the poster admits that they did something wrong.\n- yes: the poster says that something they did was wrong, unfair, or an overreaction, even in passing.\n- no: the poster does not admit any fault."}
 </script>
 <script>
 const D = JSON.parse(document.getElementById("data").textContent);
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const f2 = x => x.toFixed(2);
 function showVerdict(id, good, text) {
   const v = $(id); v.hidden = false; v.className = "verdict " + (good ? "good" : "bad"); v.textContent = text;
 }
@@ -356,59 +410,127 @@ document.querySelector(".steps").addEventListener("keydown", e => {
 $("prev").addEventListener("click", () => { go(step - 1, true); window.scrollTo({top: document.querySelector(".steps").offsetTop - 10}); });
 $("next").addEventListener("click", () => { go(step + 1, true); window.scrollTo({top: document.querySelector(".steps").offsetTop - 10}); });
 
-/* ---------- step 1: comments ---------- */
+/* ---------- sheet 1: comments ---------- */
 const C = D.comments, mineC = {};
-const NAME = {YTA: "in the wrong (YTA)", NTA: "not in the wrong (NTA)"};
-function renderComments() {
-  $("s1-items").innerHTML = C.map((c, i) => {
-    const pick = mineC[i];
-    const btn = v => `<button type="button" class="choice" data-c="${i}" data-v="${v}" aria-pressed="${pick === v}">${NAME[v]}</button>`;
-    let reveal = "";
-    if (pick) {
-      const youOk = pick === c.verdict, gemOk = c.gemini === c.verdict;
-      reveal = `<div class="reveal">
-        <span class="tag">commenter wrote: ${c.verdict}</span>
-        <span class="tag ${youOk ? "ok" : "no"}">you: ${pick}</span>
-        <span class="tag ${gemOk ? "ok" : "no"}">Gemini: ${c.gemini}</span>
-        <span class="reason">Gemini's reason: ${esc(c.reason)}</span></div>`;
-    }
-    return `<li><span class="n">${i + 1}</span><div><p class="txt">${esc(c.text)}</p>
-      <div class="choices">${btn("YTA")}${btn("NTA")}</div>${reveal}</div></li>`;
-  }).join("");
-  const done = Object.keys(mineC).map(Number);
-  $("s1-you").textContent = `${done.filter(i => mineC[i] === C[i].verdict).length} of ${done.length}`;
-  $("s1-gem").textContent = `${done.filter(i => C[i].gemini === C[i].verdict).length} of ${done.length}`;
+let shownC = false;
+function choice(attr, i, v, pick, text) {
+  return `<button type="button" class="choice" ${attr}="${i}" data-v="${v}" aria-pressed="${pick === v}">${text}</button>`;
 }
-$("s1-items").addEventListener("click", e => {
+function renderComments() {
+  $("s1-sheet").querySelector("tbody").innerHTML = C.map((c, i) => {
+    const pick = mineC[i];
+    const key = shownC ? `<span class="tag">${c.verdict}</span>` : `<span class="hidden-cell">hidden</span>`;
+    const gem = shownC ? `<span class="tag ${c.gemini === c.verdict ? "ok" : "no"}">${c.gemini}</span>` : `<span class="hidden-cell">hidden</span>`;
+    const you = shownC && pick ? ` <span class="tag ${pick === c.verdict ? "ok" : "no"}">${pick === c.verdict ? "match" : "no match"}</span>` : "";
+    const reason = shownC ? `<span class="reason">Gemini's reason: ${esc(c.reason)}</span>` : "";
+    return `<tr><td class="n">${i + 1}</td><td><span class="txt">${esc(c.text)}</span>${reason}</td>
+      <td class="lab">${choice("data-c", i, "YTA", pick, "YTA")}${choice("data-c", i, "NTA", pick, "NTA")}${you}</td>
+      <td class="lab">${key}</td><td class="lab">${gem}</td></tr>`;
+  }).join("");
+  const done = Object.keys(mineC).length;
+  $("s1-show").disabled = shownC || done < C.length;
+  $("s1-hint").textContent = shownC ? "" : done < C.length ? `Label all ${C.length} comments first (${done} of ${C.length} done).` : "";
+  if (shownC) {
+    $("s1-scores").hidden = false;
+    $("q1-card").hidden = false;
+    $("s1-you").textContent = `${C.filter((c, i) => mineC[i] === c.verdict).length} of ${C.length}`;
+    $("s1-gem").textContent = `${C.filter(c => c.gemini === c.verdict).length} of ${C.length}`;
+  }
+}
+$("s1-sheet").addEventListener("click", e => {
   const b = e.target.closest("[data-c]"); if (!b) return;
   mineC[+b.dataset.c] = b.dataset.v; renderComments();
 });
+$("s1-show").addEventListener("click", () => { shownC = true; renderComments(); });
 renderComments();
 
-/* ---------- step 2: posts ---------- */
-const P = D.posts, mineP = {};
+/* ---------- sheet 2: posts ---------- */
+const P = D.posts;
+let A = {}, B = {}, phase = "A";
 $("s2-def").textContent = D.definition;
-function renderPosts() {
-  $("s2-items").innerHTML = P.map((p, i) => {
-    const pick = mineP[i];
-    const btn = v => `<button type="button" class="choice" data-p="${i}" data-v="${v}" aria-pressed="${pick === v}">${v}</button>`;
-    let reveal = "";
-    if (pick) {
-      const agree = pick === p.gemini;
-      reveal = `<div class="reveal">
-        <span class="tag">you: ${pick}</span>
-        <span class="tag ${agree ? "ok" : "no"}">Gemini: ${p.gemini}</span>
-        <span class="reason">Gemini's reason: ${esc(p.reason)}</span></div>`;
-    }
-    return `<li><span class="n">${i + 1}</span><div><p class="ptitle">${esc(p.title)}</p><div class="ptext">${esc(p.text).replace(/\n+/g, "<br><br>")}</div>
-      <div class="choices"><span class="ask">Admits fault?</span>${btn("yes")}${btn("no")}</div>${reveal}</div></li>`;
-  }).join("");
-  const done = Object.keys(mineP).map(Number);
-  $("s2-agree").textContent = `${done.filter(i => mineP[i] === P[i].gemini).length} of ${done.length}`;
+function labelCell(who, i) {
+  const own = who === "A" ? A : B;
+  if (phase === who) return `<td class="lab">${choice("data-" + who.toLowerCase(), i, "yes", own[i], "yes")}${choice("data-" + who.toLowerCase(), i, "no", own[i], "no")}</td>`;
+  if (phase === "compare") return `<td class="lab"><span class="tag">${own[i]}</span></td>`;
+  if (who === "A") return `<td class="lab"><span class="hidden-cell">hidden</span></td>`;
+  return `<td class="lab"><span class="hidden-cell">waiting</span></td>`;
 }
-$("s2-items").addEventListener("click", e => {
-  const b = e.target.closest("[data-p]"); if (!b) return;
-  mineP[+b.dataset.p] = b.dataset.v; renderPosts();
+function renderPosts() {
+  const cmp = phase === "compare";
+  $("s2-sheet").querySelector("tbody").innerHTML = P.map((p, i) => {
+    const gem = cmp ? `<span class="tag">${p.gemini}</span>` : `<span class="hidden-cell">hidden</span>`;
+    const reason = cmp ? `<span class="reason">Gemini's reason: ${esc(p.reason)}</span>` : "";
+    const split = cmp && !(A[i] === B[i] && B[i] === p.gemini);
+    return `<tr${split ? ' class="split"' : ""}><td class="n">${i + 1}</td><td><p class="ptitle">${esc(p.title)}</p>
+      <div class="ptext" tabindex="0">${esc(p.text).replace(/\n+/g, "<br><br>")}</div>${reason}</td>
+      ${labelCell("A", i)}${labelCell("B", i)}<td class="lab">${gem}</td></tr>`;
+  }).join("");
+  const n = P.length, a = Object.keys(A).length, b = Object.keys(B).length;
+  const next = $("s2-next");
+  if (phase === "A") {
+    $("s2-phase").textContent = `Labeler A: label all ${n} posts (${a} of ${n} done).`;
+    next.hidden = false; next.textContent = "Done: Labeler B's turn"; next.disabled = a < n;
+  } else if (phase === "B") {
+    $("s2-phase").textContent = `Labeler B: label all ${n} posts (${b} of ${n} done). Labeler A's labels are hidden.`;
+    next.hidden = false; next.textContent = "Done: compare"; next.disabled = b < n;
+  } else {
+    $("s2-phase").textContent = "Both labelers are done. Rows where the three labels differ are shaded.";
+    next.hidden = true;
+  }
+  $("s2-results").hidden = !cmp;
+  if (cmp) renderAgreement();
+}
+function stats(x, y) {
+  const n = P.length; let yy = 0, yn = 0, ny = 0, nn = 0;
+  for (let i = 0; i < n; i++) {
+    if (x[i] === "yes" && y[i] === "yes") yy++;
+    else if (x[i] === "yes") yn++;
+    else if (y[i] === "yes") ny++;
+    else nn++;
+  }
+  const po = (yy + nn) / n, px = (yy + yn) / n, py = (yy + ny) / n;
+  const pe = px * py + (1 - px) * (1 - py);
+  const kappa = pe < 1 ? (po - pe) / (1 - pe) : null;
+  return {n, yy, yn, ny, nn, po, px, py, pe, kappa};
+}
+function renderAgreement() {
+  const G = P.map(p => p.gemini);
+  const pairs = [["Labeler A and Labeler B", A, B], ["Labeler A and Gemini", A, G], ["Labeler B and Gemini", B, G]];
+  $("s2-agree").querySelector("tbody").innerHTML = pairs.map(([name, x, y]) => {
+    const s = stats(x, y);
+    const k = s.kappa === null ? "not defined" : f2(s.kappa);
+    return `<tr><th scope="row">${name}</th><td>${s.yy + s.nn} of ${s.n}</td><td>${f2(s.po)}</td><td>${f2(s.pe)}</td><td>${k}</td></tr>`;
+  }).join("");
+  const s = stats(A, B), n = s.n;
+  $("s2-cm").innerHTML = `<caption>Labeler A (rows) and Labeler B (columns)</caption>
+    <tr><th></th><th scope="col">B: yes</th><th scope="col">B: no</th></tr>
+    <tr><th scope="row">A: yes</th><td class="c">${s.yy}</td><td class="c">${s.yn}</td></tr>
+    <tr><th scope="row">A: no</th><td class="c">${s.ny}</td><td class="c">${s.nn}</td></tr>`;
+  const aYes = s.yy + s.yn, bYes = s.yy + s.ny;
+  let lines = `<p>Agreement = (both yes + both no) / ${n} = (${s.yy} + ${s.nn}) / ${n} = <b>${f2(s.po)}</b></p>
+    <p>A said yes for ${aYes} of ${n} posts, B for ${bYes} of ${n}. Two labelers who said yes that often at random would agree this often:</p>
+    <p>Expected = ${aYes}/${n} × ${bYes}/${n} + ${n - aYes}/${n} × ${n - bYes}/${n} = <b>${f2(s.pe)}</b></p>`;
+  lines += s.kappa === null
+    ? `<p>Kappa is not defined here: both labelers gave every post the same label, so chance alone gives full agreement.</p>`
+    : `<p>Kappa = (agreement − expected) / (1 − expected) = (${f2(s.po)} − ${f2(s.pe)}) / (1 − ${f2(s.pe)}) = <b>${f2(s.kappa)}</b></p>`;
+  $("s2-calc").innerHTML = lines;
+}
+$("s2-sheet").addEventListener("click", e => {
+  const b = e.target.closest("[data-a],[data-b]"); if (!b) return;
+  if (b.dataset.a !== undefined && phase === "A") A[+b.dataset.a] = b.dataset.v;
+  if (b.dataset.b !== undefined && phase === "B") B[+b.dataset.b] = b.dataset.v;
+  renderPosts();
+});
+$("s2-next").addEventListener("click", () => {
+  phase = phase === "A" ? "B" : "compare";
+  renderPosts();
+  $("s2-phase").scrollIntoView({block: "nearest"});
+});
+$("s2-reset").addEventListener("click", () => {
+  A = {}; B = {}; phase = "A";
+  $("v-q2").hidden = true;
+  document.querySelectorAll("input[name=q2]").forEach(r => { r.checked = false; });
+  renderPosts();
 });
 renderPosts();
 
@@ -419,11 +541,11 @@ const QUESTIONS = {
     : v === "a"
       ? [false, "Not quite. Gemini labels short comments fine. The problem is what this one leaves out: it never says who was wrong, only who it feels sorry for."]
       : [false, "Not quite. The emoji is not the problem. The comment never says who was wrong; it feels sorry for \"this guy\", and Gemini assumed that meant the poster."],
-  q2: v => v === "c"
-    ? [true, "Correct. A disagreement often means the definition does not say what to do with this kind of post. Fix it, then label again."]
+  q2: v => v === "b"
+    ? [true, "Correct. The definition says nothing about feeling bad, so Gemini, and probably the two of you, decided case by case. A rule for this kind of post makes the labels agree more. Then label the posts again."]
     : v === "a"
-      ? [false, "Not quite. Gemini's label is only as good as the definition, and you have not checked it yet."]
-      : [false, "Not quite. Your label is a check, not the truth. If a second person disagrees with you too, the definition is unclear."],
+      ? [false, "Not quite. A bigger model still has to guess what the definition means for these posts. The gap is in the definition."]
+      : [false, "Not quite. Posts like these are common, and leaving them out would change what you measure. Add a rule for them instead."],
 };
 document.querySelectorAll("form.qcard").forEach(form => {
   form.addEventListener("submit", e => {
